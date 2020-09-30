@@ -1,0 +1,9 @@
+.git
+*.js
+
+libs/apps/js/*
+
+!.gitkeep
+
+node_modules
+package-lock.json

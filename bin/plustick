@@ -1,0 +1,194 @@
+#!/usr/bin/env bash
+
+CMD=`basename $0`
+
+#=============================================================================
+# error handler
+# エラー処理
+#=============================================================================
+function error() {
+  case ${1} in
+    [12] )
+      echo "Usage:"
+      echo "$CMD [option]"
+      echo "  -b: build application"
+      echo "  -w: build application(source watch)"
+      echo "  -a: activate application(forever)"
+      echo "  -d: debug exec application"
+      echo "  -t: terminate application(forever)"
+      echo "  -h: print this"
+      echo ""
+      ;;
+    [34] )
+      echo "require option parameter."
+      echo ""
+      ;;
+    [5] )
+      echo "invalid option - '${2}'"
+      echo ""
+      ;;
+  esac
+  exit
+}
+
+function environ_check() {
+  # create application directory
+  target="$CWD/apps"
+  if [ ! -e $target ]; then
+    mkdir -p $target
+  fi
+
+  target="$CWD/apps/js"
+  if [ ! -e $target ]; then
+    mkdir -p $target
+  fi
+
+  target="$CWD/apps/js/control"
+  if [ ! -e $target ]; then
+    mkdir -p $target
+  fi
+
+  target="$CWD/apps/js/view"
+  if [ ! -e $target ]; then
+    mkdir -p $target
+  fi
+
+  target="$CWD/apps/src"
+  if [ ! -e $target ]; then
+    mkdir -p $target
+  fi
+
+  target="$CWD/apps/src/control"
+  if [ ! -e $target ]; then
+    mkdir -p $target
+  fi
+
+  target="$CWD/apps/src/view"
+  if [ ! -e $target ]; then
+    mkdir -p $target
+  fi
+
+  target="$CWD/apps/plugins"
+  if [ ! -e $target ]; then
+    mkdir -p $target
+  fi
+
+  target="$CWD/apps/public"
+  if [ ! -e $target ]; then
+    mkdir -p $target
+  fi
+
+  # check main script
+  target="$CWD/apps/src/view/appsmain.coffee"
+  if [ ! -e $target ]; then
+    cp $MODULE/libs/template/appsmain.coffee $CWD/apps/src/view/
+  fi
+
+  # check api script
+  target="$CWD/apps/src/control/api.coffee"
+  if [ ! -e $target ]; then
+    cp $MODULE/libs/template/api.coffee $CWD/apps/src/control/
+  fi
+
+  # check config directory
+  target="$CWD/apps/config"
+  if [ ! -d $target ]; then
+    mkdir -p $target
+  fi
+
+  # check config file
+  target="$CWD/apps/config/develop.json"
+  if [ ! -e $target ]; then
+    cp $MODULE/libs/template/develop.json $CWD/apps/config/
+  fi
+  target="$CWD/apps/config/default.json"
+  if [ ! -e $target ]; then
+    cp $MODULE/libs/template/default.json $CWD/apps/config/
+  fi
+  target="$CWD/apps/config/application.json"
+  if [ ! -e $target ]; then
+    cp $MODULE/libs/template/application.json $CWD/apps/config/
+  fi
+  target="$CWD/config"
+  if [ ! -L $target ]; then
+    ln -s ./apps/config $CWD/config
+  fi
+}
+
+#=============================================================================
+# option procedure
+# オプション制御
+#=============================================================================
+function optproc() {
+  local OPT OPTARG
+  OPT=$1
+  OPTARG=$2
+
+  case $OPT in
+    [b] )
+      terffee -c ${CWD}/apps/src/view -o ${CWD}/apps/js/view -c ${CWD}/apps/src/control -o ${CWD}/apps/js/control
+      ;;
+    [w] )
+      terffee -c ${CWD}/apps/src/view -o ${CWD}/apps/js/view -c ${CWD}/apps/src/control -o ${CWD}/apps/js/control
+      terffee -w -c ${CWD}/apps/src/view -o ${CWD}/apps/js/view -c ${CWD}/apps/src/control -o ${CWD}/apps/js/control
+      ;;
+    [a] )
+      NODE_ENV=production forever start --uid `pwd` $MODULE/libs/js/control/index.min.js
+      ;;
+    [d] )
+      NODE_ENV=develop node-dev $MODULE/libs/js/control/index.min.js
+      ;;
+    [t] )
+      forever stop `pwd`
+      ;;
+    [h] )
+      error 1
+      ;;
+    [\?] )
+      error 5 $OPTARG
+      ;;
+    [:] )
+      ;;
+    * )
+      OPTION="$OPTION -$OPT"
+      ;;
+  esac
+}
+
+#=============================================================================
+# main procedure
+# メイン処理
+#=============================================================================
+
+#---------------------------
+# exec without option
+# オプションなしで実行
+#---------------------------
+if [ -z "${1}" ]; then
+  error 1
+fi
+
+#---------------------------
+# variable
+# 変数
+#---------------------------
+CWD=`pwd -P`
+MODULE=$CWD/node_modules/plustick
+
+environ_check
+
+#---------------------------
+# option loop
+# オプションでループ
+#---------------------------
+argarr=()
+
+#---------------------------
+# valid option
+# 有効なオプション
+#---------------------------
+option=":bwadth"
+
+while getopts $option OPT; do
+  optproc $OPT $OPTARG
+done

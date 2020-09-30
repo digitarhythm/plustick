@@ -1,0 +1,10 @@
+{
+    "Author": "no name",
+    "network": {
+      "startport": 3000,
+      "port": "any",
+      "protocol": "http",
+      "ssl_key": "privkey.pem",
+      "ssl_cert": "fullchain.pem"
+    }
+}

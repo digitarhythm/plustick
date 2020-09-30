@@ -1,0 +1,14 @@
+#!/bin/bash
+
+CWD=`pwd -P`
+TEMP=$CWD/libs/template
+ARG=$1
+
+# compile user source
+terffee -c ${CWD}/libs/src/view -o ${CWD}/libs/js/view -c ${CWD}/libs/src/control -o ${CWD}/libs/js/control
+
+# watch user source
+if [ "$ARG" == "-w" ]; then
+  terffee -w -c ${CWD}/libs/src/view -o ${CWD}/libs/js/view -c ${CWD}/libs/src/control -o ${CWD}/libs/js/control
+fi
+

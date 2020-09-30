@@ -1,0 +1,12 @@
+*.coffee
+
+.git
+.gitignore
+.npmignore
+
+node_modules
+libs
+!libs/js
+!libs/template
+
+makepackage
