@@ -1,7 +1,9 @@
 $ ->
   APPLICATION = new appsmain()
-  if (typeof APPLICATION.createHTML == "function")
-    APPLICATION.createHTML().then (html)=>
-      if (html?)
-        document.body.innerHTML = html
+
+  APPLICATION.createHtml().then (html)=>
+    if (html?)
+      document.body.innerHTML = html
+    if (typeof APPLICATION.viewDidAppear == 'function')
+      APPLICATION.viewDidAppear()
 
