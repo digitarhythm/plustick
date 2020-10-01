@@ -3,7 +3,7 @@ router = express.Router()
 app = express()
 Promise = require("bluebird")
 execSync = require("child_process").execSync
-http = require("http").Server(app)
+exphttp = require("http").Server(app)
 https = require("https")
 path = require("path")
 config = require("config")
@@ -11,6 +11,8 @@ fs = require("fs-extra")
 echo = require("ndlog").echo
 ECT = require("ect")
 
+pkgjson = require("#{process.cwd()}/package.json")
+pkgname = pkgjson.name
 network = config.network
 node_env = process.env.NODE_ENV
 
@@ -58,10 +60,10 @@ app.set("view engine", "ect")
 #==========================================================================
 # URI directory binding
 #==========================================================================
-app.use('/plugins', express.static(__plugindir))
-app.use('/public', express.static(__publicdir))
-app.use('/view', express.static(__jsviewdir))
-app.use('/syslib', express.static(__syslibsview))
+app.use("/#{pkgname}/plugins", express.static(__plugindir))
+app.use("/#{pkgname}/public", express.static(__publicdir))
+app.use("/#{pkgname}/view", express.static(__jsviewdir))
+app.use("/#{pkgname}/syslib", express.static(__syslibsview))
 
 #==========================================================================
 # routing function dictionary
@@ -73,7 +75,7 @@ global.ROOTDIR = __homedir
 # user API binding
 #==========================================================================
 api = require("#{__syslibsctrl}/sysapi.min.js")
-app.use("/api", api)
+app.use("/#{pkgname}/api", api)
 
 #==========================================================================
 # setting import
@@ -140,14 +142,14 @@ app.get "/", (req, res)->
     # CSS file in plugins directory
     for fname in lists
       if (fname.match(/^.*\.css$/))
-        cssfilelist.push("plugins/#{fname}")
+        cssfilelist.push("#{pkgname}/plugins/#{fname}")
     return 1
 
     # JS file in plugins directory
     __readFileList(__plugindir).then (lists)->
       for fname in lists
         if (fname.match(/^.*\.js$/))
-          jssyslist.push("plugins/#{fname}")
+          jssyslist.push("#{pkgname}/plugins/#{fname}")
       return 1
 
   .then (ret)->
@@ -156,12 +158,13 @@ app.get "/", (req, res)->
       filelist = []
       for fname in lists
         if (fname.match(/^.*\.min\.js$/) and !fname.match(/^main\.min\.js/) and !fname.match(/^sysutil\.min\.js/))
-          jsuserlist.push("view/#{fname}")
+          jsuserlist.push("#{pkgname}/view/#{fname}")
       return 1
 
   .then (ret)->
     # rendering HTML
     res.render "main",
+      pkgname: pkgname
       jssyslist: jssyslist
       jsuserlist: jsuserlist
       cssfilelist: cssfilelist
@@ -182,7 +185,7 @@ if (port == "any")
 
 switch (config.network.protocol)
   when "http"
-    http.listen port,->
+    exphttp.listen port,->
       console.log("listening on *:", port)
   when "https"
     options =
@@ -193,3 +196,4 @@ switch (config.network.protocol)
     console.log("listening on *:", port)
 
 module.exports = router
+

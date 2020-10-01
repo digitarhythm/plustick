@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
     <script type="text/javascript">
       node_env = "<%= @node_env %>";
+      pkgname = "<%= @pkgname %>";
     </script>
     <% for f in @cssfilelist : %>
       <link rel="stylesheet" type="text/css" href="<%= f %>">
@@ -12,8 +13,9 @@
     <% for f in @jssyslist : %>
       <script type="text/javascript" src="<%= f %>"></script>
     <% end %>
-    <script type="text/javascript" src="syslib/sysutil.min.js"></script>
-    <script type="text/javascript" src="syslib/main.min.js"></script>
+
+    <script type="text/javascript" src="<%= @pkgname %>/syslib/sysutil.min.js"></script>
+    <script type="text/javascript" src="<%= @pkgname %>/syslib/main.min.js"></script>
     <% for f in @jsuserlist : %>
       <script type="text/javascript" src="<%= f %>"></script>
     <% end %>

@@ -1,4 +1,4 @@
-ORIGIN = location.href.replace(/\/$/, "")
+ORIGIN = window.location.href.replace(/\/$/, "")
 
 # nop
 nop = ->
@@ -86,7 +86,7 @@ class sysutil
     headers = param.headers || {}
     headers['content-type'] = "application/json"
 
-    uri = "#{ORIGIN}/api/#{endpoint}"
+    uri = "#{ORIGIN}/#{pkgname}/api/#{endpoint}"
 
     ret = await axios
       method: "POST"
