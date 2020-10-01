@@ -1,4 +1,4 @@
-ORIGIN = location.origin
+ORIGIN = location.href.replace(/\/$/, "")
 
 # nop
 nop = ->
