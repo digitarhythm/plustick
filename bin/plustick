@@ -133,7 +133,7 @@ function optproc() {
       terffee -w -c ${CWD}/apps/src/view -o ${CWD}/apps/js/view -c ${CWD}/apps/src/control -o ${CWD}/apps/js/control
       ;;
     [a] )
-      NODE_ENV=production forever start --uid `pwd` $MODULE/libs/js/control/index.min.js
+      NODE_ENV=production forever start --uid `pwd` node_modules/libs/js/control/index.min.js
       ;;
     [d] )
       NODE_ENV=develop node-dev $MODULE/libs/js/control/index.min.js
