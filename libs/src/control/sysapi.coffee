@@ -16,8 +16,8 @@ router.post "/:endpoint", (req, res) ->
   data = req.body
 
   if (bind_router[endpoint]? && typeof(bind_router[endpoint]) == 'function')
-    ret = bind_router[endpoint](headers, data)
-    res.json(ret)
+    bind_router[endpoint](headers, data).then (ret)=>
+      res.json(ret)
 
 module.exports = router
 
