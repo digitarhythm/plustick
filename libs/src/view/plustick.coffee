@@ -78,25 +78,24 @@ class plustick
     return {'kind':kind, 'browser':browser}
 
   @APICALL:(param=undefined)->
-    return new Promise (resolve, reject)=>
-      if (!param.endpoint?)
-        reject(-1)
+    if (!param.endpoint?)
+      return -1
 
-      endpoint = param.endpoint
-      data = param.data || {}
-      headers = param.headers || {}
-      headers['content-type'] = "application/json"
+    endpoint = param.endpoint
+    data = param.data || {}
+    headers = param.headers || {}
+    headers['content-type'] = "application/json"
 
-      uri = "#{ORIGIN}/#{pkgname}/api/#{endpoint}"
+    uri = "#{ORIGIN}/#{pkgname}/api/#{endpoint}"
 
-      ret = await axios
-        method: "POST"
-        url: uri
-        headers: headers
-        data: data
+    ret = await axios
+      method: "POST"
+      url: uri
+      headers: headers
+      data: data
 
-      if (ret.error? && ret.error < 0)
-        reject(-2)
-      else
-        resolve(ret.data.fulfillmentValue)
+    if (ret.data.error? && ret.data.error < 0)
+      return -2
+    else
+      return ret.data
 

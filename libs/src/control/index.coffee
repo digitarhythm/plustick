@@ -157,7 +157,7 @@ app.get "/", (req, res)->
     __readFileList(__jsviewdir).then (lists)->
       filelist = []
       for fname in lists
-        if (fname.match(/^.*\.min\.js$/) and !fname.match(/^main\.min\.js/) and !fname.match(/^sysutil\.min\.js/))
+        if (fname.match(/^.*\.min\.js$/) and !fname.match(/^main\.min\.js/) and !fname.match(/^plustick\.min\.js/))
           jsuserlist.push("#{pkgname}/view/#{fname}")
       return 1
 
