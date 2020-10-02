@@ -13,23 +13,23 @@ echo = (a, b...) ->
   console.log(a)
   return a
 
-# format strings
-sprintf = (a, b...)->
-  for data in b
-    match = a.match(/%0\d*@/)
-    if (match?)
-      repstr = match[0]
-      num = parseInt(repstr.match(/\d+/))
-      zero =""
-      zero += "0" while (zero.length < num)
-      data2 = (zero+data).substr(-num)
-      a = a.replace(repstr, data2)
-    else
-      a = a.replace('%@', data)
-  return a
-
 # system utility class
-class sysutil
+class plustick
+  # format strings
+  @sprintf = (a, b...)->
+    for data in b
+      match = a.match(/%0\d*@/)
+      if (match?)
+        repstr = match[0]
+        num = parseInt(repstr.match(/\d+/))
+        zero =""
+        zero += "0" while (zero.length < num)
+        data2 = (zero+data).substr(-num)
+        a = a.replace(repstr, data2)
+      else
+        a = a.replace('%@', data)
+    return a
+
   # get browser size(include scrolling bar)
   @getBounds:->
     width = window.innerWidth - 1
@@ -89,13 +89,14 @@ class sysutil
 
       uri = "#{ORIGIN}/#{pkgname}/api/#{endpoint}"
 
-      ret = axios
+      ret = await axios
         method: "POST"
         url: uri
         headers: headers
         data: data
-      .then (ret) =>
+
+      if (ret.error? && ret.error < 0)
+        reject(-2)
+      else
         resolve(ret.data)
-      .catch (error)=>
-        reject(error)
 
