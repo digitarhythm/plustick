@@ -78,20 +78,24 @@ class sysutil
     return {'kind':kind, 'browser':browser}
 
   @APICALL:(param=undefined)->
-    if (!param.endpoint?)
-      return undefined
+    return new Promise (resolve, reject)=>
+      if (!param.endpoint?)
+        reject(-1)
 
-    endpoint = param.endpoint
-    data = param.data || {}
-    headers = param.headers || {}
-    headers['content-type'] = "application/json"
+      endpoint = param.endpoint
+      data = param.data || {}
+      headers = param.headers || {}
+      headers['content-type'] = "application/json"
 
-    uri = "#{ORIGIN}/#{pkgname}/api/#{endpoint}"
+      uri = "#{ORIGIN}/#{pkgname}/api/#{endpoint}"
 
-    ret = await axios
-      method: "POST"
-      url: uri
-      headers: headers
-      data: data
-    return ret.data
+      ret = axios
+        method: "POST"
+        url: uri
+        headers: headers
+        data: data
+      .then (ret) =>
+        resolve(ret.data)
+      .catch (error)=>
+        reject(error)
 
