@@ -81,6 +81,7 @@ class plustick
     if (!param.endpoint?)
       return -1
 
+    method = param.method || "POST"
     endpoint = param.endpoint
     data = param.data || {}
     headers = param.headers || {}
@@ -89,7 +90,7 @@ class plustick
     uri = "#{ORIGIN}/#{pkgname}/api/#{endpoint}"
 
     ret = await axios
-      method: "POST"
+      method: method
       url: uri
       headers: headers
       data: data

@@ -10,10 +10,12 @@ bind_router = global.BIND_ROUTER
 router.use(express.json())
 router.use(express.urlencoded({ extended: true }))
 
-router.post "/:endpoint", (req, res) ->
+router.all "/:endpoint", (req, res) ->
+  method = req.method
   endpoint = req.params.endpoint
-  headers = req.headers
   data = req.body
+  headers = req.headers
+  headers['method'] = method
 
   if (bind_router[endpoint]? && typeof(bind_router[endpoint]) == 'function')
     bind_router[endpoint](headers, data).then (ret)=>
