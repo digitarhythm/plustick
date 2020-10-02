@@ -98,5 +98,5 @@ class plustick
       if (ret.error? && ret.error < 0)
         reject(-2)
       else
-        resolve(ret.data)
+        resolve(ret.data.fulfillmentValue)
 
