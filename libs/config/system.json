@@ -5,10 +5,7 @@
         "https://code.jquery.com/ui/1.12.1/themes/cupertino/jquery-ui.css"
       ],
       "javascript":[
-        "https://code.jquery.com/jquery-3.2.1.min.js",
-        "https://cdnjs.cloudflare.com/ajax/libs/jquery.finger/0.1.6/jquery.finger.min.js",
-        "https://code.jquery.com/ui/1.12.1/jquery-ui.min.js",
-        "https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js",
+        "https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js",
         "https://cdnjs.cloudflare.com/ajax/libs/axios/0.20.0/axios.min.js"
       ]
     }

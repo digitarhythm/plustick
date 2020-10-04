@@ -1,6 +1,5 @@
-$ ->
+window.onload = ->
   APPLICATION = new appsmain()
-
   if (typeof APPLICATION.createHtml == 'function')
     APPLICATION.createHtml().then (html)=>
       if (html?)
