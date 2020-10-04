@@ -1,3 +1,4 @@
+APPLICATION = undefined
 window.onload = ->
   APPLICATION = new appsmain()
   if (typeof APPLICATION.createHtml == 'function')
