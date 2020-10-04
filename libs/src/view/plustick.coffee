@@ -130,7 +130,8 @@ class plustick
           flag = anim_proc(id, param_diff)
         , anim_tmp
       else
-        finished()
+        if (finished?)
+          finished()
     #=========================================================================
 
     elm = document.getElementById(id)
