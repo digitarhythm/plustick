@@ -1,9 +1,18 @@
 ORIGIN = window.location.href.replace(/\/$/, "")
+requestAnimationFrame = window.requestAnimationFrame ||
+                        window.mozRequestAnimationFrame ||
+                        window.webkitRequestAnimationFrame ||
+                        window.msRequestAnimationFrame
+window.requestAnimationFrame = requestAnimationFrame
 
+#===========================================================================
 # nop
+#===========================================================================
 nop = ->
 
+#===========================================================================
 # debug write
+#===========================================================================
 echo = (a, b...) ->
   #console.log(a)
   for data in b
@@ -13,7 +22,9 @@ echo = (a, b...) ->
   console.log(a)
   return a
 
+#===========================================================================
 # system utility class
+#===========================================================================
 class plustick
   # format strings
   @sprintf = (a, b...)->
@@ -30,7 +41,9 @@ class plustick
         a = a.replace('%@', data)
     return a
 
+  #===========================================================================
   # get browser size(include scrolling bar)
+  #===========================================================================
   @getBounds:->
     width = window.innerWidth - 1
     height = window.innerHeight - 1
@@ -40,9 +53,13 @@ class plustick
     frame.size.height = height
     return frame
 
+  #===========================================================================
+  #===========================================================================
   @random:(max) ->
     return Math.floor(Math.random() * (max + 1))
 
+  #===========================================================================
+  #===========================================================================
   @getBrowser:->
     ua = navigator.userAgent
     if (ua.match(".*iPhone.*"))
@@ -77,6 +94,66 @@ class plustick
 
     return {'kind':kind, 'browser':browser}
 
+  #===========================================================================
+  #===========================================================================
+  @animate:(duration, id, cssparam, finished=undefined)->
+    anim_tmp = 10.0
+
+    #=========================================================================
+    anim_proc = (id, param_diff)->
+      elm = document.getElementById(id)
+      flag = true
+      for key of param_diff
+        cssparam = param_diff[key]
+        diff = parseFloat(cssparam['diff'])
+        val = parseFloat(cssparam['val'])
+
+        cssval = parseFloat(elm.style[key])
+        cssval += diff
+
+        if (['top', 'left', 'width', 'height'].indexOf(key) < 0)
+          cssstr = cssval
+        else
+          cssstr = (parseInt(cssval)).toString()+"px"
+        elm.style[key] = cssstr
+
+        if ((cssval == val) || (diff > 0 && cssval > val) || (diff < 0 && cssval < val))
+          if (['top', 'left', 'width', 'height', 'line-height', 'padding', 'spacing'].indexOf(key) < 0)
+            cssstr = val
+          else
+            cssstr = (parseInt(val)).toString()+"px"
+          elm.style[key] = cssstr
+          flag = false
+
+      if (flag)
+        setTimeout ->
+          flag = anim_proc(id, param_diff)
+        , anim_tmp
+      else
+        finished()
+    #=========================================================================
+
+    elm = document.getElementById(id)
+    if (!elm? || !cssparam?)
+      return
+
+    param_diff = {}
+    for key of cssparam
+      cssstr = elm.style[key]
+      cssval = parseFloat(elm.style[key].replace(/[^0-9\.]/, ""))
+      if (cssval == "" || !cssval?)
+        continue
+
+      val = parseFloat(cssparam[key])
+      diff = (val - cssval) / (duration / anim_tmp)
+      param_diff[key] =
+        diff: (val - cssval) / (duration / anim_tmp)
+        val: val
+
+    anim_proc(id, param_diff)
+
+  #===========================================================================
+  #===========================================================================
   @APICALL:(param=undefined)->
     if (!param.endpoint?)
       return -1
