@@ -96,62 +96,64 @@ class plustick
 
   #===========================================================================
   #===========================================================================
-  @animate:(duration, id, cssparam, finished=undefined)->
+  @animate:(duration, target_id, toparam, finished=undefined)->
     anim_tmp = 10.0
 
     #=========================================================================
-    anim_proc = (id, param_diff)->
-      elm = document.getElementById(id)
+    anim_proc = (element, cssparam)=>
       flag = true
-      for key of param_diff
-        cssparam = param_diff[key]
-        diff = parseFloat(cssparam['diff'])
-        val = parseFloat(cssparam['val'])
+      for key of cssparam
+        toparam = cssparam[key]
+        diff = parseFloat(toparam['diff'])
+        val = parseFloat(toparam['val'])
 
-        cssval = parseFloat(elm.style[key])
+        cssval = parseFloat(element.style['opacity'])
         cssval += diff
 
         if (['top', 'left', 'width', 'height'].indexOf(key) < 0)
           cssstr = cssval
         else
           cssstr = (parseInt(cssval)).toString()+"px"
-        elm.style[key] = cssstr
+        element.style[key] = cssstr
 
         if ((cssval == val) || (diff > 0 && cssval > val) || (diff < 0 && cssval < val))
           if (['top', 'left', 'width', 'height', 'line-height', 'padding', 'spacing'].indexOf(key) < 0)
             cssstr = val
           else
             cssstr = (parseInt(val)).toString()+"px"
-          elm.style[key] = cssstr
+
+          element.style[key] = cssstr
           flag = false
 
       if (flag)
-        setTimeout ->
-          flag = anim_proc(id, param_diff)
+        setTimeout =>
+          anim_proc(element, cssparam)
         , anim_tmp
       else
         if (finished?)
-          finished()
+          setTimeout =>
+            finished()
+          , 100
     #=========================================================================
 
-    elm = document.getElementById(id)
-    if (!elm? || !cssparam?)
+    element = document.getElementById(target_id)
+    if (!element? || !toparam?)
       return
 
-    param_diff = {}
-    for key of cssparam
-      cssstr = elm.style[key]
-      cssval = parseFloat(elm.style[key].replace(/[^0-9\.]/, ""))
-      if (cssval == "" || !cssval?)
+    cssparam = {}
+    for key of toparam
+      fromcss_str = element.style[key] || parseFloat(1.0)
+      fromcss = parseFloat(fromcss_str.toString().replace(/[^0-9\.\-]/, ""))
+      if (fromcss == "" || !fromcss?)
         continue
 
-      val = parseFloat(cssparam[key])
-      diff = (val - cssval) / (duration / anim_tmp)
-      param_diff[key] =
-        diff: (val - cssval) / (duration / anim_tmp)
+      val = parseFloat(toparam[key])
+      diff = (val - fromcss) / (duration / anim_tmp)
+      cssparam[key] =
+        diff: (val - fromcss) / (duration / anim_tmp)
         val: val
 
-    anim_proc(id, param_diff)
+    anim_proc(element, cssparam)
 
   #===========================================================================
   #===========================================================================
