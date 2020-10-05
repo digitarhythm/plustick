@@ -1,4 +1,4 @@
-ORIGIN = window.location.href.replace(/\/$/, "")
+ORIGIN = window.location.href.replace(/\/$/, "")+"/#{pkgname}"
 requestAnimationFrame = window.requestAnimationFrame ||
                         window.mozRequestAnimationFrame ||
                         window.webkitRequestAnimationFrame ||
@@ -167,7 +167,7 @@ class plustick
     headers = param.headers || {}
     headers['content-type'] = "application/json"
 
-    uri = "#{ORIGIN}/#{pkgname}/api/#{endpoint}"
+    uri = "#{ORIGIN}/api/#{endpoint}"
 
     ret = await axios
       method: method
