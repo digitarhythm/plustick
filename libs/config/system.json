@@ -2,7 +2,6 @@
   "additional": {
     "front": {
       "css": [
-        "https://code.jquery.com/ui/1.12.1/themes/cupertino/jquery-ui.css"
       ],
       "javascript":[
         "https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js",
