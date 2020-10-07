@@ -157,6 +157,44 @@ class plustick
 
   #===========================================================================
   #===========================================================================
+  @checkEan13Code:(code)->
+    codestr = code.toString()
+    if (codestr.length != 13)
+      return undefined
+
+    echo "code=%@", code
+    odd = 0
+    oddstr = ""
+    even = 0
+    evenstr = ""
+    for i in [13..2] by -1
+      pos = 13 - i
+      s = codestr[pos..pos]
+      echo "i=%@, s=%@", i, s
+      if (i % 2 == 0)
+        even += parseInt(s)
+        evenstr += s
+      else
+        odd += parseInt(s)
+        oddstr += s
+
+    checkdigit = parseInt(codestr[codestr.length-1..codestr.length-1])
+
+    total = ((even * 3) + odd).toString()
+    totalstr = total[(total.length-1)..(total.length-1)]
+
+    checkdigit2 = (10 - parseInt(totalstr)) % 10
+
+    if (checkdigit == checkdigit2)
+      err = 0
+    else
+      err = -1
+
+    return
+      err: err
+
+  #===========================================================================
+  #===========================================================================
   @APICALL:(param=undefined)->
     if (!param.endpoint?)
       return -1
