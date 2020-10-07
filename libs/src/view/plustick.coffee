@@ -162,7 +162,6 @@ class plustick
     if (codestr.length != 13)
       return undefined
 
-    echo "code=%@", code
     odd = 0
     oddstr = ""
     even = 0
@@ -170,7 +169,6 @@ class plustick
     for i in [13..2] by -1
       pos = 13 - i
       s = codestr[pos..pos]
-      echo "i=%@, s=%@", i, s
       if (i % 2 == 0)
         even += parseInt(s)
         evenstr += s
