@@ -176,10 +176,10 @@ class plustick
         odd += parseInt(s)
         oddstr += s
 
-    checkdigit = parseInt(codestr[codestr.length-1..codestr.length-1])
+    checkdigit = parseInt(codestr.slice(-1))
 
     total = ((even * 3) + odd).toString()
-    totalstr = total[(total.length-1)..(total.length-1)]
+    totalstr = total.slice(-1)
 
     checkdigit2 = (10 - parseInt(totalstr)) % 10
 
