@@ -6,7 +6,7 @@ class appsmain
 
   createHtml:->
     return new Promise (resolve, reject)=>
-      bounds = sysutil.getBounds()
+      bounds = plustick.getBounds()
       width = bounds.size.width
       height = bounds.size.height
 
@@ -40,7 +40,7 @@ class appsmain
       resolve(html)
 
   viewDidAppear:->
-    ret = await sysutil.APICALL
+    ret = await plustick.APICALL
       endpoint: "version"
       data: {}
     version = ret.version
