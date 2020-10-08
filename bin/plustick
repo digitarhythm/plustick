@@ -68,7 +68,7 @@ function environ_check() {
     mkdir -p $target
   fi
 
-  target="$CWD/apps/plugins"
+  target="$CWD/apps/plugin"
   if [ ! -e $target ]; then
     mkdir -p $target
   fi
