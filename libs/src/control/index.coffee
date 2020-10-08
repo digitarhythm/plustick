@@ -139,18 +139,13 @@ app.get "/", (req, res)->
   jsuserlist = []
 
   __readFileList(__plugindir).then (lists)->
-    # CSS file in plugin directory
+    # JS/CSS file in plugin directory
     for fname in lists
       if (fname.match(/^.*\.css$/))
         cssfilelist.push("#{pkgname}/plugin/#{fname}")
+      if (fname.match(/^.*\.js$/))
+        jssyslist.push("#{pkgname}/plugin/#{fname}")
     return 1
-
-    # JS file in plugin directory
-    __readFileList(__plugindir).then (lists)->
-      for fname in lists
-        if (fname.match(/^.*\.js$/))
-          jssyslist.push("#{pkgname}/plugin/#{fname}")
-      return 1
 
   .then (ret)->
     # JS file in user script directory
