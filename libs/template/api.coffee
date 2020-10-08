@@ -9,9 +9,10 @@ BIND_ROUTER = global.BIND_ROUTER
 # API Sample
 #=============================================================================
 BIND_ROUTER.version = (headers, data)->
-  packjson = require("#{global.ROOTDIR}/package.json")
-  ret =
-    version: packjson.version
+  return new Promise (resolve, reject)=>
+    packjson = require("#{global.ROOTDIR}/package.json")
+    ret =
+      version: packjson.version
 
-  return ret
+    resolve(ret)
 
