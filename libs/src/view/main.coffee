@@ -4,7 +4,7 @@ window.onload = ->
   if (typeof APPLICATION.createHtml == 'function')
     APPLICATION.createHtml().then (html)=>
       if (html?)
-        document.body.innerHTML = html
+        document.querySelector('#_rootview_').innerHTML = html
       if (typeof APPLICATION.viewDidAppear == 'function')
         APPLICATION.viewDidAppear()
 
