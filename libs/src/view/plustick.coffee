@@ -217,3 +217,20 @@ class plustick
     else
       return ret.data
 
+  #===========================================================================
+  #===========================================================================
+  @exAPICALL:(param=undefined)->
+    method = param.method || "POST"
+    data = param.data || {}
+    headers = param.headers || {}
+    headers['content-type'] = "application/json"
+    uri = param.uri
+
+    ret = await axios
+      method: method
+      url: uri
+      headers: headers
+      data: data
+
+    return ret.data
+
