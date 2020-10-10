@@ -195,20 +195,26 @@ class plustick
   #===========================================================================
   #===========================================================================
   @APICALL:(param=undefined)->
-    if (!param.endpoint?)
+    if (!param.endpoint? && !param.uri?)
       return -1
 
     method = param.method || "POST"
-    endpoint = param.endpoint
+    endpoint = param.endpoint || undefined
+    uri = param.uri || undefined
     data = param.data || {}
     headers = param.headers || {}
     headers['content-type'] = "application/json"
 
-    uri = "#{ORIGIN}/api/#{endpoint}"
+    if (uri?)
+      apiuri = uri
+    else
+      apiuri = "#{ORIGIN}/api/#{endpoint}"
+
+    echo "apiuti=%@", apiuri
 
     ret = await axios
       method: method
-      url: uri
+      url: apiuri
       headers: headers
       data: data
 
@@ -216,21 +222,4 @@ class plustick
       return -2
     else
       return ret.data
-
-  #===========================================================================
-  #===========================================================================
-  @exAPICALL:(param=undefined)->
-    method = param.method || "POST"
-    data = param.data || {}
-    headers = param.headers || {}
-    headers['content-type'] = "application/json"
-    uri = param.uri
-
-    ret = await axios
-      method: method
-      url: uri
-      headers: headers
-      data: data
-
-    return ret.data
 
