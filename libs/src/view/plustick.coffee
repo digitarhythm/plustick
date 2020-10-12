@@ -210,8 +210,6 @@ class plustick
     else
       apiuri = "#{ORIGIN}/api/#{endpoint}"
 
-    echo "apiuti=%@", apiuri
-
     ret = await axios
       method: method
       url: apiuri
