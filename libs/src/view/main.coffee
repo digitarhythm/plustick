@@ -4,8 +4,12 @@ window.onload = ->
 
   bgcolor = APPLICATION.backgroundColor
   overflow = APPLICATION.overflow
+  rootwidth = APPLICATION.rootwidth
+  rootheight = APPLICATION.rootheight
 
   document.body.style.backgroundColor = bgcolor
+  document.body.style.width = "#{rootwidth}px"
+  document.body.style.height = "#{rootheight}px"
 
   if (typeof APPLICATION.createHtml == 'function')
     APPLICATION.createHtml().then (html)=>
