@@ -1,4 +1,5 @@
 ORIGIN = window.location.href.replace(/\/$/, "")+"/#{pkgname}"
+PUBLIC = "#{ORIGIN}/public"
 requestAnimationFrame = window.requestAnimationFrame ||
                         window.mozRequestAnimationFrame ||
                         window.webkitRequestAnimationFrame ||
