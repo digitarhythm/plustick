@@ -3,10 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-    <script type="text/javascript">
-      node_env = "<%= @node_env %>";
-      pkgname = "<%= @pkgname %>";
-    </script>
+
     <% for f in @cssfilelist : %>
       <link rel="stylesheet" type="text/css" href="<%= f %>">
     <% end %>
@@ -14,14 +11,17 @@
       <script type="text/javascript" src="<%= f %>"></script>
     <% end %>
 
+    <script type="text/javascript">
+      node_env = "<%= @node_env %>";
+      pkgname = "<%= @pkgname %>";
+    </script>
+
     <script type="text/javascript" src="<%= @pkgname %>/syslib/plustick.min.js"></script>
     <script type="text/javascript" src="<%= @pkgname %>/syslib/main.min.js"></script>
     <% for f in @jsuserlist : %>
       <script type="text/javascript" src="<%= f %>"></script>
     <% end %>
   </head>
-  <body style="margin: 0px 0px 0px 0px; overflow:hidden; background-color:black;">
-    <div id="_rootview_" class="rootview" style="margin: 0px 0px 0px 0px; position:absolute; left:0px; top:0px; background-color:black; overflow:hidden;"></div>
-  </body>
+  <body style="margin: 0px 0px 0px 0px; overflow:hidden; background-color:rgba(0, 0, 0, 1.0);"></body>
 </html>
 

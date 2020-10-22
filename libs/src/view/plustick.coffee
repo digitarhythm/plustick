@@ -46,8 +46,8 @@ class plustick
   # get browser size(include scrolling bar)
   #===========================================================================
   @getBounds:->
-    width = window.innerWidth - 2
-    height = window.innerHeight - 2
+    width = window.innerWidth
+    height = window.innerHeight
     frame = []
     frame.size = []
     frame.size.width = width
