@@ -9,12 +9,12 @@ window.requestAnimationFrame = requestAnimationFrame
 #===========================================================================
 # nop
 #===========================================================================
-nop = ->
+nop =->
 
 #===========================================================================
 # debug write
 #===========================================================================
-echo = (a, b...) ->
+echo = (a, b...)->
   #console.log(a)
   for data in b
     if (typeof(data) == 'object')
@@ -22,6 +22,9 @@ echo = (a, b...) ->
     a = a.replace('%@', data)
   console.log(a)
   return a
+
+getElement = (elmname)->
+  return document.querySelector(elmname)
 
 #===========================================================================
 # system utility class
