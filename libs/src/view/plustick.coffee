@@ -24,7 +24,7 @@ echo = (a, b...)->
   return a
 
 getElement = (elmname)->
-  return document.querySelector(elmname)
+  return document.querySelector("#"+elmname)
 
 #===========================================================================
 # system utility class
