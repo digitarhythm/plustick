@@ -13,7 +13,8 @@ window.onload = ->
   browser_width = bounds.size.width
   browser_height = bounds.size.height
 
-  if (adjust)
+  # contents size fit to browser size
+  if (APPLICATION.width? || APPLICATION.height?)
     # contents resolution
     contents_width = APPLICATION.width || browser_width
     contents_height = APPLICATION.height || browser_height
@@ -48,6 +49,7 @@ window.onload = ->
     rootview.style.transformOrigin = "0px 0px 0px"
     rootview.style.transform = "scale(#{scale}, #{scale})"
 
+  # contents done not fit
   else
     # contents resolution
     contents_width = browser_width
