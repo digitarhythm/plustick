@@ -8,8 +8,6 @@ window.onload = ->
   browser_width = bounds.size.width
   browser_height = bounds.size.height
 
-  echo "browser_width=%@, browser_height=%@", browser_width, browser_height
-
   # get user setting
   backgroundColor = APPLICATION.backgroundColor || "rgba(0, 0, 0, 1.0)"
 
@@ -24,7 +22,6 @@ window.onload = ->
     contents_height = APPLICATION.height || parseInt(Math.floor(browser_height / (browser_width / APPLICATION.width)))
     APPLICATION.width = contents_width
     APPLICATION.height = contents_height
-    echo "contents_width=%@, contents_height=%@", contents_width, contents_height
 
     # browser resolution
     bounds = plustick.getBounds()
@@ -64,9 +61,6 @@ window.onload = ->
     APPLICATION.height = browser_height
     left = 0
     top = 0
-
-
-  #echo "contents_width=%@, contents_height=%@", contents_width, contents_height
 
   rootview.style.position = "absolute"
   rootview.style.width = "#{contents_width}px"
