@@ -1,63 +1,72 @@
 APPLICATION = undefined
 window.onload = ->
+  # create application main
   APPLICATION = new appsmain()
 
-  adjust = APPLICATION.adjust || false
-  backgroundColor = APPLICATION.backgroundColor || "rgba(0, 0, 0, 1.0)"
-
-  rootview = document.createElement("div")
-  rootview.setAttribute("id", "__rootview__")
-  document.body.append(rootview)
-
+  # get browser size
   bounds = plustick.getBounds()
   browser_width = bounds.size.width
   browser_height = bounds.size.height
 
-  # contents size fit to browser size
+  echo "browser_width=%@, browser_height=%@", browser_width, browser_height
+
+  # get user setting
+  backgroundColor = APPLICATION.backgroundColor || "rgba(0, 0, 0, 1.0)"
+
+  # create root view
+  rootview = document.createElement("div")
+  rootview.setAttribute("id", "__rootview__")
+  document.body.append(rootview)
+
+  # fit contents size to browser
   if (APPLICATION.width? || APPLICATION.height?)
-    # contents resolution
-    contents_width = APPLICATION.width || browser_width
-    contents_height = APPLICATION.height || browser_height
+    contents_width = APPLICATION.width || parseInt(Math.floor(browser_width / (browser_height / APPLICATION.height)))
+    contents_height = APPLICATION.height || parseInt(Math.floor(browser_height / (browser_width / APPLICATION.width)))
     APPLICATION.width = contents_width
     APPLICATION.height = contents_height
+    echo "contents_width=%@, contents_height=%@", contents_width, contents_height
 
     # browser resolution
     bounds = plustick.getBounds()
     browser_width = bounds.size.width
     browser_height = bounds.size.height
 
+    # calc scale
     scale_x = browser_width / contents_width
     scale_y = browser_height / contents_height
-    scale_mode = 1
 
+    scale_mode = 1
     height_tmp = contents_height * scale_x
 
     if (height_tmp > browser_height)
       scale_mode = 2
 
+    # calc width/height
     if (scale_mode == 1)
       real_height = contents_height * scale_x
       left = 0
-      top = parseInt((browser_height - real_height) / 2)
+      top = parseInt(Math.floor((browser_height - real_height) / 2))
       scale = scale_x
     else
       real_width = contents_width * scale_y
-      left = parseInt((browser_width - real_width) / 2)
+      left = parseInt(Math.floor((browser_width - real_width) / 2))
       top = 0
       scale = scale_y
 
     rootview.style.transformOrigin = "0px 0px 0px"
     rootview.style.transform = "scale(#{scale}, #{scale})"
 
-  # contents done not fit
+  # does not fit contents size to browser
   else
-    # contents resolution
     contents_width = browser_width
     contents_height = browser_height
     APPLICATION.width = browser_width
     APPLICATION.height = browser_height
     left = 0
     top = 0
+
+
+  #echo "contents_width=%@, contents_height=%@", contents_width, contents_height
 
   rootview.style.position = "absolute"
   rootview.style.width = "#{contents_width}px"
