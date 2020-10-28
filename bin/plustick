@@ -32,9 +32,14 @@ function error() {
 }
 
 function environ_check() {
+  local target firstboot
+
+  firstboot=0
+
   # create application directory
   target="$CWD/apps"
   if [ ! -e $target ]; then
+    firstboot=1
     mkdir -p $target
   fi
 
@@ -115,27 +120,43 @@ function environ_check() {
   fi
 }
 
+function compile() {
+  local watch=$1
+  if [ $watch == "1" ]; then
+    terffee -wc ${CWD}/apps/src/view -o ${CWD}/apps/js/view -c ${CWD}/apps/src/control -o ${CWD}/apps/js/control
+  else
+    terffee -c ${CWD}/apps/src/view -o ${CWD}/apps/js/view -c ${CWD}/apps/src/control -o ${CWD}/apps/js/control
+  fi
+}
+
 #=============================================================================
 # option procedure
 # オプション制御
 #=============================================================================
 function optproc() {
   local OPT OPTARG
+
   OPT=$1
   OPTARG=$2
 
   case $OPT in
     [b] )
-      terffee -c ${CWD}/apps/src/view -o ${CWD}/apps/js/view -c ${CWD}/apps/src/control -o ${CWD}/apps/js/control
+      compile 0
       ;;
     [w] )
-      terffee -c ${CWD}/apps/src/view -o ${CWD}/apps/js/view -c ${CWD}/apps/src/control -o ${CWD}/apps/js/control
-      terffee -w -c ${CWD}/apps/src/view -o ${CWD}/apps/js/view -c ${CWD}/apps/src/control -o ${CWD}/apps/js/control
+      compile 0
+      compile 1
       ;;
     [a] )
+      if [ $FIRSTBOOT -eq "1" ]; then
+        compile 0
+      fi
       NODE_ENV=production forever start --uid `pwd` node_modules/$CMD/libs/js/control/index.min.js
       ;;
     [d] )
+      if [ $FIRSTBOOT -eq "1" ]; then
+        compile 0
+      fi
       NODE_ENV=develop node-dev $MODULE/libs/js/control/index.min.js
       ;;
     [t] )
@@ -175,13 +196,10 @@ fi
 CWD=`pwd -P`
 MODULE=$CWD/node_modules/plustick
 
-environ_check
-
 #---------------------------
-# option loop
-# オプションでループ
+# 初回起動チェック
 #---------------------------
-argarr=()
+FIRSTBOOT=`environ_check`
 
 #---------------------------
 # valid option
@@ -189,6 +207,14 @@ argarr=()
 #---------------------------
 option=":bwadth"
 
+#---------------------------
+# option loop
+# オプションでループ
+#---------------------------
+argarr=()
 while getopts $option OPT; do
   optproc $OPT $OPTARG
 done
+
+
+
