@@ -11,6 +11,11 @@ window.onload = ->
   # get user setting
   backgroundColor = APPLICATION.backgroundColor || "rgba(0, 0, 0, 1.0)"
 
+  # body setting
+  document.oncontextmenu = =>
+    contextmenu = APPLICATION.contextmenu
+    return contextmenu
+
   # create root view
   rootview = document.createElement("div")
   rootview.setAttribute("id", "__rootview__")
