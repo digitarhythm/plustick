@@ -16,6 +16,8 @@ pkgname = pkgjson.name
 network = config.network
 node_env = process.env.NODE_ENV
 
+echo "application loading time: [#{new Date().toLocaleString("ja-JP")}]"
+
 # system directory
 __systemdir = fs.realpathSync(__dirname+"/../../..")
 
