@@ -118,11 +118,13 @@ function environ_check() {
   if [ ! -L $target ]; then
     ln -s ./apps/config $CWD/config
   fi
+
+  echo $firstboot
 }
 
 function compile() {
   local watch=$1
-  if [ $watch == "1" ]; then
+  if [ $watch -eq 1 ]; then
     terffee -wc ${CWD}/apps/src/view -o ${CWD}/apps/js/view -c ${CWD}/apps/src/control -o ${CWD}/apps/js/control
   else
     terffee -c ${CWD}/apps/src/view -o ${CWD}/apps/js/view -c ${CWD}/apps/src/control -o ${CWD}/apps/js/control
@@ -148,13 +150,13 @@ function optproc() {
       compile 1
       ;;
     [a] )
-      if [ $FIRSTBOOT -eq "1" ]; then
+      if [ $FIRSTBOOT -eq 1 ]; then
         compile 0
       fi
       NODE_ENV=production forever start --uid `pwd` node_modules/$CMD/libs/js/control/index.min.js
       ;;
     [d] )
-      if [ $FIRSTBOOT -eq "1" ]; then
+      if [ $FIRSTBOOT -eq 1 ]; then
         compile 0
       fi
       NODE_ENV=develop node-dev $MODULE/libs/js/control/index.min.js
