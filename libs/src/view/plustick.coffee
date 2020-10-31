@@ -111,7 +111,7 @@ class plustick
         diff = parseFloat(toparam['diff'])
         val = parseFloat(toparam['val'])
 
-        cssval = parseFloat(element.style['opacity'])
+        cssval = parseFloat(element.style.opacity)
         cssval += diff
 
         if (['top', 'left', 'width', 'height'].indexOf(key) < 0)
@@ -121,7 +121,7 @@ class plustick
         element.style[key] = cssstr
 
         if ((cssval == val) || (diff > 0 && cssval > val) || (diff < 0 && cssval < val))
-          if (['top', 'left', 'width', 'height', 'line-height', 'padding', 'spacing'].indexOf(key) < 0)
+          if (['top', 'left', 'width', 'height', 'line-height', 'padding', 'spacing', ].indexOf(key) < 0)
             cssstr = val
           else
             cssstr = (parseInt(val)).toString()+"px"
@@ -146,7 +146,12 @@ class plustick
 
     cssparam = {}
     for key of toparam
-      fromcss_str = element.style[key] || parseFloat(1.0)
+      fromcss_tmp = element.style[key] || undefined
+      if (!fromcss_tmp?)
+        fromcss_str = 1.0
+        element.style[key] = fromcss_str
+      else
+        fromcss_str = fromcss_tmp
       fromcss = parseFloat(fromcss_str.toString().replace(/[^0-9\.\-]/, ""))
       if (fromcss == "" || !fromcss?)
         continue

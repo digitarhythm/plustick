@@ -119,6 +119,12 @@ function environ_check() {
     ln -s ./apps/config $CWD/config
   fi
 
+  # check plugin file
+  target="$CWD/apps/plugin/main.css"
+  if [ ! -e $target ]; then
+    cp $MODULE/libs/template/main.css $CWD/apps/plugin/
+  fi
+
   echo $firstboot
 }
 
