@@ -9,16 +9,14 @@ class appsmain
 
   createHtml:->
     return new Promise (resolve, reject)=>
-      width = @width
-      height = @height
 
       html = """
         <div style="
           display: table-cell;
           text-align: center;
           vertical-align: middle;
-          width: #{width}px;
-          height: #{height}px;
+          width: #{@width}px;
+          height: #{@height}px;
           margin: 0 auto;
           font-size: 24pt;
           color: rgba(0, 127, 255, 0.8);
