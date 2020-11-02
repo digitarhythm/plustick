@@ -29,9 +29,12 @@ getElement = (elmname)->
 #===========================================================================
 # system utility class
 #===========================================================================
-class plustick
+class plustick_core
+  constructor:->
+    @eventlistener = {}
+
   # format strings
-  @sprintf = (a, b...)->
+  sprintf = (a, b...)->
     for data in b
       match = a.match(/%0\d*@/)
       if (match?)
@@ -48,7 +51,7 @@ class plustick
   #===========================================================================
   # get browser size(include scrolling bar)
   #===========================================================================
-  @getBounds:->
+  getBounds:->
     width = window.innerWidth
     height = window.innerHeight
     frame = []
@@ -59,12 +62,12 @@ class plustick
 
   #===========================================================================
   #===========================================================================
-  @random:(max) ->
+  random:(max) ->
     return Math.floor(Math.random() * (max + 1))
 
   #===========================================================================
   #===========================================================================
-  @getBrowser:->
+  getBrowser:->
     ua = navigator.userAgent
     if (ua.match(".*iPhone.*"))
       kind = 'iOS'
@@ -100,7 +103,7 @@ class plustick
 
   #===========================================================================
   #===========================================================================
-  @animate:(duration, target_id, toparam, finished=undefined)->
+  animate:(duration, target_id, toparam, finished=undefined)->
     anim_tmp = 10.0
 
     #=========================================================================
@@ -166,7 +169,29 @@ class plustick
 
   #===========================================================================
   #===========================================================================
-  @checkEan13Code:(code)->
+  addListener:(id, type, listener, capture=false)->
+    key="#{id}_#{type}"
+    if(@eventlistener[key]?)
+      e = @eventlistener["#{id}_#{type}"]
+      e.target.removeEventListener(type, e.listener, e.capture)
+
+    target = document.querySelector("##{id}")
+    target.addEventListener(type, listener, capture)
+    @eventlistener["#{id}_#{type}"] =
+        target: target
+        listener: listener
+        capture: capture
+
+  #===========================================================================
+  #===========================================================================
+  removeListener:(id, type)->
+    if("#{id})#{type}" in @eventlistener)
+      e = @eventlistener["#{id}_#{type}"]
+      e.target.removeEventListener(type, e.listener, e.capture)
+
+  #===========================================================================
+  #===========================================================================
+  checkEan13Code:(code)->
     codestr = code.toString()
     if (codestr.length != 13)
       return undefined
@@ -203,7 +228,7 @@ class plustick
 
   #===========================================================================
   #===========================================================================
-  @APICALL:(param=undefined)->
+  APICALL:(param=undefined)->
     if (!param.endpoint? && !param.uri?)
       return -1
 
@@ -230,3 +255,5 @@ class plustick
     else
       return ret.data
 
+
+plustick = new plustick_core()
