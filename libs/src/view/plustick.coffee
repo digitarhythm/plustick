@@ -34,7 +34,7 @@ class plustick_core
     @eventlistener = {}
 
   # format strings
-  sprintf = (a, b...)->
+  sprintf:(a, b...)->
     for data in b
       match = a.match(/%0\d*@/)
       if (match?)
