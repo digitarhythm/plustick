@@ -12,6 +12,7 @@ window.onload = ->
   backgroundColor = APPLICATION.backgroundColor || "rgba(0, 0, 0, 1.0)"
 
   # body setting
+  document.body.setAttribute("id", "body")
   document.oncontextmenu = =>
     contextmenu = APPLICATION.contextmenu
     return contextmenu
