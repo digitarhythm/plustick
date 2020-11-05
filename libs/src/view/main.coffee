@@ -81,7 +81,14 @@ window.onload = ->
   if (typeof APPLICATION.createHtml == 'function')
     APPLICATION.createHtml().then (html)=>
       if (html?)
+        document.querySelector('#__rootview__').style.display = "none"
         document.querySelector('#__rootview__').innerHTML = html
+
+      if (typeof APPLICATION.viewDidLoad == 'function')
+        APPLICATION.viewDidLoad()
+
+      document.querySelector('#__rootview__').style.display = "inline"
+
       if (typeof APPLICATION.viewDidAppear == 'function')
         APPLICATION.viewDidAppear()
 
