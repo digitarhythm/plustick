@@ -1,11 +1,3 @@
-ORIGIN = window.location.href.replace(/\/$/, "")+"/#{pkgname}"
-PUBLIC = "#{ORIGIN}/public"
-requestAnimationFrame = window.requestAnimationFrame ||
-                        window.mozRequestAnimationFrame ||
-                        window.webkitRequestAnimationFrame ||
-                        window.msRequestAnimationFrame
-window.requestAnimationFrame = requestAnimationFrame
-
 #===========================================================================
 # nop
 #===========================================================================
@@ -185,9 +177,19 @@ class plustick_core
   #===========================================================================
   #===========================================================================
   removeListener:(id, type)->
-    if("#{id})#{type}" in @eventlistener)
+    if("#{id}_#{type}" in @eventlistener)
       e = @eventlistener["#{id}_#{type}"]
       e.target.removeEventListener(type, e.listener, e.capture)
+
+  #===========================================================================
+  #===========================================================================
+  procedure:(key)->
+    proc = GLOBAL.PROC
+    if (!proc[key]?)
+      return
+
+    proc[key]()
+    proc[key] = undefined
 
   #===========================================================================
   #===========================================================================
@@ -257,3 +259,4 @@ class plustick_core
 
 
 plustick = new plustick_core()
+

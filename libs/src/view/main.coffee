@@ -1,4 +1,15 @@
+ORIGIN = window.location.href.replace(/\/$/, "")+"/#{pkgname}"
+PUBLIC = "#{ORIGIN}/public"
 APPLICATION = undefined
+GLOBAL =
+  PROC: {}
+
+requestAnimationFrame = window.requestAnimationFrame ||
+                        window.mozRequestAnimationFrame ||
+                        window.webkitRequestAnimationFrame ||
+                        window.msRequestAnimationFrame
+window.requestAnimationFrame = requestAnimationFrame
+
 window.onload = ->
   # create application main
   APPLICATION = new appsmain()
