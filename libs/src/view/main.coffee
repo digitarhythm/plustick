@@ -4,6 +4,13 @@ APPLICATION = undefined
 GLOBAL =
   PROC: {}
 
+class originobj
+  constructor:->
+    S4 = ->
+      return (((1+Math.random())*0x10000)|0).toString(16).substring(1)
+    @uniqueID = (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4())
+    GLOBAL.PROC[@uniqueID] = @
+
 requestAnimationFrame = window.requestAnimationFrame ||
                         window.mozRequestAnimationFrame ||
                         window.webkitRequestAnimationFrame ||

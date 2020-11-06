@@ -1,11 +1,12 @@
 #=============================================================================
 # This class is the first class generated when the application is launched.
 #=============================================================================
-class appsmain
+class appsmain extends originobj
   #===========================================================================
   # define application environ value
   #===========================================================================
   constructor:->
+    super()
     @width = undefined
     @height = undefined
     @contextmenu = true
