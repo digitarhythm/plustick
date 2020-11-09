@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-CMD=`basename $0`
+CWD=`basename $0`
 
 #=============================================================================
 # error handler
@@ -10,8 +10,9 @@ function error() {
   case ${1} in
     [12] )
       echo "Usage:"
-      echo "$CMD [option]"
+      echo "$CWD [option]"
       echo "  -b: build application"
+      echo "  -n: create new class"
       echo "  -w: build application(source watch)"
       echo "  -a: activate application(forever)"
       echo "  -d: debug exec application"
@@ -31,6 +32,45 @@ function error() {
   exit
 }
 
+#=============================================================================
+# 新規クラスファイルを生成する
+#=============================================================================
+function create_new_class() {
+    cat <<EOF > "$CWD/apps/src/view/$1.coffee"
+#=====================================
+# new class file
+#=====================================
+class $1 extends originobj
+  constructor:->
+    super()
+
+  createHtml:->
+    return new Promise (resolve, reject)=>
+      html = """
+        <div id="#{@uniqueID}" style="
+          position: absolute;
+          left: 0px;
+          top: 0px;
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+          background-color: rgba(0, 0, 0, 1.0);
+          color: rgba(255, 255, 255, 1.0);
+        ">
+        </div>
+      """
+      resolve(html)
+
+  viewDidLoad:->
+
+  viewDidAppear:->
+
+EOF
+}
+
+#=============================================================================
+# 環境チェック
+#=============================================================================
 function environ_check() {
   local target firstboot
 
@@ -128,6 +168,9 @@ function environ_check() {
   echo $firstboot
 }
 
+#=============================================================================
+# ソースファイルコンパイル
+#=============================================================================
 function compile() {
   local watch=$1
   if [ $watch -eq 1 ]; then
@@ -142,14 +185,13 @@ function compile() {
 # オプション制御
 #=============================================================================
 function optproc() {
-  local OPT OPTARG
-
-  OPT=$1
-  OPTARG=$2
-
+  OPT2=$1
   case $OPT in
     [b] )
       compile 0
+      ;;
+    [n] )
+      create_new_class $OPT2
       ;;
     [w] )
       compile 0
@@ -159,7 +201,7 @@ function optproc() {
       if [ $FIRSTBOOT -eq 1 ]; then
         compile 0
       fi
-      NODE_ENV=production forever start --uid `pwd` node_modules/$CMD/libs/js/control/index.min.js
+      NODE_ENV=production forever start --uid `pwd` node_modules/$CWD/libs/js/control/index.min.js
       ;;
     [d] )
       if [ $FIRSTBOOT -eq 1 ]; then
@@ -198,6 +240,15 @@ if [ -z "${1}" ]; then
 fi
 
 #---------------------------
+# 2つ目のオプション
+#---------------------------
+if [ ! -z "${2}" ]; then
+  OPT2=$2
+else
+  OPT2=""
+fi
+
+#---------------------------
 # variable
 # 変数
 #---------------------------
@@ -213,7 +264,7 @@ FIRSTBOOT=`environ_check`
 # valid option
 # 有効なオプション
 #---------------------------
-option=":bwadth"
+option=":bnwadth"
 
 #---------------------------
 # option loop
@@ -221,7 +272,7 @@ option=":bwadth"
 #---------------------------
 argarr=()
 while getopts $option OPT; do
-  optproc $OPT $OPTARG
+  optproc $OPT2
 done
 
 

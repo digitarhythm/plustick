@@ -1,22 +1,47 @@
+#===========================================================================
+# GLOBAL setting
+#===========================================================================
 ORIGIN = window.location.href.replace(/\/$/, "")+"/#{pkgname}"
 PUBLIC = "#{ORIGIN}/public"
 APPLICATION = undefined
 GLOBAL =
   PROC: {}
 
+#===========================================================================
+# super super class
+#===========================================================================
 class originobj
   constructor:->
     S4 = ->
       return (((1+Math.random())*0x10000)|0).toString(16).substring(1)
-    @uniqueID = (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4())
+    @uniqueID = (S4()+S4()+"_"+S4()+"_"+S4()+"_"+S4()+"_"+S4()+S4()+S4())
     GLOBAL.PROC[@uniqueID] = @
 
+  addView:(id, obj)->
+    parent = getElement(id) || undefined
+    if (!parent?)
+      return
+    else
+      html = await obj.createHtml()
+      back = parent.style.display
+      parent.style.display = "none"
+      parent.insertAdjacentHTML('beforeend', html)
+      obj.viewDidLoad()
+      parent.style.display = back
+      obj.viewDidAppear()
+
+#===========================================================================
+# requestAnimationFrame
+#===========================================================================
 requestAnimationFrame = window.requestAnimationFrame ||
                         window.mozRequestAnimationFrame ||
                         window.webkitRequestAnimationFrame ||
                         window.msRequestAnimationFrame
 window.requestAnimationFrame = requestAnimationFrame
 
+#===========================================================================
+# execute first process
+#===========================================================================
 window.onload = ->
   # create application main
   APPLICATION = new appsmain()
@@ -99,13 +124,14 @@ window.onload = ->
   if (typeof APPLICATION.createHtml == 'function')
     APPLICATION.createHtml().then (html)=>
       if (html?)
+        display = document.querySelector('#__rootview__').style.display
         document.querySelector('#__rootview__').style.display = "none"
         document.querySelector('#__rootview__').innerHTML = html
 
       if (typeof APPLICATION.viewDidLoad == 'function')
         APPLICATION.viewDidLoad()
 
-      document.querySelector('#__rootview__').style.display = "inline"
+      document.querySelector('#__rootview__').style.display = display
 
       if (typeof APPLICATION.viewDidAppear == 'function')
         APPLICATION.viewDidAppear()

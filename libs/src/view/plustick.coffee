@@ -15,8 +15,8 @@ echo = (a, b...)->
   console.log(a)
   return a
 
-getElement = (elmname)->
-  return document.querySelector("#"+elmname)
+getElement = (id)->
+  return document.getElementById(id)
 
 #===========================================================================
 # system utility class
@@ -184,7 +184,6 @@ class plustick_core
   #===========================================================================
   #===========================================================================
   procedure:(id, key, param)->
-    echo id
     obj = GLOBAL.PROC[id]
     if (!obj?)
       return

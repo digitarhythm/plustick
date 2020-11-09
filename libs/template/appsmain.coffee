@@ -16,9 +16,9 @@ class appsmain extends originobj
   #===========================================================================
   createHtml:->
     return new Promise (resolve, reject)=>
-
       html = """
         <div style="
+          position: absolute;
           display: table-cell;
           text-align: center;
           vertical-align: middle;
