@@ -201,7 +201,7 @@ function optproc() {
       if [ $FIRSTBOOT -eq 1 ]; then
         compile 0
       fi
-      NODE_ENV=production forever start --uid `pwd` $MODULE/libs/js/control/index.min.js
+      forever start --uid `pwd` ./node_modules/plustick/libs/js/control/index.min.js
       ;;
     [d] )
       if [ $FIRSTBOOT -eq 1 ]; then

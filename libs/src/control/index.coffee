@@ -9,12 +9,13 @@ path = require("path")
 config = require("config")
 fs = require("fs-extra")
 echo = require("ndlog").echo
+process = require("process")
 ECT = require("ect")
 
 pkgjson = require("#{process.cwd()}/package.json")
 pkgname = pkgjson.name
 network = config.network
-node_env = process.env.NODE_ENV
+node_env = process.env.NODE_ENV || "production"
 
 echo "application loading time: [#{new Date().toLocaleString("ja-JP")}]"
 
