@@ -10,12 +10,15 @@ GLOBAL =
 #===========================================================================
 # super super class
 #===========================================================================
-class originobj
+class coreobject
   constructor:->
     S4 = ->
       return (((1+Math.random())*0x10000)|0).toString(16).substring(1)
     @uniqueID = (S4()+S4()+"_"+S4()+"_"+S4()+"_"+S4()+"_"+S4()+S4()+S4())
     GLOBAL.PROC[@uniqueID] = @
+    if (APPLICATION?)
+      @width = APPLICATION.width
+      @height = APPLICATION.height
 
   addView:(id, obj)->
     parent = getElement(id) || undefined
@@ -23,12 +26,18 @@ class originobj
       return
     else
       html = await obj.createHtml()
-      back = parent.style.display
+      backup = parent.style.display
       parent.style.display = "none"
       parent.insertAdjacentHTML('beforeend', html)
       obj.viewDidLoad()
-      parent.style.display = back
+      parent.style.display = backup
       obj.viewDidAppear()
+
+  createHtml:->
+
+  viewDidLoad:->
+
+  viewDidAppear:->
 
 #===========================================================================
 # requestAnimationFrame

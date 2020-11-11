@@ -1,7 +1,7 @@
 #=============================================================================
 # This class is the first class generated when the application is launched.
 #=============================================================================
-class appsmain extends originobj
+class appsmain extends coreobject
   #===========================================================================
   # define application environ value
   #===========================================================================
