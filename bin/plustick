@@ -163,9 +163,9 @@ function environ_check() {
   fi
 
   # check plugin file
-  target="$CWD/apps/plugin/main.css"
+  target="$CWD/apps/plugin/appsmain.css"
   if [ ! -e $target ]; then
-    cp $MODULE/libs/template/main.css $CWD/apps/plugin/
+    cp $MODULE/libs/template/appsmain.css $CWD/apps/plugin/
   fi
 
   echo $firstboot

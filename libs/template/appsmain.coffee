@@ -17,18 +17,7 @@ class appsmain extends coreobject
   createHtml:->
     return new Promise (resolve, reject)=>
       html = """
-        <div style="
-          position: absolute;
-          display: table-cell;
-          text-align: center;
-          vertical-align: middle;
-          width: #{@width}px;
-          height: #{@height}px;
-          margin: 0 auto;
-          font-size: 24pt;
-          color: rgba(0, 127, 255, 0.8);
-        " id="contents">
-        </div>
+        <div id="contents"></div>
       """
 
       resolve(html)
@@ -42,6 +31,9 @@ class appsmain extends coreobject
   # It is executed after the HTML is displayed.
   #===========================================================================
   viewDidAppear:->
+    getElement("contents").style.width = "#{@width}px"
+    getElement("contents").style.height = "#{@height}px"
+
     ret = await plustick.APICALL
       endpoint: "version"
       data: {}
