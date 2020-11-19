@@ -3,7 +3,6 @@ echo = require("ndlog").echo
 fs = require("fs-extra")
 
 __appspath = fs.realpathSync(process.cwd())
-__plustickpath = "#{fs.realpathSync(process.cwd())}/node_modules/plustick"
 DBPATH = "#{__appspath}/apps/lib"
 
 class plustickdb
@@ -11,9 +10,9 @@ class plustickdb
     @_dbkind = kind || "sqlite3"
     switch @_dbkind
       when "sqlite3"
-        dbmod = require("#{__plustickpath}/libs/js/plustick_sqlite3.min.js")
+        dbmod = require("#{global.PLUSTICKLIBS}/plustick_sqlite3.min.js")
       when "mysql"
-        dbmod = require("#{__plustickpath}/libs/js/plustick_mysql.min.js")
+        dbmod = require("#{global.PLUSTICKLIBS}/plustick_mysql.min.js")
 
     @DB = new dbmod()
 
