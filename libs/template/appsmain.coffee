@@ -39,15 +39,14 @@ class appsmain extends coreobject
       data: {}
     version = ret.version
 
-    elm = getElement("contents")
-    elm.innerHTML = """
-      framework sample page.<br>
-      version: #{version}<br>
-      <input type="button" id="button1" value="ボタン">
+    getElement("contents").innerHTML = """
+      <span id="version" onclick="plustick.procedure('#{@uniqueID}', 'version', '#{version}')">
+        disp version
+      </span>
     """
-    button = getElement("button1")
-    button.addEventListener "click", =>
-      @click()
+
+    GLOBAL.PROC[@uniqueID] = (param)=>
+      @click(param.version)
 
   #===========================================================================
   #===========================================================================
