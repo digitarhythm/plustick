@@ -73,6 +73,7 @@ app.use("/#{pkgname}/syslib", express.static(__syslibsview))
 #==========================================================================
 global.BIND_ROUTER = {}
 global.ROOTDIR = __homedir
+global.PLUSTICKLIBS = __syslibsctrl
 
 #==========================================================================
 # user API binding
