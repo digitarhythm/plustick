@@ -32,7 +32,7 @@ __appsdir = "#{__homedir}/apps"
 __publicdir = "#{__appsdir}/public"
 
 # tmpl directory
-__templatedir = "#{__systemdir}/libs/template"
+__templatedir = "#{__systemdir}/lib/template"
 
 # plugin directory
 __plugindir = "#{__appsdir}/plugin"
@@ -48,7 +48,7 @@ __usrctrldir = "#{__usrlibsdir}/control"
 __usrviewdir = "#{__usrlibsdir}/view"
 
 # system library directory
-__syslibsdir = "#{__systemdir}/libs/js"
+__syslibsdir = "#{__systemdir}/lib/js"
 __syslibsctrl = "#{__syslibsdir}/control"
 __syslibsview = "#{__syslibsdir}/view"
 
@@ -85,7 +85,7 @@ app.use("/#{pkgname}/api", api)
 # setting import
 #==========================================================================
 appjson = require("#{__homedir}/config/application.json")
-sysjson = require("#{__systemdir}/libs/config/system.json")
+sysjson = require("#{__systemdir}/lib/config/system.json")
 
 #==========================================================================
 # read file list function

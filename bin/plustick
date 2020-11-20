@@ -126,16 +126,21 @@ function environ_check() {
     mkdir -p $target
   fi
 
+  target="$CWD/apps/lib"
+  if [ ! -e $target ]; then
+    mkdir -p $target
+  fi
+
   # check main script
   target="$CWD/apps/src/view/appsmain.coffee"
   if [ ! -e $target ]; then
-    cp $MODULE/libs/template/appsmain.coffee $CWD/apps/src/view/
+    cp $MODULE/lib/template/appsmain.coffee $CWD/apps/src/view/
   fi
 
   # check api script
   target="$CWD/apps/src/control/api.coffee"
   if [ ! -e $target ]; then
-    cp $MODULE/libs/template/api.coffee $CWD/apps/src/control/
+    cp $MODULE/lib/template/api.coffee $CWD/apps/src/control/
   fi
 
   # check config directory
@@ -147,15 +152,15 @@ function environ_check() {
   # check config file
   target="$CWD/apps/config/develop.json"
   if [ ! -e $target ]; then
-    cp $MODULE/libs/template/develop.json $CWD/apps/config/
+    cp $MODULE/lib/template/develop.json $CWD/apps/config/
   fi
   target="$CWD/apps/config/default.json"
   if [ ! -e $target ]; then
-    cp $MODULE/libs/template/default.json $CWD/apps/config/
+    cp $MODULE/lib/template/default.json $CWD/apps/config/
   fi
   target="$CWD/apps/config/application.json"
   if [ ! -e $target ]; then
-    cp $MODULE/libs/template/application.json $CWD/apps/config/
+    cp $MODULE/lib/template/application.json $CWD/apps/config/
   fi
   target="$CWD/config"
   if [ ! -L $target ]; then
@@ -165,7 +170,7 @@ function environ_check() {
   # check plugin file
   target="$CWD/apps/plugin/appsmain.css"
   if [ ! -e $target ]; then
-    cp $MODULE/libs/template/appsmain.css $CWD/apps/plugin/
+    cp $MODULE/lib/template/appsmain.css $CWD/apps/plugin/
   fi
 
   echo $firstboot
@@ -204,13 +209,13 @@ function optproc() {
       if [ $FIRSTBOOT -eq 1 ]; then
         compile 0
       fi
-      forever start --uid `pwd` ./node_modules/plustick/libs/js/control/index.min.js
+      forever start --uid `pwd` ./node_modules/plustick/lib/js/control/index.min.js
       ;;
     [d] )
       if [ $FIRSTBOOT -eq 1 ]; then
         compile 0
       fi
-      NODE_ENV=develop node-dev $MODULE/libs/js/control/index.min.js
+      NODE_ENV=develop node-dev $MODULE/lib/js/control/index.min.js
       ;;
     [t] )
       forever stop `pwd`

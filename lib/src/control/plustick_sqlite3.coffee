@@ -20,9 +20,9 @@ class plustick_sqlite3
       try
         stmt = @_dbobject.prepare(sql, param)
         stmt.run param, (err, rows)=>
-        stmt.finalize()
-        resolve
-          err: 0
+          #stmt.finalize()
+          resolve
+            err: 0
       catch e
         reject
           err: e
@@ -69,5 +69,5 @@ class plustick_sqlite3
   close:->
     @_dbobject.close()
 
-exports.plustick_sqlite3 = plustick_sqlite3
+module.exports = plustick_sqlite3
 

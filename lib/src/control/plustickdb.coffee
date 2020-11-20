@@ -10,9 +10,9 @@ class plustickdb
     @_dbkind = kind || "sqlite3"
     switch @_dbkind
       when "sqlite3"
-        dbmod = require("#{global.PLUSTICKLIBS}/plustick_sqlite3.min.js")
+        dbmod = require("#{PLUSTICKLIBS}/plustick_sqlite3.min.js")
       when "mysql"
-        dbmod = require("#{global.PLUSTICKLIBS}/plustick_mysql.min.js")
+        dbmod = require("#{PLUSTICKLIBS}/plustick_mysql.min.js")
 
     @DB = new dbmod()
 
@@ -20,6 +20,7 @@ class plustickdb
     @DB.init(dbname)
 
   run:(sql, param)->
+    echo sql
     @DB.run(sql, param)
 
   get:(sql, param)->
@@ -34,5 +35,5 @@ class plustickdb
   close:->
     @DB.close()
 
-exports.plustickdb = plustickdb
+module.exports = plustickdb
 
