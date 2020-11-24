@@ -26,27 +26,21 @@ class appsmain extends coreobject
   # After the HTML is loaded, but before it is displayed, it is executed.
   #===========================================================================
   viewDidLoad:->
+    getElement("contents").innerHTML = """
+      <div id="version" onclick="
+        plustick.procedure('#{@uniqueID}', 'version');
+      ">
+        Version?
+      </div>
+    """
+
+    GLOBAL.PROC[@uniqueID].version = =>
+      @click()
 
   #===========================================================================
   # It is executed after the HTML is displayed.
   #===========================================================================
   viewDidAppear:->
-    getElement("contents").style.width = "#{@width}px"
-    getElement("contents").style.height = "#{@height}px"
-
-    ret = await plustick.APICALL
-      endpoint: "version"
-      data: {}
-    version = ret.version
-
-    getElement("contents").innerHTML = """
-      <span id="version" onclick="plustick.procedure('#{@uniqueID}', 'version', '#{version}')">
-        disp version
-      </span>
-    """
-
-    GLOBAL.PROC[@uniqueID] = (param)=>
-      @click(param.version)
 
   #===========================================================================
   #===========================================================================
@@ -59,14 +53,10 @@ class appsmain extends coreobject
   #===========================================================================
 
   click:->
-    plustick.animate 300, "contents",
-      opacity: 0.3
-    , =>
-      ret = confirm("クリック")
-      if (ret)
-        getElement("button1").setAttribute("value", "OK")
-      else
-        getElement("button1").setAttribute("value", "キャンセル")
-      plustick.animate 300, "contents",
-        opacity: 1.0
+    ret = await plustick.APICALL
+      endpoint: 'version'
+
+    getElement("version").innerHTML = """
+      Version: #{ret.version}
+    """
 

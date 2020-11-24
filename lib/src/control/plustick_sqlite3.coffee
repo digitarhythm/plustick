@@ -2,18 +2,41 @@ sqlite3 = require('sqlite3').verbose()
 echo = require("ndlog").echo
 fs = require("fs-extra")
 
-__appspath = fs.realpathSync(process.cwd())
-DBPATH = "#{__appspath}/apps/lib"
+DBDIR = "#{ROOTDIR}/apps/lib"
 
 class plustick_sqlite3
   constructor:->
 
   init:(dbname)->
     try
-      path = "#{DBPATH}/#{dbname}"
+      path = "#{DBDIR}/#{dbname}"
       @_dbobject = new sqlite3.Database(path)
     catch e
       echo "error: #{e}"
+
+  begin:->
+    return new Promise (resolve, reject)=>
+      try
+        stmt = @_dbobject.prepare("BEGIN TRANSACTION")
+        stmt.run param, (err, rows)=>
+          #stmt.finalize()
+          resolve
+            err: 0
+      catch e
+        reject
+          err: e
+
+  commit:->
+    return new Promise (resolve, reject)=>
+      try
+        stmt = @_dbobject.prepare("COMMIT")
+        stmt.run param, (err, rows)=>
+          #stmt.finalize()
+          resolve
+            err: 0
+      catch e
+        reject
+          err: e
 
   run:(sql, param)->
     return new Promise (resolve, reject)=>

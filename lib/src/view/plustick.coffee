@@ -183,7 +183,7 @@ class plustick_core
 
   #===========================================================================
   #===========================================================================
-  procedure:(id, key, param)->
+  procedure:(id, key=undefined, param=undefined)->
     obj = GLOBAL.PROC[id]
     if (!obj?)
       return

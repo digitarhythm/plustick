@@ -4,6 +4,7 @@
 ORIGIN = window.location.href.replace(/\/$/, "")+"/#{pkgname}"
 PUBLIC = "#{ORIGIN}/public"
 APPLICATION = undefined
+ROOT = undefined
 GLOBAL =
   PROC: {}
 
@@ -59,6 +60,7 @@ window.onload = ->
   bounds = plustick.getBounds()
   browser_width = bounds.size.width
   browser_height = bounds.size.height
+  browser_aspect = browser_width / browser_height
 
   # get user setting
   backgroundColor = APPLICATION.backgroundColor || "rgba(0, 0, 0, 1.0)"
@@ -70,14 +72,14 @@ window.onload = ->
     return contextmenu
 
   # create root view
-  rootview = document.createElement("div")
-  rootview.setAttribute("id", "__rootview__")
-  document.body.append(rootview)
+  ROOT = document.createElement("div")
+  ROOT.setAttribute("id", "__rootview__")
+  document.body.append(ROOT)
 
   # fit contents size to browser
   if (APPLICATION.width? || APPLICATION.height?)
-    contents_width = APPLICATION.width || parseInt(Math.floor(browser_width / (browser_height / APPLICATION.height)))
-    contents_height = APPLICATION.height || parseInt(Math.floor(browser_height / (browser_width / APPLICATION.width)))
+    contents_width = APPLICATION.width || parseInt(Math.round(APPLICATION.height * browser_aspect))
+    contents_height = APPLICATION.height || parseInt(Math.round(APPLICATION.width / browser_aspect))
     APPLICATION.width = contents_width
     APPLICATION.height = contents_height
 
@@ -108,8 +110,8 @@ window.onload = ->
       top = 0
       scale = scale_y
 
-    rootview.style.transformOrigin = "0px 0px 0px"
-    rootview.style.transform = "scale(#{scale}, #{scale})"
+    ROOT.style.transformOrigin = "0px 0px 0px"
+    ROOT.style.transform = "scale(#{scale}, #{scale})"
 
   # does not fit contents size to browser
   else
@@ -120,27 +122,27 @@ window.onload = ->
     left = 0
     top = 0
 
-  rootview.style.position = "absolute"
-  rootview.style.width = "#{contents_width}px"
-  rootview.style.height = "#{contents_height}px"
-  rootview.style.left = "#{left}px"
-  rootview.style.top = "#{top}px"
+  ROOT.style.position = "absolute"
+  ROOT.style.width = "#{contents_width}px"
+  ROOT.style.height = "#{contents_height}px"
+  ROOT.style.left = "#{left}px"
+  ROOT.style.top = "#{top}px"
 
-  rootview.style.margin = "0px 0px 0px 0px"
-  rootview.style.backgroundColor = backgroundColor
-  rootview.style.overflow = "hidden"
+  ROOT.style.margin = "0px 0px 0px 0px"
+  ROOT.style.backgroundColor = backgroundColor
+  ROOT.style.overflow = "hidden"
 
   if (typeof APPLICATION.createHtml == 'function')
     APPLICATION.createHtml().then (html)=>
       if (html?)
-        display = document.querySelector('#__rootview__').style.display
-        document.querySelector('#__rootview__').style.display = "none"
-        document.querySelector('#__rootview__').innerHTML = html
+        display = ROOT.style.display
+        ROOT.style.display = "none"
+        ROOT.innerHTML = html
 
       if (typeof APPLICATION.viewDidLoad == 'function')
         APPLICATION.viewDidLoad()
 
-      document.querySelector('#__rootview__').style.display = display
+      ROOT.style.display = display
 
       if (typeof APPLICATION.viewDidAppear == 'function')
         APPLICATION.viewDidAppear()

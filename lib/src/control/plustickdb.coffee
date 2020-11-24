@@ -20,7 +20,6 @@ class plustickdb
     @DB.init(dbname)
 
   run:(sql, param)->
-    echo sql
     @DB.run(sql, param)
 
   get:(sql, param)->
