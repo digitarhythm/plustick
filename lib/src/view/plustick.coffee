@@ -18,6 +18,9 @@ echo = (a, b...)->
 getElement = (id)->
   return document.getElementById(id)
 
+setHtml = (id, html)->
+  document.getElementById(id).innerHTML = html
+
 #===========================================================================
 # system utility class
 #===========================================================================
