@@ -3,7 +3,6 @@ echo = require("ndlog").echo
 fs = require("fs-extra")
 
 __appspath = fs.realpathSync(process.cwd())
-DBPATH = "#{__appspath}/apps/lib"
 
 class plustickdb
   constructor:(kind)->
