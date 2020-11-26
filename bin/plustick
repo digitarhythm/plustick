@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-CWD=`basename $0`
-
 #=============================================================================
 # error handler
 # エラー処理
@@ -10,7 +8,7 @@ function error() {
   case ${1} in
     [12] )
       echo "Usage:"
-      echo "$CWD [option]"
+      echo "$APPSDIR [option]"
       echo "  -b: build application"
       echo "  -n: create new class"
       echo "  -w: build application(source watch)"
@@ -36,34 +34,7 @@ function error() {
 # 新規クラスファイルを生成する
 #=============================================================================
 function create_new_class() {
-    cat <<EOF > "$CWD/apps/src/view/$1.coffee"
-#=====================================
-# new class file
-#=====================================
-class $1 extends coreobject
-  constructor:->
-    super()
-
-  createHtml:->
-    super()
-    return new Promise (resolve, reject)=>
-      html = """
-        <div id="#{@uniqueID}" style="
-          overflow: hidden;
-          background-color: rgba(0, 0, 0, 1.0);
-          color: rgba(255, 255, 255, 1.0);
-        ">
-        </div>
-      """
-      resolve(html)
-
-  viewDidLoad:->
-    super()
-
-  viewDidAppear:->
-    super()
-
-EOF
+  cat $MODULE/lib/template/classtmp.coffee | sed -e "s/\[\[\[:classname:\]\]\]/$1/ig" > $APPSDIR/apps/src/view/$1.coffee
 }
 
 #=============================================================================
@@ -75,97 +46,97 @@ function environ_check() {
   firstboot=0
 
   # create application directory
-  target="$CWD/apps"
+  target="$APPSDIR/apps"
   if [ ! -e $target ]; then
     firstboot=1
     mkdir -p $target
   fi
 
-  target="$CWD/apps/js"
+  target="$APPSDIR/apps/js"
   if [ ! -e $target ]; then
     mkdir -p $target
   fi
 
-  target="$CWD/apps/js/control"
+  target="$APPSDIR/apps/js/control"
   if [ ! -e $target ]; then
     mkdir -p $target
   fi
 
-  target="$CWD/apps/js/view"
+  target="$APPSDIR/apps/js/view"
   if [ ! -e $target ]; then
     mkdir -p $target
   fi
 
-  target="$CWD/apps/src"
+  target="$APPSDIR/apps/src"
   if [ ! -e $target ]; then
     mkdir -p $target
   fi
 
-  target="$CWD/apps/src/control"
+  target="$APPSDIR/apps/src/control"
   if [ ! -e $target ]; then
     mkdir -p $target
   fi
 
-  target="$CWD/apps/src/view"
+  target="$APPSDIR/apps/src/view"
   if [ ! -e $target ]; then
     mkdir -p $target
   fi
 
-  target="$CWD/apps/plugin"
+  target="$APPSDIR/apps/plugin"
   if [ ! -e $target ]; then
     mkdir -p $target
   fi
 
-  target="$CWD/apps/public"
+  target="$APPSDIR/apps/public"
   if [ ! -e $target ]; then
     mkdir -p $target
   fi
 
-  target="$CWD/apps/lib"
+  target="$APPSDIR/apps/lib"
   if [ ! -e $target ]; then
     mkdir -p $target
   fi
 
   # check main script
-  target="$CWD/apps/src/view/appsmain.coffee"
+  target="$APPSDIR/apps/src/view/appsmain.coffee"
   if [ ! -e $target ]; then
-    cp $MODULE/lib/template/appsmain.coffee $CWD/apps/src/view/
+    cp $MODULE/lib/template/appsmain.coffee $APPSDIR/apps/src/view/
   fi
 
   # check api script
-  target="$CWD/apps/src/control/api.coffee"
+  target="$APPSDIR/apps/src/control/api.coffee"
   if [ ! -e $target ]; then
-    cp $MODULE/lib/template/api.coffee $CWD/apps/src/control/
+    cp $MODULE/lib/template/api.coffee $APPSDIR/apps/src/control/
   fi
 
   # check config directory
-  target="$CWD/apps/config"
+  target="$APPSDIR/apps/config"
   if [ ! -d $target ]; then
     mkdir -p $target
   fi
 
   # check config file
-  target="$CWD/apps/config/develop.json"
+  target="$APPSDIR/apps/config/develop.json"
   if [ ! -e $target ]; then
-    cp $MODULE/lib/template/develop.json $CWD/apps/config/
+    cp $MODULE/lib/template/develop.json $APPSDIR/apps/config/
   fi
-  target="$CWD/apps/config/default.json"
+  target="$APPSDIR/apps/config/default.json"
   if [ ! -e $target ]; then
-    cp $MODULE/lib/template/default.json $CWD/apps/config/
+    cp $MODULE/lib/template/default.json $APPSDIR/apps/config/
   fi
-  target="$CWD/apps/config/application.json"
+  target="$APPSDIR/apps/config/application.json"
   if [ ! -e $target ]; then
-    cp $MODULE/lib/template/application.json $CWD/apps/config/
+    cp $MODULE/lib/template/application.json $APPSDIR/apps/config/
   fi
-  target="$CWD/config"
+  target="$APPSDIR/config"
   if [ ! -L $target ]; then
-    ln -s ./apps/config $CWD/config
+    ln -s ./apps/config $APPSDIR/config
   fi
 
   # check plugin file
-  target="$CWD/apps/plugin/appsmain.css"
+  target="$APPSDIR/apps/plugin/appsmain.css"
   if [ ! -e $target ]; then
-    cp $MODULE/lib/template/appsmain.css $CWD/apps/plugin/
+    cp $MODULE/lib/template/appsmain.css $APPSDIR/apps/plugin/
   fi
 
   echo $firstboot
@@ -177,9 +148,9 @@ function environ_check() {
 function compile() {
   local watch=$1
   if [ $watch -eq 1 ]; then
-    terffee -wc ${CWD}/apps/src/view -o ${CWD}/apps/js/view -c ${CWD}/apps/src/control -o ${CWD}/apps/js/control
+    terffee -wc ${APPSDIR}/apps/src/view -o ${APPSDIR}/apps/js/view -c ${APPSDIR}/apps/src/control -o ${APPSDIR}/apps/js/control
   else
-    terffee -c ${CWD}/apps/src/view -o ${CWD}/apps/js/view -c ${CWD}/apps/src/control -o ${CWD}/apps/js/control
+    terffee -c ${APPSDIR}/apps/src/view -o ${APPSDIR}/apps/js/view -c ${APPSDIR}/apps/src/control -o ${APPSDIR}/apps/js/control
   fi
 }
 
@@ -255,8 +226,8 @@ fi
 # variable
 # 変数
 #---------------------------
-CWD=`pwd -P`
-MODULE=$CWD/node_modules/plustick
+APPSDIR=`pwd -P`
+MODULE=$APPSDIR/node_modules/plustick
 
 #---------------------------
 # 初回起動チェック
