@@ -102,7 +102,7 @@ class plustick_core
     anim_tmp = 10.0
 
     #=========================================================================
-    anim_proc = (element, cssparam)=>
+    anim_proc = (element, cssparam) =>
       flag = true
       for key of cssparam
         toparam = cssparam[key]

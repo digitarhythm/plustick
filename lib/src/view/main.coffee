@@ -12,7 +12,7 @@ GLOBAL =
 # super super class
 #===========================================================================
 class coreobject
-  constructor:->
+  constructor: ->
     S4 = ->
       return (((1+Math.random())*0x10000)|0).toString(16).substring(1)
     @uniqueID = (S4()+S4()+"_"+S4()+"_"+S4()+"_"+S4()+"_"+S4()+S4()+S4())
@@ -21,24 +21,24 @@ class coreobject
       @width = APPLICATION.width
       @height = APPLICATION.height
 
-  addView:(id, obj)->
-    parent = getElement(id) || undefined
-    if (!parent?)
+  addView:(id, obj) ->
+    target = getElement(id) || undefined
+    if (!target?)
       return
     else
       html = await obj.createHtml()
-      backup = parent.style.display
-      parent.style.display = "none"
-      parent.insertAdjacentHTML('beforeend', html)
+      backup = target.style.display
+      target.style.display = "none"
+      target.insertAdjacentHTML('beforeend', html)
       obj.viewDidLoad()
-      parent.style.display = backup
+      target.style.display = backup
       obj.viewDidAppear()
 
-  createHtml:->
+  createHtml: ->
 
-  viewDidLoad:->
+  viewDidLoad: ->
 
-  viewDidAppear:->
+  viewDidAppear: ->
 
 #===========================================================================
 # requestAnimationFrame
@@ -52,7 +52,7 @@ window.requestAnimationFrame = requestAnimationFrame
 #===========================================================================
 # execute first process
 #===========================================================================
-window.onload = ->
+window.onload =  ->
   # create application main
   APPLICATION = new appsmain()
 
@@ -67,6 +67,7 @@ window.onload = ->
 
   # body setting
   document.body.setAttribute("id", "body")
+  document.body.style.userSelect = "none"
   document.oncontextmenu = =>
     contextmenu = APPLICATION.contextmenu
     return contextmenu
@@ -133,7 +134,7 @@ window.onload = ->
   ROOT.style.overflow = "hidden"
 
   if (typeof APPLICATION.createHtml == 'function')
-    APPLICATION.createHtml().then (html)=>
+    APPLICATION.createHtml().then (html) =>
       if (html?)
         display = ROOT.style.display
         ROOT.style.display = "none"

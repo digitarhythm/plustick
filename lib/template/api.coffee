@@ -8,8 +8,8 @@ packjson = require("#{APPSDIR}/package.json")
 #=============================================================================
 # API Sample
 #=============================================================================
-BIND_ROUTER.version = (headers, data)->
-  return new Promise (resolve, reject)=>
+BIND_ROUTER.version = (headers, data) ->
+  return new Promise (resolve, reject) =>
     version = packjson.version
     ret =
       version: version

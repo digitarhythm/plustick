@@ -5,7 +5,7 @@ class appsmain extends coreobject
   #===========================================================================
   # define application environ value
   #===========================================================================
-  constructor:->
+  constructor: ->
     super()
     @width = undefined
     @height = undefined
@@ -14,8 +14,8 @@ class appsmain extends coreobject
   #===========================================================================
   # define template HTML
   #===========================================================================
-  createHtml:->
-    return new Promise (resolve, reject)=>
+  createHtml: ->
+    return new Promise (resolve, reject) =>
       html = """
         <div id="contents"></div>
       """
@@ -25,7 +25,7 @@ class appsmain extends coreobject
   #===========================================================================
   # After the HTML is loaded, but before it is displayed, it is executed.
   #===========================================================================
-  viewDidLoad:->
+  viewDidLoad: ->
     getElement("contents").innerHTML = """
       <div id="version" onclick="
         plustick.procedure('#{@uniqueID}', 'version');
@@ -40,7 +40,7 @@ class appsmain extends coreobject
   #===========================================================================
   # It is executed after the HTML is displayed.
   #===========================================================================
-  viewDidAppear:->
+  viewDidAppear: ->
 
   #===========================================================================
   #===========================================================================
@@ -52,7 +52,7 @@ class appsmain extends coreobject
   #===========================================================================
   #===========================================================================
 
-  click:->
+  click: ->
     ret = await plustick.APICALL
       endpoint: 'version'
 

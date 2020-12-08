@@ -6,5 +6,11 @@
       "javascript":[
       ]
     }
+  },
+  "database": {
+    "sqlite3": {
+    },
+    "mysql": {
+    }
   }
 }

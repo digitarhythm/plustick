@@ -2,12 +2,12 @@
 # template class file
 #=====================================
 class [[[:classname:]]] extends coreobject
-  constructor:->
+  constructor: ->
     super()
 
-  createHtml:->
+  createHtml: ->
     super()
-    return new Promise (resolve, reject)=>
+    return new Promise (resolve, reject) =>
       html = """
         <div id="#{@uniqueID}" style="
           overflow: hidden;
@@ -18,10 +18,10 @@ class [[[:classname:]]] extends coreobject
       """
       resolve(html)
 
-  viewDidLoad:->
+  viewDidLoad: ->
     super()
 
-  viewDidAppear:->
+  viewDidAppear: ->
     super()
 
 

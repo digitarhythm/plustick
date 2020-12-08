@@ -90,9 +90,9 @@ sysjson = require("#{__systemdir}/lib/config/system.json")
 #==========================================================================
 # read file list function
 #==========================================================================
-__readFileList = (path)->
-	return new Promise (resolve, reject)->
-		fs.readdir path, (err, lists)->
+__readFileList = (path) ->
+	return new Promise (resolve, reject) ->
+		fs.readdir path, (err, lists) ->
 			if (err)
 				reject(err)
 			else
@@ -102,7 +102,7 @@ __readFileList = (path)->
 # user API import
 #==========================================================================
 usrliblist = []
-__readFileList(__usrctrldir).then (lists)->
+__readFileList(__usrctrldir).then (lists) ->
 	for fname in lists
 		if (fname.match(/^.*\.js$/))
 			require "/#{__usrctrldir}/#{fname}"
@@ -130,7 +130,7 @@ get_free_port = (start, num=1, exclude_port=[]) ->
 #==========================================================================
 # router setting
 #==========================================================================
-app.get "/", (req, res)->
+app.get "/", (req, res) ->
   #==========================================================================
   # make directory file list
   #==========================================================================
@@ -142,7 +142,7 @@ app.get "/", (req, res)->
 
   jsuserlist = []
 
-  __readFileList(__plugindir).then (lists)->
+  __readFileList(__plugindir).then (lists) ->
     # JS/CSS file in plugin directory
     for fname in lists
       if (fname.match(/^.*\.css$/))
@@ -151,16 +151,16 @@ app.get "/", (req, res)->
         jssyslist.push("#{pkgname}/plugin/#{fname}")
     return 1
 
-  .then (ret)->
+  .then (ret) ->
     # JS file in user script directory
-    __readFileList(__jsviewdir).then (lists)->
+    __readFileList(__jsviewdir).then (lists) ->
       filelist = []
       for fname in lists
         if (fname.match(/^.*\.min\.js$/) and !fname.match(/^main\.min\.js/) and !fname.match(/^plustick\.min\.js/))
           jsuserlist.push("#{pkgname}/view/#{fname}")
       return 1
 
-  .then (ret)->
+  .then (ret) ->
     # rendering HTML
     res.render "main",
       pkgname: pkgname
@@ -168,7 +168,7 @@ app.get "/", (req, res)->
       jsuserlist: jsuserlist
       cssfilelist: cssfilelist
       node_env:node_env
-  .catch (err)->
+  .catch (err) ->
     console.error(err)
     process.exit(1)
 
@@ -184,7 +184,7 @@ if (port == "any")
 
 switch (config.network.protocol)
   when "http"
-    exphttp.listen port,->
+    exphttp.listen port, ->
       console.log("listening on *:", port)
   when "https"
     options =
