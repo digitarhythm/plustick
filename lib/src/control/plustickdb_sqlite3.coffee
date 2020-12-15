@@ -92,5 +92,5 @@ class plustickdb_sqlite3
   close: ->
     @_dbobject.close()
 
-module.exports = plustick_sqlite3
+module.exports = plustickdb_sqlite3
 
