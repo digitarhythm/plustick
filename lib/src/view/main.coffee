@@ -77,6 +77,15 @@ window.onload =  ->
   ROOT.setAttribute("id", "__rootview__")
   document.body.append(ROOT)
 
+  ROOT.width = browser_width
+  ROOT.height = browser_height
+
+  # resize event
+  window.addEventListener 'resize', ->
+    bounds = plustick.getBounds()
+    ROOT.width = bounds.size.width
+    ROOT.height = bounds.size.height
+
   # fit contents size to browser
   if (APPLICATION.width? || APPLICATION.height?)
     contents_width = APPLICATION.width || parseInt(Math.round(APPLICATION.height * browser_aspect))
