@@ -53,6 +53,68 @@ window.requestAnimationFrame = requestAnimationFrame
 # execute first process
 #===========================================================================
 window.onload =  ->
+  #===========================================================================
+  # fit contents size to browser
+  #===========================================================================
+  fitContentsSize = (apps)->
+    # get browser size
+    bounds = plustick.getBounds()
+    browser_width = bounds.size.width
+    browser_height = bounds.size.height
+    browser_aspect = browser_width / browser_height
+
+    if (apps.width? || apps.height?)
+      contents_width = apps.width || parseInt(Math.round(apps.height * browser_aspect))
+      contents_height = apps.height || parseInt(Math.round(apps.width / browser_aspect))
+      apps.width = contents_width
+      apps.height = contents_height
+
+      # browser resolution
+      bounds = plustick.getBounds()
+      browser_width = bounds.size.width
+      browser_height = bounds.size.height
+
+      # calc scale
+      scale_x = browser_width / contents_width
+      scale_y = browser_height / contents_height
+
+      scale_mode = 1
+      height_tmp = contents_height * scale_x
+
+      if (height_tmp > browser_height)
+        scale_mode = 2
+
+      # calc width/height
+      if (scale_mode == 1)
+        real_height = contents_height * scale_x
+        left = 0
+        top = parseInt(Math.floor((browser_height - real_height) / 2))
+        scale = scale_x
+      else
+        real_width = contents_width * scale_y
+        left = parseInt(Math.floor((browser_width - real_width) / 2))
+        top = 0
+        scale = scale_y
+
+      ROOT.style.transformOrigin = "0px 0px 0px"
+      ROOT.style.transform = "scale(#{scale}, #{scale})"
+
+    # does not fit contents size to browser
+    else
+      contents_width = browser_width
+      contents_height = browser_height
+      apps.width = browser_width
+      apps.height = browser_height
+      left = 0
+      top = 0
+
+    return
+      width: contents_width
+      height: contents_height
+      left: left
+      top: top
+  #===========================================================================
+
   # create application main
   APPLICATION = new appsmain()
 
@@ -77,70 +139,25 @@ window.onload =  ->
   ROOT.setAttribute("id", "__rootview__")
   document.body.append(ROOT)
 
-  ROOT.width = browser_width
-  ROOT.height = browser_height
-
-  # resize event
-  window.addEventListener 'resize', ->
-    bounds = plustick.getBounds()
-    ROOT.width = bounds.size.width
-    ROOT.height = bounds.size.height
-
-  # fit contents size to browser
-  if (APPLICATION.width? || APPLICATION.height?)
-    contents_width = APPLICATION.width || parseInt(Math.round(APPLICATION.height * browser_aspect))
-    contents_height = APPLICATION.height || parseInt(Math.round(APPLICATION.width / browser_aspect))
-    APPLICATION.width = contents_width
-    APPLICATION.height = contents_height
-
-    # browser resolution
-    bounds = plustick.getBounds()
-    browser_width = bounds.size.width
-    browser_height = bounds.size.height
-
-    # calc scale
-    scale_x = browser_width / contents_width
-    scale_y = browser_height / contents_height
-
-    scale_mode = 1
-    height_tmp = contents_height * scale_x
-
-    if (height_tmp > browser_height)
-      scale_mode = 2
-
-    # calc width/height
-    if (scale_mode == 1)
-      real_height = contents_height * scale_x
-      left = 0
-      top = parseInt(Math.floor((browser_height - real_height) / 2))
-      scale = scale_x
-    else
-      real_width = contents_width * scale_y
-      left = parseInt(Math.floor((browser_width - real_width) / 2))
-      top = 0
-      scale = scale_y
-
-    ROOT.style.transformOrigin = "0px 0px 0px"
-    ROOT.style.transform = "scale(#{scale}, #{scale})"
-
-  # does not fit contents size to browser
-  else
-    contents_width = browser_width
-    contents_height = browser_height
-    APPLICATION.width = browser_width
-    APPLICATION.height = browser_height
-    left = 0
-    top = 0
+  contents_size = fitContentsSize(APPLICATION)
 
   ROOT.style.position = "absolute"
-  ROOT.style.width = "#{contents_width}px"
-  ROOT.style.height = "#{contents_height}px"
-  ROOT.style.left = "#{left}px"
-  ROOT.style.top = "#{top}px"
+  ROOT.style.width = "#{contents_size.width}px"
+  ROOT.style.height = "#{contents_size.height}px"
+  ROOT.style.left = "#{contents_size.left}px"
+  ROOT.style.top = "#{contents_size.top}px"
 
   ROOT.style.margin = "0px 0px 0px 0px"
   ROOT.style.backgroundColor = backgroundColor
   ROOT.style.overflow = "hidden"
+
+  # resize event
+  window.addEventListener 'resize', ->
+    contents_size = fitContentsSize(APPLICATION)
+    ROOT.style.width = "#{contents_size.width}px"
+    ROOT.style.height = "#{contents_size.height}px"
+    ROOT.style.left = "#{contents_size.left}px"
+    ROOT.style.top = "#{contents_size.top}px"
 
   if (typeof APPLICATION.createHtml == 'function')
     APPLICATION.createHtml().then (html) =>
