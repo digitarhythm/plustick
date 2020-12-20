@@ -167,10 +167,10 @@ window.onload =  ->
         ROOT.innerHTML = html
 
       if (typeof APPLICATION.viewDidLoad == 'function')
-        APPLICATION.viewDidLoad()
+        await APPLICATION.viewDidLoad()
 
       ROOT.style.display = display
 
       if (typeof APPLICATION.viewDidAppear == 'function')
-        APPLICATION.viewDidAppear()
+        await APPLICATION.viewDidAppear()
 
