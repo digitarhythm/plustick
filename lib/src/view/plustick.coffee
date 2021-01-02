@@ -188,9 +188,15 @@ class plustick_core
       rect = event.currentTarget.getBoundingClientRect()
       x = event.clientX - rect.left
       y = event.clientY - rect.top
+      width = rect.width
+      height = rect.height
       listener
-        x: Math.floor(x)
-        y: Math.floor(y)
+        size:
+          width: Math.floor(width)
+          height: Math.floor(height)
+        origin:
+          x: Math.floor(x)
+          y: Math.floor(y)
     , capture
 
     @eventlistener["#{id}_#{type}"] =
