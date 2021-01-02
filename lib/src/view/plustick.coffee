@@ -4,16 +4,32 @@
 nop =->
 
 #===========================================================================
+# text formatter
+#===========================================================================
+__strFormatter__ = (a, b...)->
+  for data in b
+    if (Object.prototype.toString.call(data) == "[object Object]")
+      data = JSON.stringify(data)
+    repl = a.match(/(\%.*?@)/)
+    if (repl?)
+      repstr = repl[1]
+      repl2 = repstr.match(/%0(\d+)@/)
+      if (repl2?)
+        num = parseInt(repl2[1])
+        zero =""
+        zero += "0" while (zero.length < num)
+        data2 = (zero+data).substr(-num)
+        a = a.replace(repstr, data2)
+      else
+        a = a.replace('%@', data)
+  return a
+
+#===========================================================================
 # debug write
 #===========================================================================
 echo = (a, b...)->
-  #console.log(a)
-  for data in b
-    if (typeof(data) == 'object')
-      data = JSON.stringify(data)
-    a = a.replace('%@', data)
-  console.log(a)
-  return a
+  if (node_env == "develop")
+    console.log(__strFormatter__(a, b...))
 
 getElement = (id)->
   return document.getElementById(id)
@@ -30,20 +46,7 @@ class plustick_core
 
   # format strings
   sprintf:(a, b...)->
-    for data in b
-      repl = a.match(/(\%.*?@)/)
-      if (repl?)
-        repstr = repl[1]
-        repl2 = repstr.match(/%0(\d+)@/)
-        if (repl2?)
-          num = parseInt(repl2[1])
-          zero =""
-          zero += "0" while (zero.length < num)
-          data2 = (zero+data).substr(-num)
-          a = a.replace(repstr, data2)
-        else
-          a = a.replace('%@', data)
-    return a
+    return __strFormatter__(a, b...)
 
   #===========================================================================
   # get browser size(include scrolling bar)
@@ -166,18 +169,34 @@ class plustick_core
 
   #===========================================================================
   #===========================================================================
-  addListener:(id, type, listener, capture=false)->
+  addListener:(param)->
+    id = param.id || undefined
+    type = param.type || undefined
+    listener = param.listener || undefined
+    capture = param.capture || false
+
+    if (!id? || !type?)
+      return
+
     key="#{id}_#{type}"
     if(@eventlistener[key]?)
       e = @eventlistener["#{id}_#{type}"]
       e.target.removeEventListener(type, e.listener, e.capture)
 
     target = document.querySelector("##{id}")
-    target.addEventListener(type, listener, capture)
+    target.addEventListener type, (event)=>
+      rect = event.currentTarget.getBoundingClientRect()
+      x = event.clientX - rect.left
+      y = event.clientY - rect.top
+      listener
+        x: Math.floor(x)
+        y: Math.floor(y)
+    , capture
+
     @eventlistener["#{id}_#{type}"] =
-        target: target
-        listener: listener
-        capture: capture
+      target: target
+      listener: listener
+      capture: capture
 
   #===========================================================================
   #===========================================================================
@@ -185,6 +204,7 @@ class plustick_core
     if("#{id}_#{type}" in @eventlistener)
       e = @eventlistener["#{id}_#{type}"]
       e.target.removeEventListener(type, e.listener, e.capture)
+      @eventlistener["#{id}_#{type}"] = undefined
 
   #===========================================================================
   #===========================================================================
