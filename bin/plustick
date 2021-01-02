@@ -139,6 +139,12 @@ function environ_check() {
     cp $MODULE/lib/template/appsmain.css $APPSDIR/apps/plugin/
   fi
 
+  # check public file
+  target="$APPSDIR/apps/public/OGP.png"
+  if [ ! -e $target ]; then
+    cp $MODULE/lib/template/OGP.png $APPSDIR/apps/public/
+  fi
+
   echo $firstboot
 }
 
