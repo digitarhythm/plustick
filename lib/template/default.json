@@ -1,5 +1,10 @@
 {
-    "Author": "no name",
+    "author": {
+      "name": "no name",
+      "url": "",
+      "twitter": "",
+      "facebook": ""
+    },
     "network": {
       "port": 5000,
       "protocol": "http",

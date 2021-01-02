@@ -161,13 +161,29 @@ app.get "/", (req, res) ->
       return 1
 
   .then (ret) ->
+    origin=config.Author.url
+    title=pkgjson.name
+    site_name=pkgjson.name
+    description=pkgjson.description
+    thumbnail="#{config.Author.url}/#{pkgname}/public/OGP.png"
+    twitter = config.Author.twitter || ""
+    facebook = config.Author.facebook || ""
+    console.log "origin="+origin
+    console.log config
     # rendering HTML
     res.render "main",
       pkgname: pkgname
       jssyslist: jssyslist
       jsuserlist: jsuserlist
       cssfilelist: cssfilelist
-      node_env:node_env
+      node_env: node_env
+      origin: origin
+      title: title
+      site_name: site_name
+      description: description
+      thumbnail: thumbnail
+      twitter: twitter
+      facebook: facebook
   .catch (err) ->
     console.error(err)
     process.exit(1)
