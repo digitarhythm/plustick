@@ -168,8 +168,6 @@ app.get "/", (req, res) ->
     thumbnail="#{config.Author.url}/#{pkgname}/public/OGP.png"
     twitter = config.Author.twitter || ""
     facebook = config.Author.facebook || ""
-    console.log "origin="+origin
-    console.log config
     # rendering HTML
     res.render "main",
       pkgname: pkgname
