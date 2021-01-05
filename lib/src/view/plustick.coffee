@@ -1,11 +1,11 @@
-#===========================================================================
+#=============================================================================
 # nop
-#===========================================================================
+#=============================================================================
 nop =->
 
-#===========================================================================
+#=============================================================================
 # text formatter
-#===========================================================================
+#=============================================================================
 __strFormatter__ = (a, b...)->
   for data in b
     if (Object.prototype.toString.call(data) == "[object Object]")
@@ -24,27 +24,32 @@ __strFormatter__ = (a, b...)->
         a = a.replace('%@', data)
   return a
 
-#===========================================================================
+#=============================================================================
 # debug write
-#===========================================================================
+#=============================================================================
 echo = (a, b...)->
   if (node_env == "develop")
     console.log(__strFormatter__(a, b...))
 
+#=============================================================================
+# DOM Operation
+#=============================================================================
 getElement = (id)->
   return document.getElementById(id)
 
 setHtml = (id, html)->
   document.getElementById(id).innerHTML = html
 
-#===========================================================================
+#=============================================================================
 # system utility class
-#===========================================================================
+#=============================================================================
 class plustick_core
   constructor:->
     @eventlistener = {}
 
+  #===========================================================================
   # format strings
+  #===========================================================================
   sprintf:(a, b...)->
     return __strFormatter__(a, b...)
 
@@ -61,11 +66,13 @@ class plustick_core
     return frame
 
   #===========================================================================
+  # get random value
   #===========================================================================
   random:(max) ->
     return Math.floor(Math.random() * (max + 1))
 
   #===========================================================================
+  # get browser name
   #===========================================================================
   getBrowser:->
     ua = navigator.userAgent
@@ -102,6 +109,7 @@ class plustick_core
     return {'kind':kind, 'browser':browser}
 
   #===========================================================================
+  # CSS Animation
   #===========================================================================
   animate:(duration, target_id, toparam, finished=undefined)->
     anim_tmp = 10.0
@@ -117,17 +125,21 @@ class plustick_core
         cssval = parseFloat(element.style.opacity)
         cssval += diff
 
-        if (['top', 'left', 'width', 'height'].indexOf(key) < 0)
-          cssstr = cssval
-        else
+        if (['top', 'left', 'width', 'height', 'line-height', 'padding', 'spacing'].indexOf(key) >= 0)
           cssstr = (parseInt(cssval)).toString()+"px"
+        else if (['font-size'].indexOf(key) >= 0)
+          cssstr = (parseInt(cssval)).toString()+"pt"
+        else
+          cssstr = cssval
         element.style[key] = cssstr
 
         if ((cssval == val) || (diff > 0 && cssval > val) || (diff < 0 && cssval < val))
-          if (['top', 'left', 'width', 'height', 'line-height', 'padding', 'spacing', ].indexOf(key) < 0)
-            cssstr = val
-          else
+          if (['top', 'left', 'width', 'height', 'line-height', 'padding', 'spacing', ].indexOf(key) >= 0)
             cssstr = (parseInt(val)).toString()+"px"
+          else if (['font-size'].indexOf(key) >= 0)
+            cssstr = (parseInt(val)).toString()+"pt"
+          else
+            cssstr = val
 
           element.style[key] = cssstr
           flag = false
@@ -168,6 +180,7 @@ class plustick_core
     anim_proc(element, cssparam)
 
   #===========================================================================
+  # add event listener
   #===========================================================================
   addListener:(param)->
     id = param.id || undefined
@@ -190,12 +203,14 @@ class plustick_core
         size:
           width: Math.floor(width)
           height: Math.floor(height)
-        origin:
-          x: Math.floor(x)
-          y: Math.floor(y)
-      listener(frame)
+        pos:
+          offsetX: Math.floor(x)
+          offsetY: Math.floor(y)
+          clientX: Math.floor(event.clientX)
+          clientY: Math.floor(event.clientY)
+      listener(this, frame)
 
-    target = document.querySelector("##{id}")
+    target = getElement(id)
     target.addEventListener type, method, capture
 
     key="#{id}_#{type}"
@@ -206,6 +221,7 @@ class plustick_core
       capture: capture
 
   #===========================================================================
+  # remove event listener
   #===========================================================================
   removeListener:(id, type)->
     key="#{id}_#{type}"
@@ -215,6 +231,7 @@ class plustick_core
       @eventlistener[key] = undefined
 
   #===========================================================================
+  # execute procedure for key
   #===========================================================================
   procedure:(id, key=undefined, param=undefined)->
     obj = GLOBAL.PROC[id]
@@ -225,6 +242,7 @@ class plustick_core
       obj[key](param)
 
   #===========================================================================
+  # check EAN13 code formatte
   #===========================================================================
   checkEan13Code:(code)->
     codestr = code.toString()
@@ -262,6 +280,7 @@ class plustick_core
       err: err
 
   #===========================================================================
+  # Call Ajax
   #===========================================================================
   APICALL:(param=undefined)->
     if (!param.endpoint? && !param.uri?)

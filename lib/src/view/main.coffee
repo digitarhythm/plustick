@@ -54,6 +54,16 @@ window.requestAnimationFrame = requestAnimationFrame
 #===========================================================================
 window.onload =  ->
   #===========================================================================
+  # resize event
+  #===========================================================================
+  window.addEventListener 'resize', ->
+    contents_size = fitContentsSize(APPLICATION)
+    ROOT.style.width = "#{contents_size.width}px"
+    ROOT.style.height = "#{contents_size.height}px"
+    ROOT.style.left = "#{contents_size.left}px"
+    ROOT.style.top = "#{contents_size.top}px"
+
+  #===========================================================================
   # fit contents size to browser
   #===========================================================================
   fitContentsSize = (apps)->
@@ -150,14 +160,6 @@ window.onload =  ->
   ROOT.style.margin = "0px 0px 0px 0px"
   ROOT.style.backgroundColor = backgroundColor
   ROOT.style.overflow = "hidden"
-
-  # resize event
-  window.addEventListener 'resize', ->
-    contents_size = fitContentsSize(APPLICATION)
-    ROOT.style.width = "#{contents_size.width}px"
-    ROOT.style.height = "#{contents_size.height}px"
-    ROOT.style.left = "#{contents_size.left}px"
-    ROOT.style.top = "#{contents_size.top}px"
 
   if (typeof APPLICATION.createHtml == 'function')
     APPLICATION.createHtml().then (html) =>
