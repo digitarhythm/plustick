@@ -180,8 +180,8 @@ class plustick_core
 
     key="#{id}_#{type}"
     if(@eventlistener[key]?)
-      e = @eventlistener["#{id}_#{type}"]
-      e.target.removeEventListener(type, e.listener, e.capture)
+      e = @eventlistener[key]
+      e.target.removeEventListener(e.type, e.listener, e.capture)
 
     target = document.querySelector("##{id}")
     target.addEventListener type, (event)=>
@@ -199,8 +199,9 @@ class plustick_core
           y: Math.floor(y)
     , capture
 
-    @eventlistener["#{id}_#{type}"] =
+    @eventlistener[key] =
       target: target
+      type: type
       listener: listener
       capture: capture
 
