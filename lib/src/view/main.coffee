@@ -8,6 +8,10 @@ ROOT = undefined
 GLOBAL =
   PROC: {}
 
+__RESIZELISTENER__ = {}
+__RESIZECOUNTER__ = new Date().getTime()
+__RESIZETIMEOUT__ = undefined
+
 #===========================================================================
 # super super class
 #===========================================================================
@@ -62,6 +66,15 @@ window.onload =  ->
     ROOT.style.height = "#{contents_size.height}px"
     ROOT.style.left = "#{contents_size.left}px"
     ROOT.style.top = "#{contents_size.top}px"
+    if (__RESIZETIMEOUT__?)
+      clearTimeout(__RESIZETIMEOUT__)
+    __RESIZETIMEOUT__ = setTimeout ->
+      list = Object.keys(__RESIZELISTENER__)
+      for key in list
+        obj = __RESIZELISTENER__[key]
+        obj.resize()
+      __RESIZETIMEOUT__ = undefined
+    , 100
 
   #===========================================================================
   # fit contents size to browser

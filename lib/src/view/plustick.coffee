@@ -1,12 +1,12 @@
 #=============================================================================
 # nop
 #=============================================================================
-nop =->
+nop = ->
 
 #=============================================================================
 # text formatter
 #=============================================================================
-__strFormatter__ = (a, b...)->
+__strFormatter__ = (a, b...) ->
   for data in b
     if (Object.prototype.toString.call(data) == "[object Object]")
       data = JSON.stringify(data)
@@ -27,36 +27,36 @@ __strFormatter__ = (a, b...)->
 #=============================================================================
 # debug write
 #=============================================================================
-echo = (a, b...)->
+echo = (a, b...) ->
   if (node_env == "develop")
     console.log(__strFormatter__(a, b...))
 
 #=============================================================================
 # DOM Operation
 #=============================================================================
-getElement = (id)->
+getElement = (id) ->
   return document.getElementById(id)
 
-setHtml = (id, html)->
+setHtml = (id, html) ->
   document.getElementById(id).innerHTML = html
 
 #=============================================================================
 # system utility class
 #=============================================================================
 class plustick_core
-  constructor:->
+  constructor: ->
     @eventlistener = {}
 
   #===========================================================================
   # format strings
   #===========================================================================
-  sprintf:(a, b...)->
+  sprintf:(a, b...) ->
     return __strFormatter__(a, b...)
 
   #===========================================================================
   # get browser size(include scrolling bar)
   #===========================================================================
-  getBounds:->
+  getBounds: ->
     width = window.innerWidth
     height = window.innerHeight
     frame = []
@@ -74,7 +74,7 @@ class plustick_core
   #===========================================================================
   # get browser name
   #===========================================================================
-  getBrowser:->
+  getBrowser: ->
     ua = navigator.userAgent
     if (ua.match(".*iPhone.*"))
       kind = 'iOS'
@@ -111,7 +111,7 @@ class plustick_core
   #===========================================================================
   # CSS Animation
   #===========================================================================
-  animate:(duration, target_id, toparam, finished=undefined)->
+  animate:(duration, target_id, toparam, finished=undefined) ->
     anim_tmp = 10.0
 
     #=========================================================================
@@ -182,7 +182,7 @@ class plustick_core
   #===========================================================================
   # add event listener
   #===========================================================================
-  addListener:(param)->
+  addListener:(param) ->
     id = param.id || undefined
     type = param.type || undefined
     listener = param.listener || undefined
@@ -193,7 +193,7 @@ class plustick_core
 
     @removeListener(id, type)
 
-    method = (event)->
+    method = (event) ->
       rect = event.currentTarget.getBoundingClientRect()
       x = event.clientX - rect.left
       y = event.clientY - rect.top
@@ -223,7 +223,7 @@ class plustick_core
   #===========================================================================
   # remove event listener
   #===========================================================================
-  removeListener:(id, type)->
+  removeListener:(id, type) ->
     key="#{id}_#{type}"
     if(@eventlistener[key]?)
       e = @eventlistener[key]
@@ -233,7 +233,7 @@ class plustick_core
   #===========================================================================
   # execute procedure for key
   #===========================================================================
-  procedure:(id, key=undefined, param=undefined)->
+  procedure:(id, key=undefined, param=undefined) ->
     obj = GLOBAL.PROC[id]
     if (!obj?)
       return
@@ -244,7 +244,7 @@ class plustick_core
   #===========================================================================
   # check EAN13 code formatte
   #===========================================================================
-  checkEan13Code:(code)->
+  checkEan13Code:(code) ->
     codestr = code.toString()
     if (codestr.length != 13)
       return undefined
@@ -280,9 +280,18 @@ class plustick_core
       err: err
 
   #===========================================================================
+  # add/remove resize event
+  #===========================================================================
+  addResizeEvent:(id, obj) ->
+    __RESIZELISTENER__[id] = obj
+
+  removeResizeEvent:(id) ->
+    __RESIZELISTENER__[id] = undefined
+
+  #===========================================================================
   # Call Ajax
   #===========================================================================
-  APICALL:(param=undefined)->
+  APICALL:(param=undefined) ->
     if (!param.endpoint? && !param.uri?)
       return -1
 
