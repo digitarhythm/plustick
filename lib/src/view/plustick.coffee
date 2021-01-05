@@ -178,40 +178,41 @@ class plustick_core
     if (!id? || !type?)
       return
 
-    key="#{id}_#{type}"
-    if(@eventlistener[key]?)
-      e = @eventlistener[key]
-      e.target.removeEventListener(e.type, e.listener, e.capture)
+    @removeListener(id, type)
 
-    target = document.querySelector("##{id}")
-    target.addEventListener type, (event)=>
+    method = (event)->
       rect = event.currentTarget.getBoundingClientRect()
       x = event.clientX - rect.left
       y = event.clientY - rect.top
       width = rect.width
       height = rect.height
-      listener
+      frame =
         size:
           width: Math.floor(width)
           height: Math.floor(height)
         origin:
           x: Math.floor(x)
           y: Math.floor(y)
-    , capture
+      listener(frame)
 
+    target = document.querySelector("##{id}")
+    target.addEventListener type, method, capture
+
+    key="#{id}_#{type}"
     @eventlistener[key] =
       target: target
       type: type
-      listener: listener
+      listener: method
       capture: capture
 
   #===========================================================================
   #===========================================================================
   removeListener:(id, type)->
-    if("#{id}_#{type}" in @eventlistener)
-      e = @eventlistener["#{id}_#{type}"]
+    key="#{id}_#{type}"
+    if(@eventlistener[key]?)
+      e = @eventlistener[key]
       e.target.removeEventListener(type, e.listener, e.capture)
-      @eventlistener["#{id}_#{type}"] = undefined
+      @eventlistener[key] = undefined
 
   #===========================================================================
   #===========================================================================
