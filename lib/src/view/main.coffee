@@ -9,7 +9,6 @@ ROOT = undefined
 GLOBAL =
   PROC: {}
 
-__RESIZELISTENER__ = {}
 __RESIZECOUNTER__ = new Date().getTime()
 __RESIZETIMEOUT__ = undefined
 
@@ -21,10 +20,12 @@ class coreobject
     S4 = ->
       return (((1+Math.random())*0x10000)|0).toString(16).substring(1)
     @uniqueID = (S4()+S4()+"_"+S4()+"_"+S4()+"_"+S4()+"_"+S4()+S4()+S4())
+
     GLOBAL.PROC[@uniqueID] = @
+
     if (APPLICATION?)
-      @width = APPLICATION.width
-      @height = APPLICATION.height
+      @width = APPLICATION.width || undefined
+      @height = APPLICATION.height || undefined
 
   addView:(id, obj) ->
     target = getElement(id) || undefined
@@ -32,11 +33,11 @@ class coreobject
       return
     else
       html = await obj.createHtml()
-      backup = target.style.display
-      target.style.display = "none"
+      backup = obj.style.display
+      obj.style.display = "none"
       target.insertAdjacentHTML('beforeend', html)
       obj.viewDidLoad()
-      target.style.display = backup
+      obj.style.display = backup
       obj.viewDidAppear()
 
   createHtml: ->
@@ -62,17 +63,17 @@ window.onload =  ->
   # resize event
   #===========================================================================
   window.addEventListener 'resize', ->
-    contents_size = fitContentsSize(APPLICATION)
-    ROOT.style.width = "#{contents_size.width}px"
-    ROOT.style.height = "#{contents_size.height}px"
-    ROOT.style.left = "#{contents_size.left}px"
-    ROOT.style.top = "#{contents_size.top}px"
     if (__RESIZETIMEOUT__?)
       clearTimeout(__RESIZETIMEOUT__)
     __RESIZETIMEOUT__ = setTimeout ->
-      list = Object.keys(__RESIZELISTENER__)
+      contents_size = fitContentsSize(APPLICATION)
+      ROOT.style.width = "#{contents_size.width}px"
+      ROOT.style.height = "#{contents_size.height}px"
+      ROOT.style.left = "#{contents_size.left}px"
+      ROOT.style.top = "#{contents_size.top}px"
+      list = Object.keys(GLOBAL.PROC)
       for key in list
-        obj = __RESIZELISTENER__[key]
+        obj = GLOBAL.PROC[key]
         obj.resize()
       __RESIZETIMEOUT__ = undefined
     , 100
