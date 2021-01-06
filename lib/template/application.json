@@ -1,4 +1,9 @@
 {
+  "OGP": {
+    "url": "",
+    "twitter": "",
+    "facebook": ""
+  },
   "additional": {
     "front": {
       "css": [

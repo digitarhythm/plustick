@@ -165,9 +165,9 @@ app.get "/", (req, res) ->
     title=pkgjson.name
     site_name=pkgjson.name
     description=pkgjson.description
-    thumbnail="#{config.Author.url}/#{pkgname}/public/OGP.png"
-    twitter = config.Author.twitter || ""
-    facebook = config.Author.facebook || ""
+    thumbnail="#{appjson.OGP.url}/#{pkgname}/public/OGP.png"
+    twitter = appjson.OGP.twitter || ""
+    facebook = appjson.OGP.facebook || ""
     # rendering HTML
     res.render "main",
       pkgname: pkgname

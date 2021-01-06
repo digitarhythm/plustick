@@ -1,9 +1,6 @@
 {
-    "author": {
-      "name": "no name",
-      "url": "",
-      "twitter": "",
-      "facebook": ""
+    "Author": {
+      "name": "no name"
     },
     "network": {
       "startport": 5000,
