@@ -1,7 +1,8 @@
 #===========================================================================
 # GLOBAL setting
 #===========================================================================
-ORIGIN = window.location.href.replace(/\/$/, "")+"/#{pkgname}"
+origintmp = window.location.href.replace(/\?.*$/, "")
+ORIGIN = origintmp.replace(/\/$/, "")+"/#{pkgname}"
 PUBLIC = "#{ORIGIN}/public"
 APPLICATION = undefined
 ROOT = undefined

@@ -161,7 +161,7 @@ app.get "/", (req, res) ->
       return 1
 
   .then (ret) ->
-    origin=config.Author.url
+    origin=appjson.OGP.url || ""
     title=pkgjson.name
     site_name=pkgjson.name
     description=pkgjson.description
