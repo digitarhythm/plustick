@@ -3,6 +3,13 @@
 #===========================================================================
 origintmp = window.location.href.replace(/\?.*$/, "")
 ORIGIN = origintmp.replace(/\/$/, "")+"/#{pkgname}"
+querytmp = window.location.search.replace(/^\?/, "")
+querylist = querytmp.split(/&/)
+QUERY = {}
+querylist.forEach (str) ->
+  list = str.split(/=/)
+  if (list.length == 2)
+    QUERY[list[0]] = list[1]
 PUBLIC = "#{ORIGIN}/public"
 APPLICATION = undefined
 ROOT = undefined
