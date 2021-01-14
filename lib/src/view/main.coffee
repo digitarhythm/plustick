@@ -40,11 +40,8 @@ class coreobject
       return
     else
       html = await obj.createHtml()
-      backup = obj.style.display || "inline"
-      obj.style.display = "none"
       target.insertAdjacentHTML('beforeend', html)
       obj.viewDidLoad()
-      obj.style.display = backup
       obj.viewDidAppear()
 
   createHtml: ->
