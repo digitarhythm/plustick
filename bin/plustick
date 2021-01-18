@@ -92,6 +92,11 @@ function environ_check() {
     mkdir -p $target
   fi
 
+  target="$APPSDIR/apps/stylesheet"
+  if [ ! -e $target ]; then
+    mkdir -p $target
+  fi
+
   target="$APPSDIR/apps/public"
   if [ ! -e $target ]; then
     mkdir -p $target
@@ -138,10 +143,10 @@ function environ_check() {
     ln -s ./apps/config $APPSDIR/config
   fi
 
-  # check plugin file
-  target="$APPSDIR/apps/plugin/appsmain.css"
+  # check stylesheet file
+  target="$APPSDIR/apps/stylesheet/appsmain.css"
   if [ ! -e $target ]; then
-    cp $MODULE/lib/template/appsmain.css $APPSDIR/apps/plugin/
+    cp $MODULE/lib/template/appsmain.css $APPSDIR/apps/stylesheet/
   fi
 
   # check public file

@@ -37,6 +37,9 @@ __templatedir = "#{__systemdir}/lib/template"
 # plugin directory
 __plugindir = "#{__appsdir}/plugin"
 
+# stylesheet directory
+__stylesheetdir = "#{__appsdir}/stylesheet"
+
 # javascript directory
 __jsdir = "#{__appsdir}/js"
 __jsctrldir = "#{__jsdir}/control"
@@ -64,6 +67,7 @@ app.set("view engine", "ect")
 # URI directory binding
 #==========================================================================
 app.use("/#{pkgname}/plugin", express.static(__plugindir))
+app.use("/#{pkgname}/stylesheet", express.static(__stylesheetdir))
 app.use("/#{pkgname}/public", express.static(__publicdir))
 app.use("/#{pkgname}/view", express.static(__jsviewdir))
 app.use("/#{pkgname}/syslib", express.static(__syslibsview))
@@ -143,12 +147,17 @@ app.get "/", (req, res) ->
   jsuserlist = []
 
   __readFileList(__plugindir).then (lists) ->
-    # JS/CSS file in plugin directory
+    # JS file in plugin directory
     for fname in lists
-      if (fname.match(/^.*\.css$/))
-        cssfilelist.push("#{pkgname}/plugin/#{fname}")
       if (fname.match(/^.*\.js$/))
         jssyslist.push("#{pkgname}/plugin/#{fname}")
+    return 1
+
+  __readFileList(__stylesheetdir).then (lists) ->
+    # CSS file in stylesheet directory
+    for fname in lists
+      if (fname.match(/^.*\.css$/))
+        cssfilelist.push("#{pkgname}/stylesheet/#{fname}")
     return 1
 
   .then (ret) ->
