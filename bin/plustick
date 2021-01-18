@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+ESC=$(printf '\033')
+GREEN='\u001b[01;32m'
+YELLOW='\u001b[01;33m'
+RESET='\u001b[0m'
+
 #=============================================================================
 # error handler
 # エラー処理
@@ -181,7 +186,14 @@ function optproc() {
       if [ $FIRSTBOOT -eq 1 ]; then
         compile 0
       fi
-      forever start --uid `pwd` ./node_modules/plustick/lib/js/control/index.min.js
+      uid=`pwd -P`
+      list=`forever list | grep $uid`
+      num=${#list[*]}
+      if [ $num > 0 ]; then
+        forever stop `pwd` > /dev/null 2>&1
+      fi
+      forever start --uid `pwd` ./node_modules/plustick/lib/js/control/index.min.js > /dev/null 2>&1
+      printf "${ESC}${YELLOW}Execute [${ESC}${GREEN}`pwd`${ESC}${YELLOW}] process.\n"
       ;;
     [d] )
       if [ $FIRSTBOOT -eq 1 ]; then
@@ -190,7 +202,13 @@ function optproc() {
       NODE_ENV=develop node-dev $MODULE/lib/js/control/index.min.js
       ;;
     [t] )
-      forever stop `pwd`
+      uid=`pwd -P`
+      list=`forever list | grep $uid`
+      num=${#list[*]}
+      if [ $num -ge 1 ] && [ ! "$list" = "" ]; then
+        forever stop `pwd` > /dev/null 2>&1
+        printf "${ESC}${YELLOW}[${ESC}${GREEN}`pwd`${ESC}${YELLOW}] process stopped.\n"
+      fi
       ;;
     [h] )
       error 1
