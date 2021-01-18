@@ -189,7 +189,7 @@ function optproc() {
       uid=`pwd -P`
       list=`forever list | grep $uid`
       num=${#list[*]}
-      if [ $num > 0 ]; then
+      if [ $num -ge 1 ] && [ ! "$list" = "" ]; then
         forever stop `pwd` > /dev/null 2>&1
       fi
       forever start --uid `pwd` ./node_modules/plustick/lib/js/control/index.min.js > /dev/null 2>&1
