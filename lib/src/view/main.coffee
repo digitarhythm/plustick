@@ -55,6 +55,7 @@ class coreobject
     GLOBAL.PROC[@uniqueID] = @
 
   addView:(id, obj) ->
+    obj.parent = @
     target = getElement(id) || undefined
     if (!target?)
       return
