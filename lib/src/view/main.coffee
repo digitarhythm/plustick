@@ -106,7 +106,7 @@ window.onload =  ->
       list = Object.keys(GLOBAL.PROC)
       for key in list
         obj = GLOBAL.PROC[key]
-        obj.resize()
+        obj.resize() if (typeof(obj.resize) == "function")
       __RESIZETIMEOUT__ = undefined
     , 100
 
