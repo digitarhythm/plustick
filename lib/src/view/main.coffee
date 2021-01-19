@@ -187,6 +187,7 @@ window.onload =  ->
   # body setting
   document.body.setAttribute("id", "body")
   document.body.style.userSelect = "none"
+  document.body.style.backgroundColor = "rgba(64, 64, 64, 1.0)"
   document.oncontextmenu = =>
     contextmenu = APPLICATION.contextmenu
     return contextmenu
