@@ -5,11 +5,11 @@ origintmp = window.location.href.replace(/\?.*$/, "")
 ORIGIN = origintmp.replace(/\/$/, "")+"/#{pkgname}"
 querytmp = window.location.search.replace(/^\?/, "")
 querylist = querytmp.split(/&/)
-QUERY = {}
+QUERY_PARAM = {}
 querylist.forEach (str) ->
   list = str.split(/=/)
   if (list.length == 2)
-    QUERY[list[0]] = list[1]
+    QUERY_PARAM[list[0]] = list[1]
 PUBLIC = "#{ORIGIN}/public"
 APPLICATION = undefined
 ROOT = undefined
@@ -183,11 +183,12 @@ window.onload =  ->
 
   # get user setting
   backgroundColor = APPLICATION.backgroundColor || "rgba(0, 0, 0, 1.0)"
+  bodybgcolor = APPLICATION.bodyBackgroundColor || "rgba(64, 64, 64, 1.0)"
 
   # body setting
   document.body.setAttribute("id", "body")
   document.body.style.userSelect = "none"
-  document.body.style.backgroundColor = "rgba(64, 64, 64, 1.0)"
+  document.body.style.backgroundColor = bodybgcolor
   document.oncontextmenu = =>
     contextmenu = APPLICATION.contextmenu
     return contextmenu
