@@ -62,6 +62,7 @@ class coreobject
     else
       html = await obj.createHtml()
       target.insertAdjacentHTML('beforeend', html)
+      obj.self = getElement(obj.uniqueID)
       obj.viewDidLoad()
       obj.viewDidAppear()
 
