@@ -2,8 +2,8 @@
 # template class file
 #=====================================
 class [[[:classname:]]] extends coreobject
-  constructor: ->
-    super()
+  constructor:(param) ->
+    super(param)
 
   createHtml: ->
     super()

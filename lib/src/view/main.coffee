@@ -23,7 +23,31 @@ __RESIZETIMEOUT__ = undefined
 # super super class
 #===========================================================================
 class coreobject
-  constructor: ->
+  constructor: (param=undefined) ->
+    if (param?)
+      if (param.frame?)
+        if (param.frame.size?)
+          size = param.frame.size || undefined
+        if (param.frame.origin?)
+          origin = param.frame.origin || undefined
+
+    @__frame__ =
+      origin:
+        x: undefined
+        y: undefined
+      size:
+        width: undefined
+        height: undefined
+
+    if (param?)
+      if (param.frame?)
+        if (param.frame.size?)
+          @__frame__.size.width = size.width || undefined
+          @__frame__.size.height = size.height || undefined
+        if (param.frame.origin?)
+          @__frame__.origin.x = origin.x || undefined
+          @__frame__.origin.y = origin.y || undefined
+
     S4 = ->
       return (((1+Math.random())*0x10000)|0).toString(16).substring(1)
     @uniqueID = (S4()+S4()+"_"+S4()+"_"+S4()+"_"+S4()+"_"+S4()+S4()+S4())
@@ -43,6 +67,12 @@ class coreobject
   createHtml: ->
 
   viewDidLoad: ->
+    target = getElement(@uniqueID)
+    target.style.width = "#{@__frame__.size.width}px" if (@__frame__.size.widt?)
+    target.style.height = "#{@__frame__.size.height}px" if (@__frame__.size.height?)
+    target.style.left = "#{@__frame__.origin.x}px" if (@__frame__.origin.x?)
+    target.style.top = "#{@__frame__.origin.y}px" if (@__frame__.origin.y?)
+    @__frame__ = undefined
 
   viewDidAppear: ->
 
