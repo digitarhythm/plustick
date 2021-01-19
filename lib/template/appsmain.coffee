@@ -26,7 +26,7 @@ class appsmain extends coreobject
   # After the HTML is loaded, but before it is displayed, it is executed.
   #===========================================================================
   viewDidLoad: ->
-    getElement("contents").innerHTML = """
+    setHtml "contents", """
       <div id="version" onclick="
         plustick.procedure('#{@uniqueID}', 'version');
       ">

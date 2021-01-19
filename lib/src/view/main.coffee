@@ -30,10 +30,6 @@ class coreobject
 
     GLOBAL.PROC[@uniqueID] = @
 
-    if (APPLICATION?)
-      @width = APPLICATION.width || undefined
-      @height = APPLICATION.height || undefined
-
   addView:(id, obj) ->
     target = getElement(id) || undefined
     if (!target?)
