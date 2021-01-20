@@ -146,54 +146,46 @@ app.get "/", (req, res) ->
 
   jsuserlist = []
 
-  __readFileList(__plugindir).then (lists) ->
-    # JS file in plugin directory
-    for fname in lists
-      if (fname.match(/^.*\.js$/))
-        jssyslist.push("#{pkgname}/plugin/#{fname}")
-    return 1
+  lists = await __readFileList(__stylesheetdir)
+  # CSS file in stylesheet directory
+  for fname in lists
+    if (fname.match(/^.*\.css$/))
+      cssfilelist.push("#{pkgname}/stylesheet/#{fname}")
 
-  __readFileList(__stylesheetdir).then (lists) ->
-    # CSS file in stylesheet directory
-    for fname in lists
-      if (fname.match(/^.*\.css$/))
-        cssfilelist.push("#{pkgname}/stylesheet/#{fname}")
-    return 1
+  # JS file in user script directory
+  lists = await __readFileList(__jsviewdir)
+  filelist = []
+  for fname in lists
+    if (fname.match(/^.*\.min\.js$/) and !fname.match(/^main\.min\.js/) and !fname.match(/^plustick\.min\.js/))
+      jsuserlist.push("#{pkgname}/view/#{fname}")
 
-  .then (ret) ->
-    # JS file in user script directory
-    __readFileList(__jsviewdir).then (lists) ->
-      filelist = []
-      for fname in lists
-        if (fname.match(/^.*\.min\.js$/) and !fname.match(/^main\.min\.js/) and !fname.match(/^plustick\.min\.js/))
-          jsuserlist.push("#{pkgname}/view/#{fname}")
-      return 1
+  lists = await __readFileList(__plugindir)
+  # JS file in plugin directory
+  for fname in lists
+    if (fname.match(/^.*\.js$/))
+      jssyslist.push("#{pkgname}/plugin/#{fname}")
 
-  .then (ret) ->
-    origin=appjson.OGP.url || ""
-    title=pkgjson.name
-    site_name=pkgjson.name
-    description=pkgjson.description
-    thumbnail="#{pkgname}/public/OGP.png"
-    twitter = appjson.OGP.twitter || ""
-    facebook = appjson.OGP.facebook || ""
-    # rendering HTML
-    res.render "main",
-      pkgname: pkgname
-      jssyslist: jssyslist
-      jsuserlist: jsuserlist
-      cssfilelist: cssfilelist
-      node_env: node_env
-      origin: origin
-      title: title
-      site_name: site_name
-      description: description
-      thumbnail: thumbnail
-      twitter: twitter
-      facebook: facebook
-  .catch (err) ->
-    console.error(err)
-    process.exit(1)
+  origin=appjson.OGP.url || ""
+  title=pkgjson.name
+  site_name=pkgjson.name
+  description=pkgjson.description
+  thumbnail="#{pkgname}/public/OGP.png"
+  twitter = appjson.OGP.twitter || ""
+  facebook = appjson.OGP.facebook || ""
+  # rendering HTML
+  res.render "main",
+    pkgname: pkgname
+    jssyslist: jssyslist
+    jsuserlist: jsuserlist
+    cssfilelist: cssfilelist
+    node_env: node_env
+    origin: origin
+    title: title
+    site_name: site_name
+    description: description
+    thumbnail: thumbnail
+    twitter: twitter
+    facebook: facebook
 
 #==============================================================================
 # run server
