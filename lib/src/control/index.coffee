@@ -170,6 +170,7 @@ app.get "/", (req, res) ->
   site_name=pkgjson.name
   description=pkgjson.description
   thumbnail="#{pkgname}/public/OGP.png"
+  favicon="#{pkgname}/public/favicon.ico"
   twitter = appjson.OGP.twitter || ""
   facebook = appjson.OGP.facebook || ""
   # rendering HTML
@@ -184,6 +185,7 @@ app.get "/", (req, res) ->
     site_name: site_name
     description: description
     thumbnail: thumbnail
+    favicon: favicon
     twitter: twitter
     facebook: facebook
 
