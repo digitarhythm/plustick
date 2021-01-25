@@ -2,7 +2,6 @@
 </html>
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" href="<%= @pkgname %>/public/favicon.ico">
     <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
 
     <% if @twitter != "" || @facebook != "" : %>
@@ -23,6 +22,7 @@
     <% end %>
 
     <title><%= @title %></title>
+    <link rel="icon" href="<%= @pkgname %>/favicon.ico">
 
     <% for f in @cssfilelist : %>
       <link rel="stylesheet" type="text/css" href="<%= f %>">

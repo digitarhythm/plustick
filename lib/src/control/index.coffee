@@ -71,6 +71,7 @@ app.use("/#{pkgname}/stylesheet", express.static(__stylesheetdir))
 app.use("/#{pkgname}/public", express.static(__publicdir))
 app.use("/#{pkgname}/view", express.static(__jsviewdir))
 app.use("/#{pkgname}/syslib", express.static(__syslibsview))
+app.use("/#{pkgname}/favicon.ico", express.static("#{__publicdir}/favicon.ico"))
 
 #==========================================================================
 # routing function dictionary
@@ -170,7 +171,6 @@ app.get "/", (req, res) ->
   site_name=pkgjson.name
   description=pkgjson.description
   thumbnail="#{pkgname}/public/OGP.png"
-  favicon="#{pkgname}/public/favicon.ico"
   twitter = appjson.OGP.twitter || ""
   facebook = appjson.OGP.facebook || ""
   # rendering HTML
@@ -185,7 +185,6 @@ app.get "/", (req, res) ->
     site_name: site_name
     description: description
     thumbnail: thumbnail
-    favicon: favicon
     twitter: twitter
     facebook: facebook
 
