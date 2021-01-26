@@ -46,7 +46,7 @@ __jsctrldir = "#{__jsdir}/control"
 __jsviewdir = "#{__jsdir}/view"
 
 # user Library directory
-__usrlibsdir = "#{__appsdir}/lib"
+__usrlibsdir = "#{__homedir}/lib"
 
 # user JavaScript directory
 __usrjssdir = "#{__appsdir}/js"
