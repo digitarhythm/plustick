@@ -45,10 +45,13 @@ __jsdir = "#{__appsdir}/js"
 __jsctrldir = "#{__jsdir}/control"
 __jsviewdir = "#{__jsdir}/view"
 
-# user library directory
-__usrlibsdir = "#{__appsdir}/js"
-__usrctrldir = "#{__usrlibsdir}/control"
-__usrviewdir = "#{__usrlibsdir}/view"
+# user Library directory
+__usrlibsdir = "#{__appsdir}/lib"
+
+# user JavaScript directory
+__usrjssdir = "#{__appsdir}/js"
+__usrctrldir = "#{__usrjssdir}/control"
+__usrviewdir = "#{__usrjssdir}/view"
 
 # system library directory
 __syslibsdir = "#{__systemdir}/lib/js"
@@ -71,7 +74,7 @@ app.use("/#{pkgname}/stylesheet", express.static(__stylesheetdir))
 app.use("/#{pkgname}/public", express.static(__publicdir))
 app.use("/#{pkgname}/view", express.static(__jsviewdir))
 app.use("/#{pkgname}/syslib", express.static(__syslibsview))
-app.use("/#{pkgname}/favicon.ico", express.static("#{__publicdir}/favicon.ico"))
+app.use("/#{pkgname}/usrlib", express.static(__usrlibsdir))
 
 #==========================================================================
 # routing function dictionary
@@ -153,7 +156,7 @@ app.get "/", (req, res) ->
     if (fname.match(/^.*\.css$/))
       cssfilelist.push("#{pkgname}/stylesheet/#{fname}")
 
-  # JS file in user script directory
+  # JavaScript file in user script directory
   lists = await __readFileList(__jsviewdir)
   filelist = []
   for fname in lists
@@ -161,18 +164,27 @@ app.get "/", (req, res) ->
       jsuserlist.push("#{pkgname}/view/#{fname}")
 
   lists = await __readFileList(__plugindir)
-  # JS file in plugin directory
+  # JavaScript file in plugin directory
   for fname in lists
     if (fname.match(/^.*\.js$/))
       jssyslist.push("#{pkgname}/plugin/#{fname}")
 
-  origin=appjson.OGP.url || ""
+  # SNS OGP
+  if (appjson.site?)
+    twitter = appjson.site.twitter || ""
+    facebook = appjson.site.facebook || ""
+  else
+    twitter = ""
+    facebook = ""
+
+  # Template engine value
+  origin = req.headers.host
   title=pkgjson.name
   site_name=pkgjson.name
   description=pkgjson.description
-  thumbnail="#{pkgname}/public/OGP.png"
-  twitter = appjson.OGP.twitter || ""
-  facebook = appjson.OGP.facebook || ""
+  thumbnail="://#{origin}/#{pkgname}/usrlib/OGP.png"
+  favicon="://#{origin}/#{pkgname}/usrlib/favicon.ico"
+
   # rendering HTML
   res.render "main",
     pkgname: pkgname
@@ -185,6 +197,7 @@ app.get "/", (req, res) ->
     site_name: site_name
     description: description
     thumbnail: thumbnail
+    favicon: favicon
     twitter: twitter
     facebook: facebook
 
