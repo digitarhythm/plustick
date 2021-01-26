@@ -217,12 +217,12 @@ window.onload =  ->
   link.rel = "icon"
   document.head.appendChild(link)
 
-  ogpfname = APPLICATION.ogpimg || 'OGP.png'
-
-  ogp = document.createElement('meta')
-  ogp.property = "og:image"
-  ogp.content = "#{ORIGIN}/usrlib/#{ogpfname}"
-  document.head.appendChild(ogp)
+  ogpfname = APPLICATION.ogpimg || undefined
+  if (ogpfname?)
+    ogp = document.createElement('meta')
+    ogp.property = "og:image"
+    ogp.content = "#{ORIGIN}/usrlib/#{ogpfname}"
+    document.head.appendChild(ogp)
 
   url = document.createElement('meta')
   url.property = "og:url"
