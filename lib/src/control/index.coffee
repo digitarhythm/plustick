@@ -182,8 +182,6 @@ app.get "/", (req, res) ->
   title=pkgjson.name
   site_name=pkgjson.name
   description=pkgjson.description
-  thumbnail="://#{origin}/#{pkgname}/usrlib/OGP.png"
-  favicon="://#{origin}/#{pkgname}/usrlib/favicon.ico"
 
   # rendering HTML
   res.render "main",
@@ -196,8 +194,6 @@ app.get "/", (req, res) ->
     title: title
     site_name: site_name
     description: description
-    thumbnail: thumbnail
-    favicon: favicon
     twitter: twitter
     facebook: facebook
 

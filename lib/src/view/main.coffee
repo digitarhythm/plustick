@@ -210,6 +210,21 @@ window.onload =  ->
   ROOT.style.backgroundColor = backgroundColor
   ROOT.style.overflow = "hidden"
 
+  link = document.createElement('link')
+  link.href = "#{ORIGIN}/usrlib/favicon.ico"
+  link.rel = "icon"
+  document.head.appendChild(link)
+
+  ogp = document.createElement('meta')
+  ogp.property = "og:image"
+  ogp.content = "#{ORIGIN}/usrlib/OGP.png"
+  document.head.appendChild(ogp)
+
+  thumb = document.createElement('meta')
+  thumb.property = "og:url"
+  thumb.content = ORIGIN
+  document.head.appendChild(thumb)
+
   if (typeof APPLICATION.createHtml == 'function')
     APPLICATION.createHtml().then (html) =>
       if (html?)
