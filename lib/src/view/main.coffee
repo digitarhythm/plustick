@@ -210,8 +210,10 @@ window.onload =  ->
   ROOT.style.backgroundColor = backgroundColor
   ROOT.style.overflow = "hidden"
 
+  favfname = APPLICATION.favicon || 'favicon.ico'
+
   link = document.createElement('link')
-  link.href = "#{ORIGIN}/usrlib/favicon.ico"
+  link.href = "#{ORIGIN}/usrlib/#{favfname}"
   link.rel = "icon"
   document.head.appendChild(link)
 
