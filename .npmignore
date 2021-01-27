@@ -4,6 +4,6 @@
 package-lock.json
 
 node_modules
-libs/src
+lib/src
 
 makepackage
