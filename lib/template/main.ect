@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-</html>
+<html>
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
 
     <% if @twitter != "" || @facebook != "" : %>
-      <meta property="og:image" content="<%= @pkgname %>/usrlib/OGP.png" />
-      <meta property="og:url" content="<%= @origin %>/<%= @pkgname %>" />
+      <meta property="og:image" content="<%= @image %>" />
+      <meta property="og:url" content="<%= @origin %>" />
       <meta property="og:type" content="website" />
       <meta property="og:title" content="<%= @title %>" />
       <meta property="og:description" content="<%= @description %>" />
@@ -22,9 +22,10 @@
     <% end %>
 
     <title><%= @title %></title>
+    <link rel="icon" href="<%= @favicon %>" />
 
     <% for f in @cssfilelist : %>
-      <link rel="stylesheet" type="text/css" href="<%= f %>">
+      <link rel="stylesheet" type="text/css" href="<%= f %>" />
     <% end %>
     <% for f in @jssyslist : %>
       <script type="text/javascript" src="<%= f %>"></script>

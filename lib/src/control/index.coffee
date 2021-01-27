@@ -170,16 +170,21 @@ app.get "/", (req, res) ->
       jssyslist.push("#{pkgname}/plugin/#{fname}")
 
   # Template engine value
-  origin = req.headers.host
   title = pkgjson.name
   site_name = pkgjson.name
   description = pkgjson.description
 
   # SNS Info
   if (appjson.site?)
+    origin = "#{(appjson.site.origin || req.headers.host)}"
+    imgtmp = appjson.site.image || "OGP.png"
+    image = "#{origin}/#{pkgname}/usrlib/#{imgtmp}"
+    favicon = "#{origin}/#{pkgname}/usrlib/#{appjson.site.favicon}" || ""
     twitter = appjson.site.twitter || ""
     facebook = appjson.site.facebook || ""
   else
+    origin = req.headers.host
+    image = "#{origin}/usrlib/OGP.png"
     twitter = ""
     facebook = ""
 
@@ -191,6 +196,8 @@ app.get "/", (req, res) ->
     cssfilelist: cssfilelist
     node_env: node_env
     origin: origin
+    image: image
+    favicon: favicon
     title: title
     site_name: site_name
     description: description

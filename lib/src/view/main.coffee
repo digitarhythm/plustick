@@ -211,13 +211,6 @@ window.onload =  ->
   ROOT.style.backgroundColor = backgroundColor
   ROOT.style.overflow = "hidden"
 
-  # favicon
-  favfname = APPLICATION.favicon || 'favicon.ico'
-  link = document.createElement('link')
-  link.href = "#{SITEURL}/usrlib/#{favfname}"
-  link.rel = "icon"
-  document.head.appendChild(link)
-
   if (typeof APPLICATION.createHtml == 'function')
     APPLICATION.createHtml().then (html) =>
       if (html?)
