@@ -115,7 +115,7 @@ function environ_check() {
     mkdir -p $target
   fi
 
-  target="$APPSDIR/apps/lib"
+  target="$APPSDIR/apps/usrlib"
   if [ ! -e $target ]; then
     mkdir -p $target
   fi
@@ -163,9 +163,9 @@ function environ_check() {
   fi
 
   # check user lib file
-  target="$APPSDIR/apps/lib/OGP.png"
+  target="$APPSDIR/apps/usrlib/OGP.png"
   if [ ! -e $target ]; then
-    cp $MODULE/lib/template/OGP.png $APPSDIR/apps/lib/
+    cp $MODULE/lib/template/OGP.png $APPSDIR/apps/usrlib/
   fi
 
   echo $firstboot
