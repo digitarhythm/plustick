@@ -296,7 +296,7 @@ class plustick_core
     if (uri?)
       apiuri = uri
     else
-      apiuri = "#{ORIGIN}/api/#{endpoint}"
+      apiuri = "#{SITEURL}/api/#{endpoint}"
 
     ret = await axios
       method: method
