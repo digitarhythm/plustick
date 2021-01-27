@@ -169,19 +169,19 @@ app.get "/", (req, res) ->
     if (fname.match(/^.*\.js$/))
       jssyslist.push("#{pkgname}/plugin/#{fname}")
 
-  # SNS OGP
+  # Template engine value
+  origin = req.headers.host
+  title = pkgjson.name
+  site_name = pkgjson.name
+  description = pkgjson.description
+
+  # SNS Info
   if (appjson.site?)
     twitter = appjson.site.twitter || ""
     facebook = appjson.site.facebook || ""
   else
     twitter = ""
     facebook = ""
-
-  # Template engine value
-  origin = req.headers.host
-  title=pkgjson.name
-  site_name=pkgjson.name
-  description=pkgjson.description
 
   # rendering HTML
   res.render "main",

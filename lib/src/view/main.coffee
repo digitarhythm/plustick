@@ -2,7 +2,8 @@
 # GLOBAL setting
 #===========================================================================
 origintmp = window.location.href.replace(/\?.*$/, "")
-ORIGIN = origintmp.replace(/\/$/, "")+"/#{pkgname}"
+ORIGIN = origintmp.replace(/\/$/, "")
+SITEURL = "#{ORIGIN}/#{pkgname}"
 querytmp = window.location.search.replace(/^\?/, "")
 querylist = querytmp.split(/&/)
 QUERY_PARAM = {}
@@ -10,7 +11,7 @@ querylist.forEach (str) ->
   list = str.split(/=/)
   if (list.length == 2)
     QUERY_PARAM[list[0]] = list[1]
-PUBLIC = "#{ORIGIN}/public"
+PUBLIC = "#{SITEURL}/public"
 APPLICATION = undefined
 ROOT = undefined
 GLOBAL =
@@ -210,24 +211,12 @@ window.onload =  ->
   ROOT.style.backgroundColor = backgroundColor
   ROOT.style.overflow = "hidden"
 
+  # favicon
   favfname = APPLICATION.favicon || 'favicon.ico'
-
   link = document.createElement('link')
-  link.href = "#{ORIGIN}/usrlib/#{favfname}"
+  link.href = "#{SITEURL}/usrlib/#{favfname}"
   link.rel = "icon"
   document.head.appendChild(link)
-
-  ogpfname = APPLICATION.ogpimg || undefined
-  if (ogpfname?)
-    ogp = document.createElement('meta')
-    ogp.property = "og:image"
-    ogp.content = "#{ORIGIN}/usrlib/#{ogpfname}"
-    document.head.appendChild(ogp)
-
-  url = document.createElement('meta')
-  url.property = "og:url"
-  url.content = ORIGIN
-  document.head.appendChild(url)
 
   if (typeof APPLICATION.createHtml == 'function')
     APPLICATION.createHtml().then (html) =>

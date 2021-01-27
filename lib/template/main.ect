@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
 
     <% if @twitter != "" || @facebook != "" : %>
+      <meta property="og:image" content="<%= @pkgname %>/usrlib/OGP.png" />
+      <meta property="og:url" content="<%= @origin %>/<%= @pkgname %>" />
       <meta property="og:type" content="website" />
       <meta property="og:title" content="<%= @title %>" />
       <meta property="og:description" content="<%= @description %>" />
