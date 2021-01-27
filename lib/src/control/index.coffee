@@ -177,14 +177,14 @@ app.get "/", (req, res) ->
   # SNS Info
   if (appjson.site?)
     origin = "#{(appjson.site.origin || req.headers.host)}"
-    imgtmp = appjson.site.image || "OGP.png"
-    image = "#{origin}/#{pkgname}/usrlib/#{imgtmp}"
-    favicon = "#{origin}/#{pkgname}/usrlib/#{appjson.site.favicon}" || ""
+    ogpimg = appjson.site.image || ""
+    favimg = appjson.site.favicon || ""
     twitter = appjson.site.twitter || ""
     facebook = appjson.site.facebook || ""
   else
     origin = req.headers.host
-    image = "#{origin}/usrlib/OGP.png"
+    ogpimg = ""
+    favimg = ""
     twitter = ""
     facebook = ""
 
@@ -196,8 +196,8 @@ app.get "/", (req, res) ->
     cssfilelist: cssfilelist
     node_env: node_env
     origin: origin
-    image: image
-    favicon: favicon
+    ogpimg: ogpimg
+    favimg: favimg
     title: title
     site_name: site_name
     description: description

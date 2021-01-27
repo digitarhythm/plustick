@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
 
     <% if @twitter != "" || @facebook != "" : %>
-      <meta property="og:image" content="<%= @image %>" />
+      <% if @ogpimg != "" : %>
+        <meta property="og:image" content="<%= @origin %>/<%= @pkgname %>/usrlib/<%= @ogpimg %>" />
+      <% end %>
       <meta property="og:url" content="<%= @origin %>" />
       <meta property="og:type" content="website" />
       <meta property="og:title" content="<%= @title %>" />
@@ -22,7 +24,9 @@
     <% end %>
 
     <title><%= @title %></title>
-    <link rel="icon" href="<%= @favicon %>" />
+    <% if @favimg != "" : %>
+      <link rel="icon" href="<%= @origin %>/<%= @pkgname %>/usrlib/<%= @favimg %>" />
+    <% end %>
 
     <% for f in @cssfilelist : %>
       <link rel="stylesheet" type="text/css" href="<%= f %>" />
