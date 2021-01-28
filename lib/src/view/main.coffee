@@ -67,6 +67,14 @@ class coreobject
       obj.viewDidLoad()
       obj.viewDidAppear()
 
+  removeView:(id) ->
+    obj = getElement(id)
+    obj.remove()
+
+  removeFromSuperview: ->
+    obj = getElement(@uniqueID)
+    obj.remove()
+
   createHtml: ->
 
   viewDidLoad: ->
