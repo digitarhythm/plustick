@@ -41,22 +41,25 @@ __plugindir = "#{__appsdir}/plugin"
 __stylesheetdir = "#{__appsdir}/stylesheet"
 
 # javascript directory
-__jsdir = "#{__appsdir}/js"
-__jsctrldir = "#{__jsdir}/control"
-__jsviewdir = "#{__jsdir}/view"
+__usrjsdir = "#{__appsdir}/js"
+__usrjsctrl = "#{__usrjsdir}/control"
+__usrjsview = "#{__usrjsdir}/view"
 
 # user Library directory
-__usrlibsdir = "#{__appsdir}/usrlib"
+__usrlibdir = "#{__appsdir}/usrlib"
 
 # user JavaScript directory
 __usrjssdir = "#{__appsdir}/js"
 __usrctrldir = "#{__usrjssdir}/control"
 __usrviewdir = "#{__usrjssdir}/view"
 
+# system file directory
+__sysjsdir = "#{__systemdir}/lib/js"
+__sysjsctrl = "#{__sysjsdir}/control"
+__sysjsview = "#{__sysjsdir}/view"
+
 # system library directory
-__syslibsdir = "#{__systemdir}/lib/js"
-__syslibsctrl = "#{__syslibsdir}/control"
-__syslibsview = "#{__syslibsdir}/view"
+__syslibdir = "#{__systemdir}/lib/include"
 
 #==========================================================================
 # template engine
@@ -72,21 +75,22 @@ app.set("view engine", "ect")
 app.use("/#{pkgname}/plugin", express.static(__plugindir))
 app.use("/#{pkgname}/stylesheet", express.static(__stylesheetdir))
 app.use("/#{pkgname}/public", express.static(__publicdir))
-app.use("/#{pkgname}/view", express.static(__jsviewdir))
-app.use("/#{pkgname}/syslib", express.static(__syslibsview))
-app.use("/#{pkgname}/usrlib", express.static(__usrlibsdir))
+app.use("/#{pkgname}/view", express.static(__usrjsview))
+app.use("/#{pkgname}/syslib", express.static(__sysjsview))
+app.use("/#{pkgname}/usrlib", express.static(__usrlibdir))
+app.use("/#{pkgname}/include", express.static(__syslibdir))
 
 #==========================================================================
 # routing function dictionary
 #==========================================================================
 global.BIND_ROUTER = {}
 global.APPSDIR = __homedir
-global.PLUSTICKLIBS = __syslibsctrl
+global.PLUSTICKLIBS = __sysjsctrl
 
 #==========================================================================
 # user API binding
 #==========================================================================
-api = require("#{__syslibsctrl}/sysapi.min.js")
+api = require("#{__sysjsctrl}/sysapi.min.js")
 app.use("/#{pkgname}/api", api)
 
 #==========================================================================
@@ -150,31 +154,51 @@ app.get "/", (req, res) ->
 
   jsuserlist = []
 
+  #----------------------------------
+  # User CSS file include
+  #----------------------------------
   lists = await __readFileList(__stylesheetdir)
-  # CSS file in stylesheet directory
   for fname in lists
     if (fname.match(/^.*\.css$/))
       cssfilelist.push("#{pkgname}/stylesheet/#{fname}")
 
-  # JavaScript file in user script directory
-  lists = await __readFileList(__jsviewdir)
+  #----------------------------------
+  # System library file include
+  #----------------------------------
+  lists = await __readFileList(__syslibdir)
   filelist = []
   for fname in lists
-    if (fname.match(/^.*\.min\.js$/) and !fname.match(/^main\.min\.js/) and !fname.match(/^plustick\.min\.js/))
+    if (fname.match(/^.*\.min\.js$/))
+      jssyslist.push("#{pkgname}/include/#{fname}")
+
+  #----------------------------------
+  # User JavaScript file include
+  #----------------------------------
+  lists = await __readFileList(__usrjsview)
+  filelist = []
+  for fname in lists
+    if (fname.match(/^.*\.min\.js$/))
       jsuserlist.push("#{pkgname}/view/#{fname}")
 
+  #----------------------------------
+  # plugin include
+  #----------------------------------
   lists = await __readFileList(__plugindir)
   # JavaScript file in plugin directory
   for fname in lists
     if (fname.match(/^.*\.js$/))
       jssyslist.push("#{pkgname}/plugin/#{fname}")
 
+  #----------------------------------
   # Template engine value
+  #----------------------------------
   title = pkgjson.name
   site_name = pkgjson.name
   description = pkgjson.description
 
+  #----------------------------------
   # SNS Info
+  #----------------------------------
   if (appjson.site?)
     origin = "#{(appjson.site.origin || req.headers.host)}"
     ogpimg = appjson.site.image || ""
@@ -188,7 +212,9 @@ app.get "/", (req, res) ->
     twitter = ""
     facebook = ""
 
+  #----------------------------------
   # rendering HTML
+  #----------------------------------
   res.render "main",
     pkgname: pkgname
     jssyslist: jssyslist
