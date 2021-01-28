@@ -191,7 +191,9 @@ class plustick_core
     if (!id? || !type?)
       return
 
-    @removeListener(id, type)
+    typelist = type.split(/ /)
+    for t in typelist
+      @removeListener(id, t)
 
     method = (event) ->
       rect = event.currentTarget.getBoundingClientRect()
@@ -211,24 +213,27 @@ class plustick_core
       listener(this, frame)
 
     target = getElement(id)
-    target.addEventListener type, method, capture
-
-    key="#{id}_#{type}"
-    @eventlistener[key] =
-      target: target
-      type: type
-      listener: method
-      capture: capture
+    for t in typelist
+      echo "t=%@", t
+      target.addEventListener t, method, capture
+      key="#{id}_#{t}"
+      @eventlistener[key] =
+        target: target
+        type: t
+        listener: method
+        capture: capture
 
   #===========================================================================
   # remove event listener
   #===========================================================================
   removeListener:(id, type) ->
-    key="#{id}_#{type}"
-    if(@eventlistener[key]?)
-      e = @eventlistener[key]
-      e.target.removeEventListener(type, e.listener, e.capture)
-      @eventlistener[key] = undefined
+    typelist = type.split(/ /)
+    for t in typelist
+      key="#{id}_#{t}"
+      if(@eventlistener[key]?)
+        e = @eventlistener[key]
+        e.target.removeEventListener(t, e.listener, e.capture)
+        @eventlistener[key] = undefined
 
   #===========================================================================
   # execute procedure for key
