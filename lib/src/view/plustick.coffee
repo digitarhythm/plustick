@@ -214,7 +214,6 @@ class plustick_core
 
     target = getElement(id)
     for t in typelist
-      echo "t=%@", t
       target.addEventListener t, method, capture
       key="#{id}_#{t}"
       @eventlistener[key] =
