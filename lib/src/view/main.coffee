@@ -32,10 +32,12 @@ class coreobject
     size = {}
     origin = {}
     if (param? && param.frame?)
-      size.width = param.frame.size.width || undefined
-      size.height = param.frame.size.height || undefined
-      origin.x = param.frame.origin.x || undefined
-      origin.y = param.frame.origin.y || undefined
+      if (param.frame.size?)
+        size.width = param.frame.size.width || undefined
+        size.height = param.frame.size.height || undefined
+      if (param.frame.origin?)
+        origin.x = param.frame.origin.x || undefined
+        origin.y = param.frame.origin.y || undefined
 
     @__frame__ =
       origin:
