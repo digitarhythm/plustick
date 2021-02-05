@@ -6,12 +6,9 @@ class [[[:classname:]]] extends coreobject
     super(param)
 
   createHtml: ->
-    super()
+    # Value 'html' is page rendering HTML tag text.
+    html = await super()
     return new Promise (resolve, reject) =>
-      html = """
-        <div id="#{@uniqueID}" class="[[[:classname:]]]">
-        </div>
-      """
       resolve(html)
 
   viewDidLoad: ->
@@ -19,5 +16,4 @@ class [[[:classname:]]] extends coreobject
 
   viewDidAppear: ->
     super()
-
 

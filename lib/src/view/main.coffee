@@ -13,6 +13,7 @@ querylist.forEach (str) ->
     QUERY_PARAM[list[0]] = list[1]
 PUBLIC = "#{SITEURL}/public"
 APPLICATION = undefined
+BROWSER_FRAME = undefined
 ROOT = undefined
 GLOBAL =
   PROC: {}
@@ -25,29 +26,24 @@ __RESIZETIMEOUT__ = undefined
 #===========================================================================
 class coreobject
   constructor: (param=undefined) ->
-    if (param?)
-      if (param.frame?)
-        if (param.frame.size?)
-          size = param.frame.size || undefined
-        if (param.frame.origin?)
-          origin = param.frame.origin || undefined
+    @visibility = false
+    @selfdiv = undefined
+
+    size = {}
+    origin = {}
+    if (param? && param.frame?)
+      size.width = param.frame.size.width || undefined
+      size.height = param.frame.size.height || undefined
+      origin.x = param.frame.origin.x || undefined
+      origin.y = param.frame.origin.y || undefined
 
     @__frame__ =
       origin:
-        x: undefined
-        y: undefined
+        x: origin.x || undefined
+        y: origin.y || undefined
       size:
-        width: undefined
-        height: undefined
-
-    if (param?)
-      if (param.frame?)
-        if (param.frame.size?)
-          @__frame__.size.width = size.width || undefined
-          @__frame__.size.height = size.height || undefined
-        if (param.frame.origin?)
-          @__frame__.origin.x = origin.x || undefined
-          @__frame__.origin.y = origin.y || undefined
+        width: size.width || undefined
+        height: size.height || undefined
 
     S4 = ->
       return (((1+Math.random())*0x10000)|0).toString(16).substring(1)
@@ -55,34 +51,34 @@ class coreobject
 
     GLOBAL.PROC[@uniqueID] = @
 
-  addView:(id, obj) ->
+  addView:(obj, baseid=@uniqueID) ->
     obj.parent = @
-    target = getElement(id) || undefined
-    if (!target?)
+    obj.browser_frame = BROWSER_FRAME
+    baseview = getElement(baseid) || undefined
+    if (!baseview?)
       return
     else
       html = await obj.createHtml()
-      target.insertAdjacentHTML('beforeend', html)
-      obj.self = getElement(obj.uniqueID)
+      ret = baseview.insertAdjacentHTML('beforeend', html)
       obj.viewDidLoad()
       obj.viewDidAppear()
 
-  removeView:(id) ->
-    obj = getElement(id)
+  removeView:(removeid) ->
+    obj = getElement(removeid)
     obj.remove()
-
-  removeFromSuperview: ->
-    obj = getElement(@uniqueID)
-    obj.remove()
+    return undefined
 
   createHtml: ->
+    return "<div></div>"
 
   viewDidLoad: ->
-    target = getElement(@uniqueID)
-    target.style.width = "#{@__frame__.size.width}px" if (@__frame__.size.widt?)
-    target.style.height = "#{@__frame__.size.height}px" if (@__frame__.size.height?)
-    target.style.left = "#{@__frame__.origin.x}px" if (@__frame__.origin.x?)
-    target.style.top = "#{@__frame__.origin.y}px" if (@__frame__.origin.y?)
+    @selfdiv = getElement(@uniqueID) || undefined
+
+    if (@selfdiv?)
+      @selfdiv.style.width = "#{@__frame__.size.width}px" if (@__frame__.size.widt?)
+      @selfdiv.style.height = "#{@__frame__.size.height}px" if (@__frame__.size.height?)
+      @selfdiv.style.left = "#{@__frame__.origin.x}px" if (@__frame__.origin.x?)
+      @selfdiv.style.top = "#{@__frame__.origin.y}px" if (@__frame__.origin.y?)
     @__frame__ = undefined
 
   viewDidAppear: ->
@@ -112,6 +108,10 @@ window.onload =  ->
       ROOT.style.height = "#{contents_size.height}px"
       ROOT.style.left = "#{contents_size.left}px"
       ROOT.style.top = "#{contents_size.top}px"
+      BROWSER_FRAME.style.width = "#{contents_size.width}px"
+      BROWSER_FRAME.style.height = "#{contents_size.height}px"
+      BROWSER_FRAME.style.left = "#{contents_size.left}px"
+      BROWSER_FRAME.style.top = "#{contents_size.top}px"
       list = Object.keys(GLOBAL.PROC)
       for key in list
         obj = GLOBAL.PROC[key]
@@ -124,10 +124,10 @@ window.onload =  ->
   #===========================================================================
   fitContentsSize = (apps)->
     # get browser size
-    bounds = plustick.getBounds()
-    browser_width = bounds.size.width
-    browser_height = bounds.size.height
-    browser_aspect = browser_width / browser_height
+    BROWSER_FRAME = plustick.getBounds()
+
+    # get browser size
+    browser_aspect = BROWSER_FRAME.size.width / BROWSER_FRAME.size.height
 
     if (apps.width? || apps.height?)
       contents_width = apps.width || parseInt(Math.round(apps.height * browser_aspect))
@@ -135,30 +135,25 @@ window.onload =  ->
       apps.width = contents_width
       apps.height = contents_height
 
-      # browser resolution
-      bounds = plustick.getBounds()
-      browser_width = bounds.size.width
-      browser_height = bounds.size.height
-
       # calc scale
-      scale_x = browser_width / contents_width
-      scale_y = browser_height / contents_height
+      scale_x = BROWSER_FRAME.size.width / contents_width
+      scale_y = BROWSER_FRAME.size.height / contents_height
 
       scale_mode = 1
       height_tmp = contents_height * scale_x
 
-      if (height_tmp > browser_height)
+      if (height_tmp > BROWSER_FRAME.size.height)
         scale_mode = 2
 
       # calc width/height
       if (scale_mode == 1)
         real_height = contents_height * scale_x
         left = 0
-        top = parseInt(Math.floor((browser_height - real_height) / 2))
+        top = parseInt(Math.floor((BROWSER_FRAME.size.height - real_height) / 2))
         scale = scale_x
       else
         real_width = contents_width * scale_y
-        left = parseInt(Math.floor((browser_width - real_width) / 2))
+        left = parseInt(Math.floor((BROWSER_FRAME.size.width - real_width) / 2))
         top = 0
         scale = scale_y
 
@@ -167,10 +162,10 @@ window.onload =  ->
 
     # does not fit contents size to browser
     else
-      contents_width = browser_width
-      contents_height = browser_height
-      apps.width = browser_width
-      apps.height = browser_height
+      contents_width = BROWSER_FRAME.size.width
+      contents_height = BROWSER_FRAME.size.height
+      apps.width = BROWSER_FRAME.size.width
+      apps.height = BROWSER_FRAME.size.height
       left = 0
       top = 0
 
@@ -183,12 +178,6 @@ window.onload =  ->
 
   # create application main
   APPLICATION = new appsmain()
-
-  # get browser size
-  bounds = plustick.getBounds()
-  browser_width = bounds.size.width
-  browser_height = bounds.size.height
-  browser_aspect = browser_width / browser_height
 
   # get user setting
   backgroundColor = APPLICATION.backgroundColor || "rgba(0, 0, 0, 1.0)"
@@ -220,17 +209,17 @@ window.onload =  ->
   ROOT.style.overflow = "hidden"
 
   if (typeof APPLICATION.createHtml == 'function')
-    APPLICATION.createHtml().then (html) =>
-      if (html?)
-        display = ROOT.style.display
-        ROOT.style.display = "none"
-        ROOT.innerHTML = html
+    html = await APPLICATION.createHtml()
+    if (html?)
+      display = ROOT.style.display
+      ROOT.style.display = "none"
+      ROOT.innerHTML = html
 
-      if (typeof APPLICATION.viewDidLoad == 'function')
-        await APPLICATION.viewDidLoad()
+    if (typeof APPLICATION.viewDidLoad == 'function')
+      await APPLICATION.viewDidLoad()
 
-      ROOT.style.display = display
+    ROOT.style.display = display
 
-      if (typeof APPLICATION.viewDidAppear == 'function')
-        await APPLICATION.viewDidAppear()
+    if (typeof APPLICATION.viewDidAppear == 'function')
+      await APPLICATION.viewDidAppear()
 

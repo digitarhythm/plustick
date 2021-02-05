@@ -38,7 +38,11 @@ getElement = (id) ->
   return document.getElementById(id)
 
 setHtml = (id, html) ->
-  document.getElementById(id).innerHTML = html
+  elm = document.getElementById(id)
+  if (elm?)
+    elm.innerHTML = html
+  else
+    console.error("id is undefined.")
 
 #=============================================================================
 # system utility class
@@ -193,7 +197,9 @@ class plustick_core
 
     typelist = type.split(/ /)
     for t in typelist
-      @removeListener(id, t)
+      @removeListener
+        id: id
+        type: t
 
     method = (event) ->
       rect = event.currentTarget.getBoundingClientRect()
@@ -210,7 +216,7 @@ class plustick_core
           offsetY: Math.floor(y)
           clientX: Math.floor(event.clientX)
           clientY: Math.floor(event.clientY)
-      listener(this, frame)
+      listener(event, frame)
 
     target = getElement(id)
     for t in typelist
@@ -225,8 +231,11 @@ class plustick_core
   #===========================================================================
   # remove event listener
   #===========================================================================
-  removeListener:(id, type) ->
+  removeListener:(param) ->
+    id = param.id
+    type = param.type
     typelist = type.split(/ /)
+
     for t in typelist
       key="#{id}_#{t}"
       if(@eventlistener[key]?)

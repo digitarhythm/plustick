@@ -15,9 +15,12 @@ class appsmain extends coreobject
   # define template HTML
   #===========================================================================
   createHtml: ->
+    html = await super()
     return new Promise (resolve, reject) =>
       html = """
-        <div id="contents"></div>
+        <div id="#{@uniqueID}">
+          Version?
+        </div>
       """
 
       resolve(html)
@@ -26,21 +29,15 @@ class appsmain extends coreobject
   # After the HTML is loaded, but before it is displayed, it is executed.
   #===========================================================================
   viewDidLoad: ->
-    setHtml "contents", """
-      <div id="version" onclick="
-        plustick.procedure('#{@uniqueID}', 'version');
-      ">
-        Version?
-      </div>
-    """
-
-    GLOBAL.PROC[@uniqueID].version = =>
+    super()
+    plustick.addListener @uniqueID, "click tap", (self, pos) =>
       @click()
 
   #===========================================================================
   # It is executed after the HTML is displayed.
   #===========================================================================
   viewDidAppear: ->
+    super()
 
   #===========================================================================
   #===========================================================================
@@ -56,7 +53,7 @@ class appsmain extends coreobject
     ret = await plustick.APICALL
       endpoint: 'version'
 
-    getElement("version").innerHTML = """
+    getElement(@uniqueID).innerHTML = """
       Version: #{ret.version}
     """
 
