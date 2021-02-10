@@ -9,7 +9,12 @@ class appsmain extends coreobject
     super()
     @width = undefined
     @height = undefined
+    @backgroundColor = "black"
     @contextmenu = true
+    @orientation = false
+    @motion = false
+
+    @idxstorage = new indexStorage()
 
   #===========================================================================
   # define template HTML

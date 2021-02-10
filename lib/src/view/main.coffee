@@ -4,6 +4,21 @@
 origintmp = window.location.href.replace(/\?.*$/, "")
 ORIGIN = origintmp.replace(/\/$/, "")
 SITEURL = "#{ORIGIN}/#{pkgname}"
+PUBLIC = "#{SITEURL}/public"
+LANGUAGE = window.navigator.language
+
+APPLICATION = undefined
+BROWSER_FRAME = undefined
+ROOT = undefined
+
+GLOBAL =
+  PROC: {}
+
+DEVICEORIENTATION = false
+
+#===========================================================================
+# Query parameter
+#===========================================================================
 querytmp = window.location.search.replace(/^\?/, "")
 querylist = querytmp.split(/&/)
 QUERY_PARAM = {}
@@ -11,13 +26,10 @@ querylist.forEach (str) ->
   list = str.split(/=/)
   if (list.length == 2)
     QUERY_PARAM[list[0]] = list[1]
-PUBLIC = "#{SITEURL}/public"
-APPLICATION = undefined
-BROWSER_FRAME = undefined
-ROOT = undefined
-GLOBAL =
-  PROC: {}
 
+#===========================================================================
+# Resize control value
+#===========================================================================
 __RESIZECOUNTER__ = new Date().getTime()
 __RESIZETIMEOUT__ = undefined
 
@@ -209,6 +221,17 @@ window.onload =  ->
   ROOT.style.margin = "0px 0px 0px 0px"
   ROOT.style.backgroundColor = backgroundColor
   ROOT.style.overflow = "hidden"
+
+  #---------------------------------------------------------------------------
+  # Gyro
+  #---------------------------------------------------------------------------
+  if (plustick.getBrowser().kind == "iOS")
+    if (DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission == 'function')
+      DeviceOrientationEvent.requestPermission().then (permissionState) ->
+        if (permissionState == 'granted')
+          DEVICEORIENTATION = true
+  else
+    DEVICEORIENTATION = true
 
   if (typeof APPLICATION.createHtml == 'function')
     html = await APPLICATION.createHtml()

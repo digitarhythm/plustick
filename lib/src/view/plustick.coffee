@@ -201,7 +201,7 @@ class plustick_core
         id: id
         type: t
 
-    method = (event) ->
+    method1 = (event) ->
       rect = event.currentTarget.getBoundingClientRect()
       x = event.clientX - rect.left
       y = event.clientY - rect.top
@@ -218,7 +218,16 @@ class plustick_core
           clientY: Math.floor(event.clientY)
       listener(event, frame)
 
-    target = getElement(id)
+    method2 = (event) ->
+      listener(event)
+
+    if (id == "window")
+      target = window
+      method = method2
+    else
+      target = getElement(id)
+      method = method1
+
     for t in typelist
       target.addEventListener t, method, capture
       key="#{id}_#{t}"
@@ -322,6 +331,67 @@ class plustick_core
     else
       return ret.data
 
+  #=========================================================================
+  # copy object auto classification
+  #=========================================================================
+  copyObj:(a) ->
+    cpObj = (a) ->
+      return Object.assign({}, a)
+    cpArr = (a) ->
+      return a.concat()
+
+    type = Object.prototype.toString.call(a)
+    echo type
+
+    array_list = [
+      "[object Array]"
+    ]
+    object_list = [
+      "[object Object]"
+      "[object Function]"
+    ]
+
+    if (array_list.indexOf(type) >= 0)
+      return cpArr(a)
+    else if (object_list.indexOf(type) >= 0)
+      return cpObj(a)
+
+  addOrientationProc:(proc) ->
+    if (APPLICATION.orientation && DEVICEORIENTATION)
+      @addListener
+        id: "window"
+        type: "deviceorientationabsolute"
+        capture: true
+        listener: (e) =>
+          if (proc?)
+            proc
+              absolute: e.absolute
+              alpha: e.alpha
+              beta: e.beta
+              gamma: e.gamma
+
+  removeOrientationProc: ->
+    @removeListener
+      id: "window"
+      type: "deviceorientationabsolute"
+
+  addMotionProc:(proc) ->
+    if (APPLICATION.motion)
+      @addListener
+        id: "window"
+        type: "devicemotion"
+        capture: true
+        listener: (e) =>
+          if (proc?)
+            proc
+              x: e.accelerationIncludingGravity.x
+              y: e.accelerationIncludingGravity.y
+              z: e.accelerationIncludingGravity.z
+
+  removeMotionProc: ->
+    @removeListener
+      id: "window"
+      type: "devicemotion"
 
 plustick = new plustick_core()
 
