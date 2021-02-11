@@ -156,6 +156,16 @@ function environ_check() {
     ln -s ./apps/config $APPSDIR/config
   fi
 
+  # check loading indicator
+  target="$APPSDIR/apps/usrlib/loading_g.gif"
+  if [ ! -e $target ]; then
+    cp $MODULE/lib/template/loading_g.gif $APPSDIR/apps/usrlib/
+  fi
+  target="$APPSDIR/apps/usrlib/loading_w.gif"
+  if [ ! -e $target ]; then
+    cp $MODULE/lib/template/loading_w.gif $APPSDIR/apps/usrlib/
+  fi
+
   # check stylesheet file
   target="$APPSDIR/apps/stylesheet/appsmain.css"
   if [ ! -e $target ]; then
