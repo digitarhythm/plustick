@@ -42,7 +42,7 @@ setHtml = (id, html) ->
   if (elm?)
     elm.innerHTML = html
   else
-    console.error("id is undefined.")
+    console.error("id: ["+id+"] is undefined.")
 
 #=============================================================================
 # system utility class
@@ -63,10 +63,11 @@ class plustick_core
   getBounds: ->
     width = window.innerWidth
     height = window.innerHeight
-    frame = []
-    frame.size = []
-    frame.size.width = width
-    frame.size.height = height
+    frame =
+      size:
+        width: width
+        height: height
+        aspect: width / height
     return frame
 
   #===========================================================================
