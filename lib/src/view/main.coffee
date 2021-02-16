@@ -8,8 +8,8 @@ PUBLIC = "#{SITEURL}/public"
 LANGUAGE = window.navigator.language
 
 APPLICATION = undefined
-BROWSER_FRAME = undefined
-ROOT = undefined
+BROWSER_FRAME = plustick.getBounds()
+ROOTDIV = undefined
 
 GLOBAL =
   PROC: {}
@@ -36,35 +36,18 @@ __RESIZETIMEOUT__ = undefined
 #===========================================================================
 # super super class
 #===========================================================================
-class coreobject
+class viewController
+  #----------------------
+  #----------------------
   constructor: (param=undefined) ->
-    @visibility = false
-    @selfdiv = undefined
-
-    size = {}
-    origin = {}
-    if (param? && param.frame?)
-      if (param.frame.size?)
-        size.width = param.frame.size.width || undefined
-        size.height = param.frame.size.height || undefined
-      if (param.frame.origin?)
-        origin.x = param.frame.origin.x || undefined
-        origin.y = param.frame.origin.y || undefined
-
-    @__frame__ =
-      origin:
-        x: origin.x || undefined
-        y: origin.y || undefined
-      size:
-        width: size.width || undefined
-        height: size.height || undefined
-
     S4 = ->
       return (((1+Math.random())*0x10000)|0).toString(16).substring(1)
     @uniqueID = (S4()+S4()+"_"+S4()+"_"+S4()+"_"+S4()+"_"+S4()+S4()+S4())
 
     GLOBAL.PROC[@uniqueID] = @
 
+  #----------------------
+  #----------------------
   addView:(obj, baseid=@uniqueID) ->
     obj.parent = @
     obj.browser_frame = BROWSER_FRAME
@@ -73,28 +56,34 @@ class coreobject
       return
     else
       html = await obj.createHtml()
-      ret = baseview.insertAdjacentHTML('beforeend', html)
+      baseview.insertAdjacentHTML('beforeend', html)
       obj.viewDidLoad()
       obj.viewDidAppear()
 
-  removeView:(removeid) ->
+  #----------------------
+  #----------------------
+  removeView:(obj) ->
+    obj = getElement(@uniqueID)
+    obj.remove()
+    return undefined
+
+  #----------------------
+  #----------------------
+  removeDiv:(removeid) ->
     obj = getElement(removeid)
     obj.remove()
     return undefined
 
+  #----------------------
+  #----------------------
   createHtml: ->
-    return "<div></div>"
 
+  #----------------------
+  #----------------------
   viewDidLoad: ->
-    @selfdiv = getElement(@uniqueID) || undefined
 
-    if (@selfdiv?)
-      @selfdiv.style.width = "#{@__frame__.size.width}px" if (@__frame__.size.widt?)
-      @selfdiv.style.height = "#{@__frame__.size.height}px" if (@__frame__.size.height?)
-      @selfdiv.style.left = "#{@__frame__.origin.x}px" if (@__frame__.origin.x?)
-      @selfdiv.style.top = "#{@__frame__.origin.y}px" if (@__frame__.origin.y?)
-    @__frame__ = undefined
-
+  #----------------------
+  #----------------------
   viewDidAppear: ->
 
 #===========================================================================
@@ -118,14 +107,10 @@ window.onload =  ->
       clearTimeout(__RESIZETIMEOUT__)
     __RESIZETIMEOUT__ = setTimeout ->
       contents_size = fitContentsSize(APPLICATION)
-      ROOT.style.width = "#{contents_size.width}px"
-      ROOT.style.height = "#{contents_size.height}px"
-      ROOT.style.left = "#{contents_size.left}px"
-      ROOT.style.top = "#{contents_size.top}px"
-      BROWSER_FRAME.style.width = "#{contents_size.width}px"
-      BROWSER_FRAME.style.height = "#{contents_size.height}px"
-      BROWSER_FRAME.style.left = "#{contents_size.left}px"
-      BROWSER_FRAME.style.top = "#{contents_size.top}px"
+      ROOTDIV.style.width = "#{contents_size.width}px"
+      ROOTDIV.style.height = "#{contents_size.height}px"
+      ROOTDIV.style.left = "#{contents_size.left}px"
+      ROOTDIV.style.top = "#{contents_size.top}px"
       list = Object.keys(GLOBAL.PROC)
       for key in list
         obj = GLOBAL.PROC[key]
@@ -141,11 +126,11 @@ window.onload =  ->
     BROWSER_FRAME = plustick.getBounds()
 
     # get browser size
-    browser_aspect = BROWSER_FRAME.size.width / BROWSER_FRAME.size.height
+    aspect = BROWSER_FRAME.size.aspect
 
     if (apps.width? || apps.height?)
-      contents_width = apps.width || parseInt(Math.round(apps.height * browser_aspect))
-      contents_height = apps.height || parseInt(Math.round(apps.width / browser_aspect))
+      contents_width = apps.width || parseInt(Math.round(apps.height * aspect))
+      contents_height = apps.height || parseInt(Math.round(apps.width / aspect))
       apps.width = contents_width
       apps.height = contents_height
 
@@ -171,8 +156,8 @@ window.onload =  ->
         top = 0
         scale = scale_y
 
-      ROOT.style.transformOrigin = "0px 0px 0px"
-      ROOT.style.transform = "scale(#{scale}, #{scale})"
+      ROOTDIV.style.transformOrigin = "0px 0px 0px"
+      ROOTDIV.style.transform = "scale(#{scale}, #{scale})"
 
     # does not fit contents size to browser
     else
@@ -195,7 +180,7 @@ window.onload =  ->
 
   # get user setting
   backgroundColor = APPLICATION.backgroundColor || "rgba(0, 0, 0, 1.0)"
-  bodybgcolor = APPLICATION.bodyBackgroundColor || "rgba(64, 64, 64, 1.0)"
+  bodybgcolor = APPLICATION.bodyBackgroundColor || "rgba(32, 32, 32, 1.0)"
 
   # body setting
   document.body.setAttribute("id", "body")
@@ -205,22 +190,21 @@ window.onload =  ->
     contextmenu = APPLICATION.contextmenu
     return contextmenu
 
-  # create root view
-  ROOT = document.createElement("div")
-  ROOT.setAttribute("id", "__rootview__")
-  document.body.append(ROOT)
+  # root view setting
+  ROOTDIV = document.createElement("div")
+  ROOTDIV.setAttribute("id", "ROOTDIV")
+  document.body.append(ROOTDIV)
 
   contents_size = fitContentsSize(APPLICATION)
 
-  ROOT.style.position = "absolute"
-  ROOT.style.width = "#{contents_size.width}px"
-  ROOT.style.height = "#{contents_size.height}px"
-  ROOT.style.left = "#{contents_size.left}px"
-  ROOT.style.top = "#{contents_size.top}px"
-
-  ROOT.style.margin = "0px 0px 0px 0px"
-  ROOT.style.backgroundColor = backgroundColor
-  ROOT.style.overflow = "hidden"
+  ROOTDIV.style.position = "absolute"
+  ROOTDIV.style.width = "#{contents_size.width}px"
+  ROOTDIV.style.height = "#{contents_size.height}px"
+  ROOTDIV.style.left = "#{contents_size.left}px"
+  ROOTDIV.style.top = "#{contents_size.top}px"
+  ROOTDIV.style.margin = "0px 0px 0px 0px"
+  ROOTDIV.style.backgroundColor = backgroundColor
+  ROOTDIV.style.overflow = "hidden"
 
   #---------------------------------------------------------------------------
   # Gyro
@@ -233,18 +217,17 @@ window.onload =  ->
   else
     DEVICEORIENTATION = true
 
+  #---------------------------------------------------------------------------
+  # disp root view
+  #---------------------------------------------------------------------------
   if (typeof APPLICATION.createHtml == 'function')
+    APPLICATION.browser_frame = BROWSER_FRAME
     html = await APPLICATION.createHtml()
-    if (html?)
-      display = ROOT.style.display
-      ROOT.style.display = "none"
-      ROOT.innerHTML = html
+    ROOTDIV.insertAdjacentHTML('beforeend', html)
 
-    if (typeof APPLICATION.viewDidLoad == 'function')
-      await APPLICATION.viewDidLoad()
+  if (typeof APPLICATION.viewDidLoad == 'function')
+    await APPLICATION.viewDidLoad()
 
-    ROOT.style.display = display
-
-    if (typeof APPLICATION.viewDidAppear == 'function')
-      await APPLICATION.viewDidAppear()
+  if (typeof APPLICATION.viewDidAppear == 'function')
+    await APPLICATION.viewDidAppear()
 

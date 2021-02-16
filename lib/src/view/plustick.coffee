@@ -16,7 +16,7 @@ __strFormatter__ = (a, b...) ->
       repl2 = repstr.match(/%0(\d+)@/)
       if (repl2?)
         num = parseInt(repl2[1])
-        zero =""
+        zero = ""
         zero += "0" while (zero.length < num)
         data2 = (zero+data).substr(-num)
         a = a.replace(repstr, data2)
@@ -342,7 +342,6 @@ class plustick_core
       return a.concat()
 
     type = Object.prototype.toString.call(a)
-    echo type
 
     array_list = [
       "[object Array]"

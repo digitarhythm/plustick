@@ -1,7 +1,7 @@
 #=============================================================================
 # This class is the first class generated when the application is launched.
 #=============================================================================
-class appsmain extends coreobject
+class appsmain extends viewController
   #===========================================================================
   # define application environ value
   #===========================================================================
@@ -23,7 +23,7 @@ class appsmain extends coreobject
     html = await super()
     return new Promise (resolve, reject) =>
       html = """
-        <div id="#{@uniqueID}">
+        <div id="version">
           Version?
         </div>
       """
@@ -35,7 +35,7 @@ class appsmain extends coreobject
   #===========================================================================
   viewDidLoad: ->
     super()
-    plustick.addListener @uniqueID, "click tap", (self, pos) =>
+    plustick.addListener "version", "click tap", (self, pos) =>
       @click()
 
   #===========================================================================
@@ -58,7 +58,7 @@ class appsmain extends coreobject
     ret = await plustick.APICALL
       endpoint: 'version'
 
-    getElement(@uniqueID).innerHTML = """
+    getElement("version").innerHTML = """
       Version: #{ret.version}
     """
 
