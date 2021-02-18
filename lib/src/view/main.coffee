@@ -43,6 +43,7 @@ class viewController
     S4 = ->
       return (((1+Math.random())*0x10000)|0).toString(16).substring(1)
     @uniqueID = (S4()+S4()+"_"+S4()+"_"+S4()+"_"+S4()+"_"+S4()+S4()+S4())
+    @browser_frame = BROWSER_FRAME
 
     GLOBAL.PROC[@uniqueID] = @
 
@@ -50,7 +51,6 @@ class viewController
   #----------------------
   addView:(obj, baseid=@uniqueID) ->
     obj.parent = @
-    obj.browser_frame = BROWSER_FRAME
     baseview = getElement(baseid) || undefined
     if (!baseview?)
       return
@@ -116,7 +116,7 @@ window.onload =  ->
         obj = GLOBAL.PROC[key]
         obj.resize() if (typeof(obj.resize) == "function")
       __RESIZETIMEOUT__ = undefined
-    , 100
+    , 10
 
   #===========================================================================
   # fit contents size to browser
