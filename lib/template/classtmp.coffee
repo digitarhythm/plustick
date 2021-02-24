@@ -1,7 +1,7 @@
 #=====================================
 # template class file
 #=====================================
-class [[[:classname:]]] extends coreobject
+class [[[:classname:]]] extends viewController
   constructor:(param) ->
     super(param)
 
