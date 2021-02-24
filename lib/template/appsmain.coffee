@@ -35,7 +35,7 @@ class appsmain extends viewController
   #===========================================================================
   viewDidLoad: ->
     super()
-    plustick.addListener "version", "click tap", (self, pos) =>
+    plustick.addListener "version", "click tap", (event, frame) =>
       @click()
 
   #===========================================================================

@@ -356,6 +356,8 @@ class plustick_core
     else if (object_list.indexOf(type) >= 0)
       return cpObj(a)
 
+  #=========================================================================
+  #=========================================================================
   addOrientationProc:(proc) ->
     if (APPLICATION.orientation && DEVICEORIENTATION)
       @addListener

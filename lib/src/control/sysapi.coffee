@@ -17,6 +17,11 @@ router.all "/:endpoint", (req, res) ->
   headers = req.headers
   headers['method'] = method
 
+  origin = headers.origin
+  referer = headers.referer || ""
+  if (origin != referer.replace(/\/$/, ""))
+    res.json(-1)
+
   if (bind_router[endpoint]? && typeof(bind_router[endpoint]) == 'function')
     bind_router[endpoint](headers, data).then (ret)=>
       res.json(ret)
