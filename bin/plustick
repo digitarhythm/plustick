@@ -1,17 +1,5 @@
 #!/usr/bin/env bash
 
-cmd="jq > /dev/null 2>&1"
-eval $cmd
-ret=$?
-if [ $ret = "127" ]; then
-  echo "Please, install jq command."
-  exit
-fi
-
-packagejson=`cat ./node_modules/plustick/package.json`
-vertmp=`echo $packagejson | jq .version`
-ver=${vertmp//\"/ }
-
 ESC=$(printf '\033')
 GREEN='\u001b[01;32m'
 YELLOW='\u001b[01;33m'
@@ -32,7 +20,6 @@ function error() {
       echo "  -a: activate application(forever)"
       echo "  -d: debug exec application"
       echo "  -t: terminate application(forever)"
-      echo "  -v: display version number"
       echo "  -h: print this"
       echo ""
       ;;
@@ -238,9 +225,6 @@ function optproc() {
         printf "${ESC}${YELLOW}[${ESC}${GREEN}`pwd`${ESC}${YELLOW}] process stopped.\n"
       fi
       ;;
-    [v] )
-      echo $ver
-      ;;
     [h] )
       error 1
       ;;
@@ -293,7 +277,7 @@ FIRSTBOOT=`environ_check`
 # valid option
 # 有効なオプション
 #---------------------------
-option=":bnwadtvh"
+option=":bnwadth"
 
 #---------------------------
 # option loop
