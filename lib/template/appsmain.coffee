@@ -35,8 +35,11 @@ class appsmain extends viewController
   #===========================================================================
   viewDidLoad: ->
     super()
-    plustick.addListener "version", "click tap", (event, frame) =>
-      @click()
+    plustick.addListener
+      id: "version"
+      type: "click tap"
+      listener: (event, frame) =>
+        @click()
 
   #===========================================================================
   # It is executed after the HTML is displayed.
