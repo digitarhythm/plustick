@@ -256,13 +256,13 @@ class plustick_core
   #===========================================================================
   # execute procedure for key
   #===========================================================================
-  procedure:(id, key=undefined, param=undefined) ->
+  procedure:(id, key=undefined, param=undefined, event=undefined) ->
     obj = GLOBAL.PROC[id]
     if (!obj?)
       return
 
     try
-      obj[key](param)
+      obj[key](param, event)
 
   #===========================================================================
   # check EAN13 code formatte
