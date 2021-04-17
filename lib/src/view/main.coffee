@@ -167,6 +167,9 @@ window.onload =  ->
       apps.height = BROWSER_FRAME.size.height
       left = 0
       top = 0
+      scale = 1.0
+
+    BROWSER_FRAME.scale = scale
 
     return
       width: contents_width
