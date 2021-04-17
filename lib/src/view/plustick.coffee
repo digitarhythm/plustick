@@ -256,7 +256,10 @@ class plustick_core
   #===========================================================================
   # execute procedure for key
   #===========================================================================
-  procedure:(id, key=undefined, param=undefined, event=undefined) ->
+  procedure:(id, key=undefined, param=undefined, argument=undefined) ->
+    if (argument?)
+      event = argument[0]
+
     obj = GLOBAL.PROC[id]
     if (!obj?)
       return
