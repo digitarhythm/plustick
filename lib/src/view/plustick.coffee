@@ -204,6 +204,12 @@ class plustick_core
 
     method1 = (event) ->
       rect = event.currentTarget.getBoundingClientRect()
+      if (event.type.match(/touch.*/))
+        clicntX = event.touches[0].clientX
+        clicntY = event.touches[0].clientY
+      else
+        clientX = event.clientX
+        clientY = event.clientY
       x = event.clientX - rect.left
       y = event.clientY - rect.top
       width = rect.width
@@ -213,10 +219,10 @@ class plustick_core
           width: Math.floor(width)
           height: Math.floor(height)
         pos:
-          offsetX: Math.floor(x)
-          offsetY: Math.floor(y)
-          clientX: Math.floor(event.clientX)
-          clientY: Math.floor(event.clientY)
+          offsetX: parseInt(x)
+          offsetY: parseInt(y)
+          clientX: parseInt(clientX)
+          clientY: parseInt(clientY)
       listener(event, frame)
 
     method2 = (event) ->
