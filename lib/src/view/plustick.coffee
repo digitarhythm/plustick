@@ -205,8 +205,12 @@ class plustick_core
     method1 = (event) ->
       rect = event.currentTarget.getBoundingClientRect()
       if (event.type.match(/touch.*/))
-        clientX = event.touches[0].clientX
-        clientY = event.touches[0].clientY
+        if (event.type == "touchend" || event.type == "touchcancel")
+          clientX = 0
+          clientY = 0
+        else
+          clientX = event.touches[0].clientX
+          clientY = event.touches[0].clientY
       else
         clientX = event.clientX
         clientY = event.clientY
