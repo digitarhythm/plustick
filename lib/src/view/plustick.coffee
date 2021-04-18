@@ -203,33 +203,52 @@ class plustick_core
         type: t
 
     method1 = (event) ->
-      rect = event.currentTarget.getBoundingClientRect()
-      if (event.type.match(/touch.*/))
-        if (event.type == "touchend" || event.type == "touchcancel")
-          clientX = 0
-          clientY = 0
-        else
+      type = event.type
+      posevent = [
+        "mousedown"
+        "mousemove"
+        "mouseup"
+        "touchstart"
+        "touchmove"
+      ]
+      if (posevent.indexOf(type) >= 0)
+        if (type.match(/touch.*/))
           clientX = event.touches[0].clientX
           clientY = event.touches[0].clientY
-      else
-        clientX = event.clientX
-        clientY = event.clientY
+        else
+          clientX = event.clientX
+          clientY = event.clientY
 
-      x = clientX - rect.left
-      y = clientY - rect.top
-      width = rect.width
-      height = rect.height
+        rect = event.currentTarget.getBoundingClientRect()
+        x = clientX - rect.left
+        y = clientY - rect.top
+        width = rect.width
+        height = rect.height
 
-      frame =
-        size:
+        size = {
           width: Math.floor(width)
           height: Math.floor(height)
-        pos:
+        }
+
+        pos = {
           offsetX: parseInt(x)
           offsetY: parseInt(y)
           clientX: parseInt(clientX)
           clientY: parseInt(clientY)
-      listener(event, frame)
+        }
+
+      else
+        size = undefined
+        pos = undefined
+
+      if (size? && pos?)
+        frame =
+          size: size
+          pos: pos
+
+        listener(event, frame)
+      else
+        listener(event)
 
     method2 = (event) ->
       listener(event)
