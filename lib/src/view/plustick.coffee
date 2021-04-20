@@ -205,6 +205,10 @@ class plustick_core
     method1 = (event) ->
       type = event.type
       posevent = [
+        "click"
+        "dblclick"
+        "tap"
+        "dbltap"
         "mousedown"
         "mousemove"
         "mouseup"
@@ -212,7 +216,7 @@ class plustick_core
         "touchmove"
       ]
       if (posevent.indexOf(type) >= 0)
-        if (type.match(/touch.*/))
+        if (type.match(/touch.*/) || type == "tap")
           clientX = event.touches[0].clientX
           clientY = event.touches[0].clientY
         else
