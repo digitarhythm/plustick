@@ -191,6 +191,7 @@ class plustick_core
     id = param.id || undefined
     type = param.type || undefined
     listener = param.listener || undefined
+    passive = param.passive || false
     capture = param.capture || false
 
     if (!id? || !type?)
@@ -219,6 +220,7 @@ class plustick_core
         if (type.match(/touch.*/) || type == "tap")
           clientX = event.touches[0].clientX
           clientY = event.touches[0].clientY
+          passive = true
         else
           clientX = event.clientX
           clientY = event.clientY
@@ -265,7 +267,7 @@ class plustick_core
       method = method1
 
     for t in typelist
-      target.addEventListener t, method, capture
+      target.addEventListener t, method, capture, {passive: passive}
       key="#{id}_#{t}"
       @eventlistener[key] =
         target: target
@@ -283,7 +285,7 @@ class plustick_core
 
     for t in typelist
       key="#{id}_#{t}"
-      if(@eventlistener[key]?)
+      if (@eventlistener[key]?)
         e = @eventlistener[key]
         e.target.removeEventListener(t, e.listener, e.capture)
         @eventlistener[key] = undefined

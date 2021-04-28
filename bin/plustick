@@ -97,6 +97,11 @@ function environ_check() {
     mkdir -p $target
   fi
 
+  target="$APPSDIR/apps/html"
+  if [ ! -e $target ]; then
+    mkdir -p $target
+  fi
+
   target="$APPSDIR/apps/public"
   if [ ! -e $target ]; then
     mkdir -p $target
