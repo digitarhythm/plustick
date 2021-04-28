@@ -204,6 +204,7 @@ class plustick_core
         type: t
 
     method1 = (event) ->
+      event.preventDefault()
       type = event.type
       posevent = [
         "click"
@@ -257,6 +258,7 @@ class plustick_core
         listener(event)
 
     method2 = (event) ->
+      event.preventDefault()
       listener(event)
 
     if (id == "window")
@@ -267,7 +269,7 @@ class plustick_core
       method = method1
 
     for t in typelist
-      target.addEventListener t, method, capture, {passive: passive}
+      target.addEventListener t, method, capture, {passive: true}
       key="#{id}_#{t}"
       @eventlistener[key] =
         target: target
