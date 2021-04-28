@@ -238,8 +238,8 @@ class plustick_core
         }
 
         pos = {
-          offsetX: parseInt(x)
-          offsetY: parseInt(y)
+          offsetX: parseInt(x / BROWSER_FRAME.scale)
+          offsetY: parseInt(y / BROWSER_FRAME.scale)
           clientX: parseInt(clientX)
           clientY: parseInt(clientY)
         }
