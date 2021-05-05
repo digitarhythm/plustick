@@ -183,11 +183,13 @@ app.get "/", (req, res) ->
   #----------------------------------
   # plugin include
   #----------------------------------
+  ###
   lists = await __readFileList(__plugindir)
   # JavaScript file in plugin directory
   for fname in lists
     if (fname.match(/^.*\.js$/))
       jssyslist.push("#{pkgname}/plugin/#{fname}")
+  ###
 
   #----------------------------------
   # Template engine value
