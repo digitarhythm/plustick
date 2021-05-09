@@ -204,6 +204,7 @@ class plustick_core
         type: t
 
     method1 = (event) ->
+      rect = event.currentTarget.getBoundingClientRect()
       type = event.type
       posevent = [
         "click"
@@ -217,30 +218,37 @@ class plustick_core
         "touchmove"
       ]
       if (posevent.indexOf(type) >= 0)
+        touches = []
         if (type.match(/touch.*/) || type == "tap")
           clientX = event.touches[0].clientX
           clientY = event.touches[0].clientY
+          for p, idx in event.touches
+            touches[idx] =
+              clientX: parseInt(p.clientX / BROWSER_FRAME.scale)
+              clientY: parseInt(p.clientY / BROWSER_FRAME.scale)
+              offsetX: parseInt((p.clientX - rect.left) / BROWSER_FRAME.scale)
+              offsetY: parseInt((p.clientY - rect.top) / BROWSER_FRAME.scale)
           passive = true
         else
           clientX = event.clientX
           clientY = event.clientY
 
-        rect = event.currentTarget.getBoundingClientRect()
-        x = clientX - rect.left
-        y = clientY - rect.top
+        offsetX = clientX - rect.left
+        offsetY = clientY - rect.top
         width = rect.width
         height = rect.height
 
         size = {
-          width: Math.floor(width)
-          height: Math.floor(height)
+          width: parseInt(width)
+          height: parseInt(height)
         }
 
         pos = {
-          offsetX: parseInt(x / BROWSER_FRAME.scale)
-          offsetY: parseInt(y / BROWSER_FRAME.scale)
-          clientX: parseInt(clientX)
-          clientY: parseInt(clientY)
+          offsetX: parseInt(offsetX / BROWSER_FRAME.scale)
+          offsetY: parseInt(offsetY / BROWSER_FRAME.scale)
+          clientX: parseInt(clientX / BROWSER_FRAME.scale)
+          clientY: parseInt(clientY / BROWSER_FRAME.scale)
+          touches: touches
         }
 
       else
