@@ -446,5 +446,11 @@ class plustick_core
       id: "window"
       type: "devicemotion"
 
+  enum:(arr) ->
+    ret = {}
+    for d, idx in arr
+      ret[d] = idx
+    return ret
+
 plustick = new plustick_core()
 
