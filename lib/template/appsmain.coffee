@@ -23,8 +23,8 @@ class appsmain extends viewController
     html = await super()
     return new Promise (resolve, reject) =>
       html = """
-        <div id="version">
-          Version?
+        <div id="contents">
+          Hello World!
         </div>
       """
 
@@ -36,8 +36,8 @@ class appsmain extends viewController
   viewDidLoad: ->
     super()
     plustick.addListener
-      id: "version"
-      type: "click tap"
+      id: "contents"
+      type: "mousedown touchstart"
       listener: (event, frame) =>
         @click()
 
@@ -61,7 +61,7 @@ class appsmain extends viewController
     ret = await plustick.APICALL
       endpoint: 'version'
 
-    getElement("version").innerHTML = """
-      Version: #{ret.version}
+    getElement("contents").innerHTML = """
+      Apps Version: #{ret.version}
     """
 
