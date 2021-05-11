@@ -129,8 +129,8 @@ window.onload =  ->
     aspect = BROWSER_FRAME.size.aspect
 
     if (apps.width? || apps.height?)
-      contents_width = apps.width || parseInt(Math.round(apps.height * aspect))
-      contents_height = apps.height || parseInt(Math.round(apps.width / aspect))
+      contents_width = apps.width || Math.ceil(Math.round(apps.height * aspect))
+      contents_height = apps.height || Math.ceil(Math.round(apps.width / aspect))
       apps.width = contents_width
       apps.height = contents_height
 
