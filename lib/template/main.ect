@@ -31,20 +31,15 @@
     <% for f in @cssfilelist : %>
       <link rel="stylesheet" type="text/css" href="<%= f %>" />
     <% end %>
-    <% for f in @jssyslist : %>
-      <script type="text/javascript" src="<%= f %>" crossorigin="anonymous"></script>
-    <% end %>
 
     <script type="text/javascript">
       node_env = "<%= @node_env %>";
       pkgname = "<%= @pkgname %>";
     </script>
 
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
     <script type="text/javascript" src="<%= @pkgname %>/syslib/plustick.min.js"></script>
     <script type="text/javascript" src="<%= @pkgname %>/syslib/main.min.js"></script>
-    <% for f in @jsuserlist : %>
-      <script type="text/javascript" src="<%= f %>"></script>
-    <% end %>
   </head>
   <body style="margin: 0px 0px 0px 0px; overflow:hidden; background-color:rgba(0, 0, 0, 0.9); overscroll-behavior:none;">
   </body>

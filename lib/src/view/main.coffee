@@ -178,37 +178,6 @@ window.onload =  ->
       top: top
   #===========================================================================
 
-  # create application main
-  APPLICATION = new appsmain()
-
-  # get user setting
-  backgroundColor = APPLICATION.backgroundColor || "rgba(0, 0, 0, 1.0)"
-  bodybgcolor = APPLICATION.bodyBackgroundColor || "rgba(32, 32, 32, 1.0)"
-
-  # body setting
-  document.body.setAttribute("id", "body")
-  document.body.style.userSelect = "none"
-  document.body.style.backgroundColor = bodybgcolor
-  document.oncontextmenu = =>
-    contextmenu = APPLICATION.contextmenu
-    return contextmenu
-
-  # root view setting
-  ROOTDIV = document.createElement("div")
-  ROOTDIV.setAttribute("id", "ROOTDIV")
-  document.body.append(ROOTDIV)
-
-  contents_size = fitContentsSize(APPLICATION)
-
-  ROOTDIV.style.position = "absolute"
-  ROOTDIV.style.width = "#{contents_size.width}px"
-  ROOTDIV.style.height = "#{contents_size.height}px"
-  ROOTDIV.style.left = "#{contents_size.left}px"
-  ROOTDIV.style.top = "#{contents_size.top}px"
-  ROOTDIV.style.margin = "0px 0px 0px 0px"
-  ROOTDIV.style.backgroundColor = backgroundColor
-  ROOTDIV.style.overflow = "hidden"
-
   #---------------------------------------------------------------------------
   # Gyro
   #---------------------------------------------------------------------------
@@ -221,16 +190,90 @@ window.onload =  ->
     DEVICEORIENTATION = true
 
   #---------------------------------------------------------------------------
-  # disp root view
+  # plugin load
   #---------------------------------------------------------------------------
-  if (typeof APPLICATION.createHtml == 'function')
-    APPLICATION.browser_frame = BROWSER_FRAME
-    html = await APPLICATION.createHtml()
-    ROOTDIV.insertAdjacentHTML('beforeend', html)
+  pluginload = (script) ->
+    return new Promise (resolve, reject) ->
+      head = document.getElementsByTagName('head')[0]
+      try
+        script.onload = (e) ->
+          resolve(e)
+        head.appendChild(script)
+      catch e
+        reject(e)
 
-  if (typeof APPLICATION.viewDidLoad == 'function')
-    await APPLICATION.viewDidLoad()
+  apiuri = "#{SITEURL}/api/__getjslist__"
+  axios
+    method: "POST"
+    url: apiuri
+  .then (ret)->
+    #------------------
+    # JS file load
+    #------------------
+    if (ret.data.error? && ret.data.error < 0)
+      jsfilelist = []
+    else
+      jsfilelist = ret.data.jsfilelist
 
-  if (typeof APPLICATION.viewDidAppear == 'function')
-    await APPLICATION.viewDidAppear()
+    scriptlist = [
+      'plugin'
+      'include'
+      'view'
+    ]
+    for name in scriptlist
+      filelist = jsfilelist[name]
+      for fname in filelist
+        script = document.createElement("script")
+        script.setAttribute("src", fname)
+        script.setAttribute("type", "text/javascript")
+        await pluginload(script)
+
+    #------------------
+    # create application main
+    #------------------
+    APPLICATION = new appsmain()
+
+    # get user setting
+    backgroundColor = APPLICATION.backgroundColor || "rgba(0, 0, 0, 1.0)"
+    bodybgcolor = APPLICATION.bodyBackgroundColor || "rgba(32, 32, 32, 1.0)"
+
+    # body setting
+    document.body.setAttribute("id", "body")
+    document.body.style.userSelect = "none"
+    document.body.style.backgroundColor = bodybgcolor
+    document.oncontextmenu = =>
+      contextmenu = APPLICATION.contextmenu
+      return contextmenu
+
+    #------------------
+    # root view setting
+    #------------------
+    ROOTDIV = document.createElement("div")
+    ROOTDIV.setAttribute("id", "ROOTDIV")
+    document.body.append(ROOTDIV)
+
+    contents_size = fitContentsSize(APPLICATION)
+
+    ROOTDIV.style.position = "absolute"
+    ROOTDIV.style.width = "#{contents_size.width}px"
+    ROOTDIV.style.height = "#{contents_size.height}px"
+    ROOTDIV.style.left = "#{contents_size.left}px"
+    ROOTDIV.style.top = "#{contents_size.top}px"
+    ROOTDIV.style.margin = "0px 0px 0px 0px"
+    ROOTDIV.style.backgroundColor = backgroundColor
+    ROOTDIV.style.overflow = "hidden"
+
+    #------------------
+    # disp root view
+    #------------------
+    if (typeof APPLICATION.createHtml == 'function')
+      APPLICATION.browser_frame = BROWSER_FRAME
+      html = await APPLICATION.createHtml()
+      ROOTDIV.insertAdjacentHTML('beforeend', html)
+
+    if (typeof APPLICATION.viewDidLoad == 'function')
+      await APPLICATION.viewDidLoad()
+
+    if (typeof APPLICATION.viewDidAppear == 'function')
+      await APPLICATION.viewDidAppear()
 

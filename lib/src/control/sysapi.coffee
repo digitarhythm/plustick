@@ -3,9 +3,10 @@ router = express.Router()
 Promise = require("bluebird")
 path = require("path")
 config = require("config")
-fs = require("fs-extra")
 echo = require("ndlog").echo
 bind_router = global.BIND_ROUTER
+fs = require("fs-extra")
+pathinfo = require("#{PLUSTICKLIBS}/pathinfo.min.js")
 
 router.use(express.json())
 router.use(express.urlencoded({ extended: true }))
@@ -22,12 +23,43 @@ router.all "/:endpoint", (req, res) ->
   if (origin != referer.replace(/\/$/, ""))
     res.json(-1)
 
-  if (bind_router[endpoint]? && typeof(bind_router[endpoint]) == 'function')
-    bind_router[endpoint](headers, data).then (ret)=>
-      res.json(ret)
-    .catch (e)=>
-      res.json
-        error: e
+  if (endpoint == "__getjslist__")
+    readFileList = (path) ->
+      return new Promise (resolve, reject) ->
+        fs.readdir path, (err, lists) ->
+          if (err)
+            reject(err)
+          else
+            resolve(lists)
+
+    # make load Javascript file list
+    jsfilelist =
+      plugin: []
+      view: []
+      include: []
+    lists = await readFileList(pathinfo.plugindir)
+    for fname in lists
+      if (fname.match(/^.*\.js$/))
+        jsfilelist['plugin'].push("#{pathinfo.pkgname}/plugin/#{fname}")
+    lists = await readFileList(pathinfo.usrjsview)
+    for fname in lists
+      if (fname.match(/^.*\.min\.js$/))
+        jsfilelist['view'].push("#{pathinfo.pkgname}/view/#{fname}")
+    lists = await readFileList(pathinfo.syslibdir)
+    for fname in lists
+      if (fname.match(/^.*\.min\.js$/))
+        jsfilelist['include'].push("#{pathinfo.pkgname}/include/#{fname}")
+    res.json
+      error: 0
+      jsfilelist: jsfilelist
+
+  else
+    if (bind_router[endpoint]? && typeof(bind_router[endpoint]) == 'function')
+      bind_router[endpoint](headers, data).then (ret)=>
+        res.json(ret)
+      .catch (e)=>
+        res.json
+          error: e
 
 module.exports = router
 

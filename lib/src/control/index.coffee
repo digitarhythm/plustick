@@ -12,92 +12,55 @@ echo = require("ndlog").echo
 process = require("process")
 ECT = require("ect")
 
-pkgjson = require("#{process.cwd()}/package.json")
-pkgname = pkgjson.name
+__systemdir = fs.realpathSync(__dirname+"/../../..")
+__sysjsdir = "#{__systemdir}/lib/js"
+__sysjsctrl = "#{__sysjsdir}/control"
+pathinfo = require("#{__sysjsctrl}/pathinfo.min.js")
+
 network = config.network
 node_env = process.env.NODE_ENV || "production"
 
 echo "application loading time: [#{new Date().toLocaleString("ja-JP")}]"
 
-# system directory
-__systemdir = fs.realpathSync(__dirname+"/../../..")
-
-# home directory
-__homedir = fs.realpathSync(__dirname+"/../../../../..")
-
-# application directory
-__appsdir = "#{__homedir}/apps"
-
-# public directory
-__publicdir = "#{__appsdir}/public"
-
-# tmpl directory
-__templatedir = "#{__systemdir}/lib/template"
-
-# plugin directory
-__plugindir = "#{__appsdir}/plugin"
-
-# stylesheet directory
-__stylesheetdir = "#{__appsdir}/stylesheet"
-
-# javascript directory
-__usrjsdir = "#{__appsdir}/js"
-__usrjsctrl = "#{__usrjsdir}/control"
-__usrjsview = "#{__usrjsdir}/view"
-
-# user Library directory
-__usrlibdir = "#{__appsdir}/usrlib"
-
-# user JavaScript directory
-__usrjssdir = "#{__appsdir}/js"
-__usrctrldir = "#{__usrjssdir}/control"
-__usrviewdir = "#{__usrjssdir}/view"
-
-# system file directory
-__sysjsdir = "#{__systemdir}/lib/js"
-__sysjsctrl = "#{__sysjsdir}/control"
-__sysjsview = "#{__sysjsdir}/view"
-
-# system library directory
-__syslibdir = "#{__systemdir}/lib/include"
+pkgjson = require("#{process.cwd()}/package.json")
 
 #==========================================================================
 # template engine
 #==========================================================================
-app.set("views", __templatedir)
-ectRenderer = ECT({ watch: true, root: __templatedir, ext : ".ect" })
+app.set("views", pathinfo.templatedir)
+ectRenderer = ECT({ watch: true, root: pathinfo.templatedir, ext : ".ect" })
 app.engine("ect", ectRenderer.render)
 app.set("view engine", "ect")
 
 #==========================================================================
 # URI directory binding
 #==========================================================================
-app.use("/#{pkgname}/plugin", express.static(__plugindir))
-app.use("/#{pkgname}/stylesheet", express.static(__stylesheetdir))
-app.use("/#{pkgname}/public", express.static(__publicdir))
-app.use("/#{pkgname}/view", express.static(__usrjsview))
-app.use("/#{pkgname}/syslib", express.static(__sysjsview))
-app.use("/#{pkgname}/usrlib", express.static(__usrlibdir))
-app.use("/#{pkgname}/include", express.static(__syslibdir))
+app.use("/#{pathinfo.pkgname}/plugin", express.static(pathinfo.plugindir))
+app.use("/#{pathinfo.pkgname}/stylesheet", express.static(pathinfo.stylesheetdir))
+app.use("/#{pathinfo.pkgname}/public", express.static(pathinfo.publicdir))
+app.use("/#{pathinfo.pkgname}/view", express.static(pathinfo.usrjsview))
+app.use("/#{pathinfo.pkgname}/syslib", express.static(pathinfo.sysjsview))
+app.use("/#{pathinfo.pkgname}/usrlib", express.static(pathinfo.usrlibdir))
+app.use("/#{pathinfo.pkgname}/include", express.static(pathinfo.syslibdir))
 
 #==========================================================================
 # routing function dictionary
 #==========================================================================
 global.BIND_ROUTER = {}
-global.APPSDIR = __homedir
-global.PLUSTICKLIBS = __sysjsctrl
+global.APPSDIR = pathinfo.homedir
+global.PLUSTICKLIBS = pathinfo.sysjsctrl
 
 #==========================================================================
 # user API binding
 #==========================================================================
-api = require("#{__sysjsctrl}/sysapi.min.js")
-app.use("/#{pkgname}/api", api)
+api = require("#{pathinfo.sysjsctrl}/sysapi.min.js")
+app.use("/#{pathinfo.pkgname}/api", api)
 
 #==========================================================================
 # setting import
 #==========================================================================
-appjson = require("#{__homedir}/config/application.json")
-sysjson = require("#{__systemdir}/lib/config/system.json")
+appjson = require("#{pathinfo.homedir}/config/application.json")
+sysjson = require("#{pathinfo.systemdir}/lib/config/system.json")
 
 #==========================================================================
 # read file list function
@@ -114,10 +77,10 @@ __readFileList = (path) ->
 # user API import
 #==========================================================================
 usrliblist = []
-__readFileList(__usrctrldir).then (lists) ->
+__readFileList(pathinfo.usrctrldir).then (lists) ->
 	for fname in lists
 		if (fname.match(/^.*\.js$/))
-			require "/#{__usrctrldir}/#{fname}"
+			require "/#{pathinfo.usrctrldir}/#{fname}"
 
 #==========================================================================
 # get free port
@@ -157,37 +120,10 @@ app.get "/", (req, res) ->
   #----------------------------------
   # User CSS file include
   #----------------------------------
-  lists = await __readFileList(__stylesheetdir)
+  lists = await __readFileList(pathinfo.stylesheetdir)
   for fname in lists
     if (fname.match(/^.*\.css$/))
-      cssfilelist.push("#{pkgname}/stylesheet/#{fname}")
-
-  #----------------------------------
-  # System library file include
-  #----------------------------------
-  lists = await __readFileList(__syslibdir)
-  filelist = []
-  for fname in lists
-    if (fname.match(/^.*\.min\.js$/))
-      jssyslist.push("#{pkgname}/include/#{fname}")
-
-  #----------------------------------
-  # User JavaScript file include
-  #----------------------------------
-  lists = await __readFileList(__usrjsview)
-  filelist = []
-  for fname in lists
-    if (fname.match(/^.*\.min\.js$/))
-      jsuserlist.push("#{pkgname}/view/#{fname}")
-
-  #----------------------------------
-  # plugin include
-  #----------------------------------
-  lists = await __readFileList(__plugindir)
-  # JavaScript file in plugin directory
-  for fname in lists
-    if (fname.match(/^.*\.js$/))
-      jssyslist.push("#{pkgname}/plugin/#{fname}")
+      cssfilelist.push("#{pathinfo.pkgname}/stylesheet/#{fname}")
 
   #----------------------------------
   # Template engine value
@@ -216,9 +152,9 @@ app.get "/", (req, res) ->
   # rendering HTML
   #----------------------------------
   res.render "main",
-    pkgname: pkgname
-    jssyslist: jssyslist
-    jsuserlist: jsuserlist
+    pkgname: pathinfo.pkgname
+    #jssyslist: jssyslist
+    #jsuserlist: jsuserlist
     cssfilelist: cssfilelist
     node_env: node_env
     origin: origin
