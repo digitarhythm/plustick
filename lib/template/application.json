@@ -1,10 +1,14 @@
 {
   "site": {
     "origin": "",
-    "image": "",
+    "ogp": "",
     "favicon": "",
     "twitter": "",
-    "facebook": ""
+    "facebook": "",
+    "splash": {
+      "image": "",
+      "size": ""
+    }
   },
   "additional": {
     "front": {

@@ -60,7 +60,7 @@ app.use("/#{pathinfo.pkgname}/api", api)
 #==========================================================================
 # setting import
 #==========================================================================
-appjson = require("#{pathinfo.homedir}/config/application.json")
+appsjson = require("#{pathinfo.homedir}/config/application.json")
 sysjson = require("#{pathinfo.systemdir}/lib/config/system.json")
 
 #==========================================================================
@@ -111,12 +111,10 @@ app.get "/", (req, res) ->
   # make directory file list
   #==========================================================================
   cssfilelist = [].concat(sysjson.additional.front.css) || []
-  cssfilelist.push(...appjson.additional.front.css)
+  cssfilelist.push(...appsjson.additional.front.css)
 
   jssyslist = [].concat(sysjson.additional.front.javascript) || []
-  jssyslist.push(...appjson.additional.front.javascript)
-
-  jsuserlist = []
+  jssyslist.push(...appsjson.additional.front.javascript)
 
   #----------------------------------
   # System CSS file
@@ -141,12 +139,12 @@ app.get "/", (req, res) ->
   #----------------------------------
   # SNS Info
   #----------------------------------
-  if (appjson.site?)
-    origin = "#{(appjson.site.origin || req.headers.host)}"
-    ogpimg = appjson.site.image || ""
-    favimg = appjson.site.favicon || ""
-    twitter = appjson.site.twitter || ""
-    facebook = appjson.site.facebook || ""
+  if (appsjson.site?)
+    origin = "#{(appsjson.site.origin || req.headers.host)}"
+    ogpimg = appsjson.site.ogp || "OGP.png"
+    favimg = appsjson.site.favicon || ""
+    twitter = appsjson.site.twitter || ""
+    facebook = appsjson.site.facebook || ""
   else
     origin = req.headers.host
     ogpimg = ""
@@ -161,6 +159,7 @@ app.get "/", (req, res) ->
     pkgname: pathinfo.pkgname
     systemcss: systemcss
     cssfilelist: cssfilelist
+    jssyslist: jssyslist
     node_env: node_env
     origin: origin
     ogpimg: ogpimg

@@ -36,29 +36,40 @@ router.all "/:endpoint", (req, res) ->
     fpath = "#{pathinfo.usrlibdir}/splash.png"
     try
       err = fs.openSync(fpath, 'r')
+      splash = "#{pathinfo.pkgname}/usrlib/splash.png"
     catch e
-      fpath = "#{pathinfo.pkgname}/usrlib/OGP.png"
+      splash = "#{pathinfo.pkgname}/usrlib/OGP.png"
 
     # make load Javascript file list
     jsfilelist =
       plugin: []
       view: []
       include: []
+
     lists = await readFileList(pathinfo.plugindir)
     for fname in lists
       if (fname.match(/^.*\.js$/))
         jsfilelist['plugin'].push("#{pathinfo.pkgname}/plugin/#{fname}")
+
     lists = await readFileList(pathinfo.usrjsview)
     for fname in lists
       if (fname.match(/^.*\.min\.js$/))
-        jsfilelist['view'].push("#{pathinfo.pkgname}/view/#{fname}")
+        if (fname.match(/appsmain\.min\.js$/) == null)
+          jsfilelist['view'].push("#{pathinfo.pkgname}/view/#{fname}")
+        else
+          appsmain = "#{pathinfo.pkgname}/view/#{fname}"
+
+    jsfilelist['include'] = [].concat(pathinfo.appsjson.additional.front.javascript) || []
+    jsfilelist['include'].push(...pathinfo.appsjson.additional.front.javascript)
     lists = await readFileList(pathinfo.syslibdir)
     for fname in lists
       if (fname.match(/^.*\.min\.js$/))
         jsfilelist['include'].push("#{pathinfo.pkgname}/include/#{fname}")
+
     res.json
       error: 0
-      splash: fpath
+      pathinfo: pathinfo
+      appsmain: appsmain
       jsfilelist: jsfilelist
 
   else

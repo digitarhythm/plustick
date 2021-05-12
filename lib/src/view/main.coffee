@@ -219,15 +219,36 @@ window.onload =  ->
     # JS file load
     #------------------
     if (ret.data.error? && ret.data.error < 0)
-      jsfilelist = []
-      splash = ""
+      return
     else
       jsfilelist = ret.data.jsfilelist
-      splash = ret.data.splash
+      pathinfo = ret.data.pathinfo
+      appsjson = pathinfo.appsjson
+      appsmainpath = ret.data.appsmain
+
+    script = document.createElement("script")
+    script.setAttribute("src", appsmainpath)
+    script.setAttribute("type", "text/javascript")
+    await pluginload(script)
+
+    APPLICATION = new appsmain()
+
+    # get user setting
+    backgroundColor = APPLICATION.backgroundColor || "rgba(0, 0, 0, 1.0)"
+    bodybgcolor = APPLICATION.bodyBackgroundColor || "rgba(255, 255, 255, 1.0)"
+
+    #------------------
+    # body setting
+    #------------------
+    document.body.setAttribute("id", "body")
+    document.body.style.userSelect = "none"
+    document.body.style.backgroundColor = bodybgcolor
 
     #---------------------------------------------------------------------------
     # Splash banner
     #---------------------------------------------------------------------------
+    splashimage = appsjson.site.splash.image || undefined
+    splashsize = appsjson.site.splash.size || "contain"
     splash_banner = document.createElement("div")
     document.body.append(splash_banner)
     contents_size = fitContentsSize(splash_banner)
@@ -240,11 +261,15 @@ window.onload =  ->
     splash_banner.style.margin = "0px 0px 0px 0px"
     splash_banner.style.backgroundColor = "rgba(255, 255, 255, 0.0)"
     splash_banner.style.overflow = "hidden"
-    splash_banner.style.backgroundSize = "cover"
+    splash_banner.style.backgroundSize = splashsize
     splash_banner.style.backgroundPosition = "center"
     splash_banner.style.backgroundRepeat = "no-repeat"
     splash_banner.style.backgroundAttachment = "fixed"
-    splash_banner.style.backgroundImage = "url(#{splash})"
+    if (splashimage?)
+      url = "url(#{pathinfo.pkgname}/usrlib/#{splashimage})"
+    else
+      url = "url(#{pathinfo.pkgname}/usrlib/splash.png)"
+    splash_banner.style.backgroundImage = url
 
     scriptlist = [
       'plugin'
@@ -262,12 +287,6 @@ window.onload =  ->
     #------------------
     # disp root view
     #------------------
-    APPLICATION = new appsmain()
-
-    # get user setting
-    backgroundColor = APPLICATION.backgroundColor || "rgba(0, 0, 0, 1.0)"
-    bodybgcolor = APPLICATION.bodyBackgroundColor || "rgba(255, 255, 255, 1.0)"
-
     document.querySelector("#splash_banner").className = "fadeout"
     setTimeout ->
       document.getElementById("splash_banner").remove()
@@ -290,12 +309,6 @@ window.onload =  ->
       ROOTDIV.style.backgroundColor = backgroundColor
       ROOTDIV.style.overflow = "hidden"
 
-      #------------------
-      # body setting
-      #------------------
-      document.body.setAttribute("id", "body")
-      document.body.style.userSelect = "none"
-      document.body.style.backgroundColor = bodybgcolor
       document.oncontextmenu = =>
         contextmenu = APPLICATION.contextmenu
         return contextmenu
