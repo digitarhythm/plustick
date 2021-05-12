@@ -2,6 +2,8 @@ fs = require("fs-extra")
 process = require("process")
 pkgjson = require("#{process.cwd()}/package.json")
 
+# Application JSON
+__appsjson = require("#{process.cwd()}/config/application.json")
 # Package name
 __pkgname = pkgjson.name
 # System directory
@@ -35,6 +37,7 @@ __sysjsview = "#{__sysjsdir}/view"
 # system library directory
 __syslibdir = "#{__systemdir}/lib/include"
 
+exports.appsjson      = __appsjson
 exports.pkgname       = __pkgname
 exports.systemdir     = __systemdir
 exports.homedir       = __homedir

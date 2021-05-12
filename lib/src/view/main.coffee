@@ -5,6 +5,7 @@ origintmp = window.location.href.replace(/\?.*$/, "")
 ORIGIN = origintmp.replace(/\/$/, "")
 SITEURL = "#{ORIGIN}/#{pkgname}"
 PUBLIC = "#{SITEURL}/public"
+USRLIB = "#{SITEURL}/usrlib"
 LANGUAGE = window.navigator.language
 
 APPLICATION = undefined
@@ -192,6 +193,10 @@ window.onload =  ->
   #---------------------------------------------------------------------------
   # plugin load
   #---------------------------------------------------------------------------
+
+  #------------------
+  # JS file loding function
+  #------------------
   pluginload = (script) ->
     return new Promise (resolve, reject) ->
       head = document.getElementsByTagName('head')[0]
@@ -202,7 +207,10 @@ window.onload =  ->
       catch e
         reject(e)
 
-  apiuri = "#{SITEURL}/api/__getjslist__"
+  #------------------
+  # Get JS file list
+  #------------------
+  apiuri = "#{SITEURL}/api/__getappsinfo__"
   axios
     method: "POST"
     url: apiuri
@@ -212,8 +220,31 @@ window.onload =  ->
     #------------------
     if (ret.data.error? && ret.data.error < 0)
       jsfilelist = []
+      splash = ""
     else
       jsfilelist = ret.data.jsfilelist
+      splash = ret.data.splash
+
+    #---------------------------------------------------------------------------
+    # Splash banner
+    #---------------------------------------------------------------------------
+    splash_banner = document.createElement("div")
+    document.body.append(splash_banner)
+    contents_size = fitContentsSize(splash_banner)
+    splash_banner.setAttribute("id", "splash_banner")
+    splash_banner.style.position = "absolute"
+    splash_banner.style.width = "#{contents_size.width}px"
+    splash_banner.style.height = "#{contents_size.height}px"
+    splash_banner.style.left = "#{contents_size.left}px"
+    splash_banner.style.top = "#{contents_size.top}px"
+    splash_banner.style.margin = "0px 0px 0px 0px"
+    splash_banner.style.backgroundColor = "rgba(255, 255, 255, 0.0)"
+    splash_banner.style.overflow = "hidden"
+    splash_banner.style.backgroundSize = "cover"
+    splash_banner.style.backgroundPosition = "center"
+    splash_banner.style.backgroundRepeat = "no-repeat"
+    splash_banner.style.backgroundAttachment = "fixed"
+    splash_banner.style.backgroundImage = "url(#{splash})"
 
     scriptlist = [
       'plugin'
@@ -229,51 +260,55 @@ window.onload =  ->
         await pluginload(script)
 
     #------------------
-    # create application main
+    # disp root view
     #------------------
     APPLICATION = new appsmain()
 
     # get user setting
     backgroundColor = APPLICATION.backgroundColor || "rgba(0, 0, 0, 1.0)"
-    bodybgcolor = APPLICATION.bodyBackgroundColor || "rgba(32, 32, 32, 1.0)"
+    bodybgcolor = APPLICATION.bodyBackgroundColor || "rgba(255, 255, 255, 1.0)"
 
-    # body setting
-    document.body.setAttribute("id", "body")
-    document.body.style.userSelect = "none"
-    document.body.style.backgroundColor = bodybgcolor
-    document.oncontextmenu = =>
-      contextmenu = APPLICATION.contextmenu
-      return contextmenu
+    document.querySelector("#splash_banner").className = "fadeout"
+    setTimeout ->
+      document.getElementById("splash_banner").remove()
 
-    #------------------
-    # root view setting
-    #------------------
-    ROOTDIV = document.createElement("div")
-    ROOTDIV.setAttribute("id", "ROOTDIV")
-    document.body.append(ROOTDIV)
+      #------------------
+      # root view setting
+      #------------------
+      ROOTDIV = document.createElement("div")
+      ROOTDIV.setAttribute("id", "ROOTDIV")
+      document.body.append(ROOTDIV)
 
-    contents_size = fitContentsSize(APPLICATION)
+      contents_size = fitContentsSize(APPLICATION)
 
-    ROOTDIV.style.position = "absolute"
-    ROOTDIV.style.width = "#{contents_size.width}px"
-    ROOTDIV.style.height = "#{contents_size.height}px"
-    ROOTDIV.style.left = "#{contents_size.left}px"
-    ROOTDIV.style.top = "#{contents_size.top}px"
-    ROOTDIV.style.margin = "0px 0px 0px 0px"
-    ROOTDIV.style.backgroundColor = backgroundColor
-    ROOTDIV.style.overflow = "hidden"
+      ROOTDIV.style.position = "absolute"
+      ROOTDIV.style.width = "#{contents_size.width}px"
+      ROOTDIV.style.height = "#{contents_size.height}px"
+      ROOTDIV.style.left = "#{contents_size.left}px"
+      ROOTDIV.style.top = "#{contents_size.top}px"
+      ROOTDIV.style.margin = "0px 0px 0px 0px"
+      ROOTDIV.style.backgroundColor = backgroundColor
+      ROOTDIV.style.overflow = "hidden"
 
-    #------------------
-    # disp root view
-    #------------------
-    if (typeof APPLICATION.createHtml == 'function')
-      APPLICATION.browser_frame = BROWSER_FRAME
-      html = await APPLICATION.createHtml()
-      ROOTDIV.insertAdjacentHTML('beforeend', html)
+      #------------------
+      # body setting
+      #------------------
+      document.body.setAttribute("id", "body")
+      document.body.style.userSelect = "none"
+      document.body.style.backgroundColor = bodybgcolor
+      document.oncontextmenu = =>
+        contextmenu = APPLICATION.contextmenu
+        return contextmenu
 
-    if (typeof APPLICATION.viewDidLoad == 'function')
-      await APPLICATION.viewDidLoad()
+      if (typeof APPLICATION.createHtml == 'function')
+        APPLICATION.browser_frame = BROWSER_FRAME
+        html = await APPLICATION.createHtml()
+        ROOTDIV.insertAdjacentHTML('beforeend', html)
 
-    if (typeof APPLICATION.viewDidAppear == 'function')
-      await APPLICATION.viewDidAppear()
+      if (typeof APPLICATION.viewDidLoad == 'function')
+        await APPLICATION.viewDidLoad()
+
+      if (typeof APPLICATION.viewDidAppear == 'function')
+        await APPLICATION.viewDidAppear()
+    , 1000
 

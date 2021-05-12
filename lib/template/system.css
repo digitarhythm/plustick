@@ -1,0 +1,31 @@
+.fadein {
+  animation-duration: 1000ms;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: forwards;
+  animation-name: fadein;
+}
+
+@keyframes fadein {
+  from {
+    opacity: 0.0;
+  }
+  to {
+    opacity: 1.0;
+  }
+}
+
+.fadeout {
+  animation-duration: 1000ms;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: forwards;
+  animation-name: fadeout;
+}
+
+@keyframes fadeout {
+  from {
+    opacity: 1.0;
+  }
+  to {
+    opacity: 0.0;
+  }
+}

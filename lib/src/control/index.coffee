@@ -42,6 +42,7 @@ app.use("/#{pathinfo.pkgname}/view", express.static(pathinfo.usrjsview))
 app.use("/#{pathinfo.pkgname}/syslib", express.static(pathinfo.sysjsview))
 app.use("/#{pathinfo.pkgname}/usrlib", express.static(pathinfo.usrlibdir))
 app.use("/#{pathinfo.pkgname}/include", express.static(pathinfo.syslibdir))
+app.use("/#{pathinfo.pkgname}/template", express.static(pathinfo.templatedir))
 
 #==========================================================================
 # routing function dictionary
@@ -118,6 +119,11 @@ app.get "/", (req, res) ->
   jsuserlist = []
 
   #----------------------------------
+  # System CSS file
+  #----------------------------------
+  systemcss = "#{pathinfo.pkgname}/template/system.css"
+
+  #----------------------------------
   # User CSS file include
   #----------------------------------
   lists = await __readFileList(pathinfo.stylesheetdir)
@@ -153,8 +159,7 @@ app.get "/", (req, res) ->
   #----------------------------------
   res.render "main",
     pkgname: pathinfo.pkgname
-    #jssyslist: jssyslist
-    #jsuserlist: jsuserlist
+    systemcss: systemcss
     cssfilelist: cssfilelist
     node_env: node_env
     origin: origin

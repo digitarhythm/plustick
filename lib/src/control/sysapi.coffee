@@ -23,7 +23,7 @@ router.all "/:endpoint", (req, res) ->
   if (origin != referer.replace(/\/$/, ""))
     res.json(-1)
 
-  if (endpoint == "__getjslist__")
+  if (endpoint == "__getappsinfo__")
     readFileList = (path) ->
       return new Promise (resolve, reject) ->
         fs.readdir path, (err, lists) ->
@@ -31,6 +31,13 @@ router.all "/:endpoint", (req, res) ->
             reject(err)
           else
             resolve(lists)
+
+    # splash image file
+    fpath = "#{pathinfo.usrlibdir}/splash.png"
+    try
+      err = fs.openSync(fpath, 'r')
+    catch e
+      fpath = "#{pathinfo.pkgname}/usrlib/OGP.png"
 
     # make load Javascript file list
     jsfilelist =
@@ -51,6 +58,7 @@ router.all "/:endpoint", (req, res) ->
         jsfilelist['include'].push("#{pathinfo.pkgname}/include/#{fname}")
     res.json
       error: 0
+      splash: fpath
       jsfilelist: jsfilelist
 
   else
