@@ -111,10 +111,7 @@ app.get "/", (req, res) ->
   # make directory file list
   #==========================================================================
   cssfilelist = [].concat(sysjson.additional.front.css) || []
-  cssfilelist.push(...appsjson.additional.front.css)
-
   jssyslist = [].concat(sysjson.additional.front.javascript) || []
-  jssyslist.push(...appsjson.additional.front.javascript)
 
   #----------------------------------
   # System CSS file
@@ -128,6 +125,16 @@ app.get "/", (req, res) ->
   for fname in lists
     if (fname.match(/^.*\.css$/))
       cssfilelist.push("#{pathinfo.pkgname}/stylesheet/#{fname}")
+
+  lists = await __readFileList(pathinfo.plugindir)
+  for fname in lists
+    if (fname.match(/^.*\.js$/))
+      jssyslist.push("#{pathinfo.pkgname}/plugin/#{fname}")
+
+  lists = await __readFileList(pathinfo.syslibdir)
+  for fname in lists
+    if (fname.match(/^.*\.min\.js$/))
+      jssyslist.push("#{pathinfo.pkgname}/include/#{fname}")
 
   #----------------------------------
   # Template engine value

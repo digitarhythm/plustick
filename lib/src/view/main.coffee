@@ -265,18 +265,11 @@ window.onload =  ->
       url = "url(#{pathinfo.pkgname}/usrlib/splash.png)"
     splash_banner.style.backgroundImage = url
 
-    scriptlist = [
-      'plugin'
-      'include'
-      'view'
-    ]
-    for name in scriptlist
-      filelist = jsfilelist[name]
-      for fname in filelist
-        script = document.createElement("script")
-        script.setAttribute("type", "text/javascript")
-        script.setAttribute("src", fname)
-        await pluginload(script)
+    for fname in jsfilelist
+      script = document.createElement("script")
+      script.setAttribute("type", "text/javascript")
+      script.setAttribute("src", fname)
+      await pluginload(script)
 
     #------------------
     # disp root view
