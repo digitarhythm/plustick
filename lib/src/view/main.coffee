@@ -224,12 +224,6 @@ window.onload =  ->
       jsfilelist = ret.data.jsfilelist
       pathinfo = ret.data.pathinfo
       appsjson = pathinfo.appsjson
-      appsmainpath = ret.data.appsmain
-
-    script = document.createElement("script")
-    script.setAttribute("src", appsmainpath)
-    script.setAttribute("type", "text/javascript")
-    await pluginload(script)
 
     APPLICATION = new appsmain()
 
@@ -280,8 +274,8 @@ window.onload =  ->
       filelist = jsfilelist[name]
       for fname in filelist
         script = document.createElement("script")
-        script.setAttribute("src", fname)
         script.setAttribute("type", "text/javascript")
+        script.setAttribute("src", fname)
         await pluginload(script)
 
     #------------------

@@ -56,11 +56,8 @@ router.all "/:endpoint", (req, res) ->
       if (fname.match(/^.*\.min\.js$/))
         if (fname.match(/appsmain\.min\.js$/) == null)
           jsfilelist['view'].push("#{pathinfo.pkgname}/view/#{fname}")
-        else
-          appsmain = "#{pathinfo.pkgname}/view/#{fname}"
 
     jsfilelist['include'] = [].concat(pathinfo.appsjson.additional.front.javascript) || []
-    jsfilelist['include'].push(...pathinfo.appsjson.additional.front.javascript)
     lists = await readFileList(pathinfo.syslibdir)
     for fname in lists
       if (fname.match(/^.*\.min\.js$/))
@@ -69,7 +66,6 @@ router.all "/:endpoint", (req, res) ->
     res.json
       error: 0
       pathinfo: pathinfo
-      appsmain: appsmain
       jsfilelist: jsfilelist
 
   else
