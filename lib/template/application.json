@@ -5,7 +5,7 @@
     "basecolor": "rgba(255, 255, 255, 1.0)",
     "splash": {
       "image": "OGP.png",
-      "size": "cover"
+      "size": "contain"
     }
   },
   "sns": {
