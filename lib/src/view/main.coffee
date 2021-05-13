@@ -130,8 +130,8 @@ window.onload =  ->
     aspect = BROWSER_FRAME.size.aspect
 
     if (apps.width? || apps.height?)
-      contents_width = apps.width || parseInt(Math.ceil(Math.round(apps.height * aspect)))
-      contents_height = apps.height || parseInt(Math.ceil(Math.round(apps.width / aspect)))
+      contents_width = apps.width || parseInt(Math.floor(apps.height * aspect))
+      contents_height = apps.height || parseInt(Math.floor(apps.width / aspect))
       apps.width = contents_width
       apps.height = contents_height
 
@@ -147,12 +147,12 @@ window.onload =  ->
 
       # calc width/height
       if (scale_mode == 1)
-        real_height = contents_height * scale_x
+        real_height = parseInt(Math.floor(contents_height * scale_x))
         left = 0
         top = parseInt(Math.floor((BROWSER_FRAME.size.height - real_height) / 2))
         scale = scale_x
       else
-        real_width = contents_width * scale_y
+        real_width = parseInt(Math.floor(contents_width * scale_y))
         left = parseInt(Math.floor((BROWSER_FRAME.size.width - real_width) / 2))
         top = 0
         scale = scale_y
