@@ -150,8 +150,8 @@ app.get "/", (req, res) ->
   #----------------------------------
   if (sitejson?)
     origin = "#{(sitejson.origin || req.headers.host)}"
-    ogpimg = sitejson.ogp || "OGP.png"
     favimg = sitejson.favicon || ""
+    ogpimg = snsjson.ogp || "OGP.png"
     twitter = snsjson.twitter || ""
     facebook = snsjson.facebook || ""
   else

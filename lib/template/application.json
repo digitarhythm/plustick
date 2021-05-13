@@ -1,7 +1,6 @@
 {
   "site": {
     "origin": "",
-    "ogp": "OGP.png",
     "favicon": "",
     "basecolor": "rgba(255, 255, 255, 1.0)",
     "splash": {
@@ -10,6 +9,7 @@
     }
   },
   "sns": {
+    "ogp": "OGP.png",
     "twitter": "",
     "facebook": ""
   },
