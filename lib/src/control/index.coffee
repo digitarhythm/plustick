@@ -62,6 +62,8 @@ app.use("/#{pathinfo.pkgname}/api", api)
 #==========================================================================
 appsjson = require("#{pathinfo.homedir}/config/application.json")
 sysjson = require("#{pathinfo.systemdir}/lib/config/system.json")
+sitejson = appsjson.site || {}
+snsjson = appsjson.sns || {}
 
 #==========================================================================
 # read file list function
@@ -146,12 +148,12 @@ app.get "/", (req, res) ->
   #----------------------------------
   # SNS Info
   #----------------------------------
-  if (appsjson.site?)
-    origin = "#{(appsjson.site.origin || req.headers.host)}"
-    ogpimg = appsjson.site.ogp || "OGP.png"
-    favimg = appsjson.site.favicon || ""
-    twitter = appsjson.site.twitter || ""
-    facebook = appsjson.site.facebook || ""
+  if (sitejson?)
+    origin = "#{(sitejson.origin || req.headers.host)}"
+    ogpimg = sitejson.ogp || "OGP.png"
+    favimg = sitejson.favicon || ""
+    twitter = snsjson.twitter || ""
+    facebook = snsjson.facebook || ""
   else
     origin = req.headers.host
     ogpimg = ""

@@ -1,14 +1,17 @@
 {
   "site": {
     "origin": "",
-    "ogp": "",
+    "ogp": "OGP.png",
     "favicon": "",
-    "twitter": "",
-    "facebook": "",
+    "basecolor": "rgba(255, 255, 255, 1.0)",
     "splash": {
-      "image": "",
-      "size": ""
+      "image": "OGP.png",
+      "size": "cover"
     }
+  },
+  "sns": {
+    "twitter": "",
+    "facebook": ""
   },
   "additional": {
     "front": {

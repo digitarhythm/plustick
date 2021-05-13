@@ -149,11 +149,11 @@ window.onload =  ->
       if (scale_mode == 1)
         real_height = contents_height * scale_x
         left = 0
-        top = parseInt(Math.ceil((BROWSER_FRAME.size.height - real_height) / 2))
+        top = parseInt(Math.floor((BROWSER_FRAME.size.height - real_height) / 2))
         scale = scale_x
       else
         real_width = contents_width * scale_y
-        left = parseInt(Math.ceil((BROWSER_FRAME.size.width - real_width) / 2))
+        left = parseInt(Math.floor((BROWSER_FRAME.size.width - real_width) / 2))
         top = 0
         scale = scale_y
 
@@ -224,26 +224,24 @@ window.onload =  ->
       jsfilelist = ret.data.jsfilelist
       pathinfo = ret.data.pathinfo
       appsjson = pathinfo.appsjson
-
-    APPLICATION = new appsmain()
-
-    # get user setting
-    backgroundColor = APPLICATION.backgroundColor || "rgba(0, 0, 0, 1.0)"
-    bodybgcolor = APPLICATION.bodyBackgroundColor || "rgba(255, 255, 255, 1.0)"
+      sitejson = appsjson.site || {}
+      snsjson = appsjson.sns || {}
 
     #------------------
     # body setting
     #------------------
     document.body.setAttribute("id", "body")
     document.body.style.userSelect = "none"
-    document.body.style.backgroundColor = bodybgcolor
+    document.body.style.display = "none"
+    document.body.style.backgroundColor = "white"
 
     #---------------------------------------------------------------------------
-    # Splash banner
+    # Splash screen
     #---------------------------------------------------------------------------
     splashimage = appsjson.site.splash.image || undefined
     splashsize = appsjson.site.splash.size || "contain"
     splash_banner = document.createElement("div")
+    splash_banner.style.display = "none"
     document.body.append(splash_banner)
     contents_size = fitContentsSize(splash_banner)
     splash_banner.setAttribute("id", "splash_banner")
@@ -253,7 +251,7 @@ window.onload =  ->
     splash_banner.style.left = "#{contents_size.left}px"
     splash_banner.style.top = "#{contents_size.top}px"
     splash_banner.style.margin = "0px 0px 0px 0px"
-    splash_banner.style.backgroundColor = "rgba(255, 255, 255, 0.0)"
+    splash_banner.style.backgroundColor = "transparent"
     splash_banner.style.overflow = "hidden"
     splash_banner.style.backgroundSize = splashsize
     splash_banner.style.backgroundPosition = "center"
@@ -264,51 +262,70 @@ window.onload =  ->
     else
       url = "url(#{pathinfo.pkgname}/usrlib/splash.png)"
     splash_banner.style.backgroundImage = url
-
-    for fname in jsfilelist
-      script = document.createElement("script")
-      script.setAttribute("type", "text/javascript")
-      script.setAttribute("src", fname)
-      await pluginload(script)
+    splash_banner.style.display = "inline"
 
     #------------------
-    # disp root view
+    # body color
     #------------------
-    document.querySelector("#splash_banner").className = "fadeout"
+    document.body.style.backgroundColor = sitejson.basecolor || "black"
+    document.body.style.display = "inline"
+
     setTimeout ->
-      document.getElementById("splash_banner").remove()
 
       #------------------
-      # root view setting
+      # JS file load
       #------------------
-      ROOTDIV = document.createElement("div")
-      ROOTDIV.setAttribute("id", "ROOTDIV")
-      document.body.append(ROOTDIV)
+      for fname in jsfilelist
+        script = document.createElement("script")
+        script.setAttribute("type", "text/javascript")
+        script.setAttribute("src", fname)
+        await pluginload(script)
 
-      contents_size = fitContentsSize(APPLICATION)
+      #------------------
+      # disp root view
+      #------------------
+      splash_banner.className = "fadeout"
+      setTimeout ->
+        splash_banner.remove()
 
-      ROOTDIV.style.position = "absolute"
-      ROOTDIV.style.width = "#{contents_size.width}px"
-      ROOTDIV.style.height = "#{contents_size.height}px"
-      ROOTDIV.style.left = "#{contents_size.left}px"
-      ROOTDIV.style.top = "#{contents_size.top}px"
-      ROOTDIV.style.margin = "0px 0px 0px 0px"
-      ROOTDIV.style.backgroundColor = backgroundColor
-      ROOTDIV.style.overflow = "hidden"
+        APPLICATION = new appsmain()
 
-      document.oncontextmenu = =>
-        contextmenu = APPLICATION.contextmenu
-        return contextmenu
+        # get user setting
+        backgroundColor = APPLICATION.backgroundColor || "rgba(0, 0, 0, 1.0)"
 
-      if (typeof APPLICATION.createHtml == 'function')
-        APPLICATION.browser_frame = BROWSER_FRAME
-        html = await APPLICATION.createHtml()
-        ROOTDIV.insertAdjacentHTML('beforeend', html)
+        #------------------
+        # root view setting
+        #------------------
+        ROOTDIV = document.createElement("div")
+        ROOTDIV.setAttribute("id", "ROOTDIV")
+        document.body.append(ROOTDIV)
 
-      if (typeof APPLICATION.viewDidLoad == 'function')
-        await APPLICATION.viewDidLoad()
+        contents_size = fitContentsSize(APPLICATION)
 
-      if (typeof APPLICATION.viewDidAppear == 'function')
-        await APPLICATION.viewDidAppear()
+        ROOTDIV.style.position = "absolute"
+        ROOTDIV.style.width = "#{contents_size.width}px"
+        ROOTDIV.style.height = "#{contents_size.height}px"
+        ROOTDIV.style.left = "#{contents_size.left}px"
+        ROOTDIV.style.top = "#{contents_size.top}px"
+        ROOTDIV.style.margin = "0px 0px 0px 0px"
+        ROOTDIV.style.backgroundColor = backgroundColor
+        ROOTDIV.style.overflow = "hidden"
+
+        document.oncontextmenu = =>
+          contextmenu = APPLICATION.contextmenu
+          return contextmenu
+
+        if (typeof APPLICATION.createHtml == 'function')
+          APPLICATION.browser_frame = BROWSER_FRAME
+          html = await APPLICATION.createHtml()
+          ROOTDIV.insertAdjacentHTML('beforeend', html)
+
+        if (typeof APPLICATION.viewDidLoad == 'function')
+          await APPLICATION.viewDidLoad()
+
+        if (typeof APPLICATION.viewDidAppear == 'function')
+          await APPLICATION.viewDidAppear()
+      , 500
+
     , 1000
 
