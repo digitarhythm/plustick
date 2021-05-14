@@ -271,7 +271,6 @@ window.addEventListener "DOMContentLoaded", ->
     document.body.style.display = "inline"
 
     setTimeout ->
-
       #------------------
       # JS file load
       #------------------

@@ -9,7 +9,8 @@ __pkgname = pkgjson.name
 # System directory
 __systemdir = fs.realpathSync(__dirname+"/../../..")
 # home directory
-__homedir = fs.realpathSync(__dirname+"/../../../../..")
+#__homedir = fs.realpathSync(__dirname+"/../../../../..")
+__homedir = fs.realpathSync("./")
 # application directory
 __appsdir = "#{__homedir}/apps"
 # public directory

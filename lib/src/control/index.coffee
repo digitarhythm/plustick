@@ -113,7 +113,9 @@ app.get "/", (req, res) ->
   # make directory file list
   #==========================================================================
   cssfilelist = [].concat(sysjson.additional.front.css) || []
+  cssfilelist = cssfilelist.concat(appsjson.additional.front.css)
   jssyslist = [].concat(sysjson.additional.front.javascript) || []
+  jssyslist = jssyslist.concat(appsjson.additional.front.javascript)
 
   #----------------------------------
   # System CSS file

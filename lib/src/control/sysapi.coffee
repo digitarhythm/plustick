@@ -11,6 +11,9 @@ pathinfo = require("#{PLUSTICKLIBS}/pathinfo.min.js")
 router.use(express.json())
 router.use(express.urlencoded({ extended: true }))
 
+#=============================================================================
+# normal api
+#=============================================================================
 router.all "/:endpoint", (req, res) ->
   method = req.method
   endpoint = req.params.endpoint
@@ -23,6 +26,9 @@ router.all "/:endpoint", (req, res) ->
   if (origin != referer.replace(/\/$/, ""))
     res.json(-1)
 
+  #--------------------------
+  # get application info from server
+  #--------------------------
   if (endpoint == "__getappsinfo__")
     readFileList = (path) ->
       return new Promise (resolve, reject) ->
