@@ -99,7 +99,7 @@ window.requestAnimationFrame = requestAnimationFrame
 #===========================================================================
 # execute first process
 #===========================================================================
-window.onload =  ->
+window.addEventListener "DOMContentLoaded", ->
   #===========================================================================
   # resize event
   #===========================================================================
@@ -258,9 +258,9 @@ window.onload =  ->
     splash_banner.style.backgroundRepeat = "no-repeat"
     splash_banner.style.backgroundAttachment = "fixed"
     if (splashimage?)
-      url = "url(#{pathinfo.pkgname}/usrlib/#{splashimage})"
+      url = "url(#{pathinfo.pkgname}/public/#{splashimage})"
     else
-      url = "url(#{pathinfo.pkgname}/usrlib/splash.png)"
+      url = "url(#{pathinfo.pkgname}/public/splash.png)"
     splash_banner.style.backgroundImage = url
     splash_banner.style.display = "inline"
 

@@ -6,7 +6,7 @@
 
     <% if @twitter != "" || @facebook != "" : %>
       <% if @ogpimg != "" : %>
-        <meta property="og:image" content="<%= @origin %>/<%= @pkgname %>/usrlib/<%= @ogpimg %>" />
+        <meta property="og:image" content="<%= @origin %>/<%= @pkgname %>/public/<%= @ogpimg %>" />
       <% end %>
       <meta property="og:url" content="<%= @origin %>" />
       <meta property="og:type" content="website" />
@@ -25,7 +25,7 @@
 
     <title><%= @title %></title>
     <% if @favimg != "" : %>
-      <link rel="icon" href="<%= @origin %>/<%= @pkgname %>/usrlib/<%= @favimg %>" />
+      <link rel="icon" href="<%= @origin %>/<%= @pkgname %>/public/<%= @favimg %>" />
     <% end %>
 
     <link rel="stylesheet" type="text/css" href="<%= @systemcss %>" />
