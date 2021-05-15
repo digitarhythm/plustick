@@ -191,8 +191,8 @@ class plustick_core
     id = param.id || undefined
     type = param.type || undefined
     listener = param.listener || undefined
-    passive = param.passive || false
     capture = param.capture || false
+    propagation = param.propagation || false
 
     if (!id? || !type?)
       return
@@ -276,7 +276,8 @@ class plustick_core
 
     for t in typelist
       target.addEventListener t, (event) =>
-        event.preventDefault()
+        if (!propagation)
+          event.stopPropagation()
         method(event)
       , capture, {passive: true}
       key="#{id}_#{t}"
