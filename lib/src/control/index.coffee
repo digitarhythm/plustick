@@ -148,18 +148,24 @@ app.get "/", (req, res) ->
   description = pkgjson.description
 
   #----------------------------------
-  # SNS Info
+  # Site info
   #----------------------------------
   if (sitejson?)
-    origin = "#{(sitejson.origin || req.headers.host)}"
+    origin = sitejson.origin || req.headers.host
     favimg = sitejson.favicon || ""
+  else
+    origin = req.headers.host
+    favimg = ""
+
+  #----------------------------------
+  # SNS info
+  #----------------------------------
+  if (snsjson?)
     ogpimg = snsjson.ogp || "OGP.png"
     twitter = snsjson.twitter || ""
     facebook = snsjson.facebook || ""
   else
-    origin = req.headers.host
     ogpimg = ""
-    favimg = ""
     twitter = ""
     facebook = ""
 
