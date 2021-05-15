@@ -22,9 +22,10 @@ router.all "/:endpoint", (req, res) ->
   headers['method'] = method
 
   origin = headers.origin
-  referer = headers.referer || ""
+  referer = headers.referer.replace(/\/\?.*$/, "") || ""
   if (origin != referer.replace(/\/$/, ""))
     res.json(-1)
+    return
 
   #--------------------------
   # get application info from server
@@ -41,6 +42,7 @@ router.all "/:endpoint", (req, res) ->
     # make load Javascript file list
     jsfilelist = []
     lists = await readFileList(pathinfo.usrjsview)
+
     for fname in lists
       if (fname.match(/^.*\.min\.js$/))
         if (fname.match(/appsmain\.min\.js$/) == null)
