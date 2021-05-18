@@ -171,12 +171,15 @@ window.addEventListener "DOMContentLoaded", ->
       scale = 1.0
 
     BROWSER_FRAME.scale = scale
+    BROWSER_FRAME.size.width = contents_width
+    BROWSER_FRAME.size.height = contents_height
 
     return
       width: contents_width
       height: contents_height
       left: left
       top: top
+      scale: scale
   #===========================================================================
 
   #---------------------------------------------------------------------------
