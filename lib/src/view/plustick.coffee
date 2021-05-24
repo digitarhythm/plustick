@@ -223,19 +223,25 @@ class plustick_core
           pos = []
           for p in event.touches
             force = p.force || 1.0
+            if (p.radiusX == 0.5 && p.radiusY == 0.5)
+              kind = "stylus"
+            else
+              kind = "finger"
             pos.push
               clientX: parseInt(p.clientX / BROWSER_FRAME.scale)
               clientY: parseInt(p.clientY / BROWSER_FRAME.scale)
               offsetX: parseInt((p.clientX - rect.left) / BROWSER_FRAME.scale)
               offsetY: parseInt((p.clientY - rect.top) / BROWSER_FRAME.scale)
+              kind: kind
               force: p.force
           passive = true
         else
           pos = [
-            offsetX: event.clientX - rect.left
-            offsetY: event.clientY - rect.top
-            clientX: event.clientX
-            clientY: event.clientY
+            clientX: parseInt(event.clientX)
+            clientY: parseInt(event.clientY)
+            offsetX: parseInt(event.offsetX)
+            offsetY: parseInt(event.offsetY)
+            kind: "mouse"
             force: 1.0
           ]
 
