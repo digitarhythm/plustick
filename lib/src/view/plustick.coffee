@@ -31,6 +31,7 @@ echo = (a, b...) ->
   if (node_env == "develop")
     console.log(__strFormatter__(a, b...))
 
+
 #=============================================================================
 # DOM Operation
 #=============================================================================
@@ -228,6 +229,7 @@ class plustick_core
               clientY: parseInt(p.clientY / BROWSER_FRAME.scale)
               offsetX: parseInt((p.clientX - rect.left) / BROWSER_FRAME.scale)
               offsetY: parseInt((p.clientY - rect.top) / BROWSER_FRAME.scale)
+              force: p.force
           passive = true
         else
           clientX = event.clientX
