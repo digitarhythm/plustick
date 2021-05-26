@@ -223,7 +223,7 @@ class plustick_core
           pos = []
           for p in event.touches
             force = p.force || 1.0
-            if (p.radiusX == 0.5 && p.radiusY == 0.5)
+            if (p.radiusX == 0.50 && p.radiusY == 0.50)
               kind = "stylus"
             else
               kind = "finger"
