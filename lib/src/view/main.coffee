@@ -45,6 +45,7 @@ class viewController
       return (((1+Math.random())*0x10000)|0).toString(16).substring(1)
     @uniqueID = (S4()+S4()+"_"+S4()+"_"+S4()+"_"+S4()+"_"+S4()+S4()+S4())
     @browser_frame = BROWSER_FRAME
+    @parent = undefined
 
     GLOBAL.PROC[@uniqueID] = @
 
