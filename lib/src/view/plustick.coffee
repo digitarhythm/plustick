@@ -117,7 +117,11 @@ class plustick_core
   #===========================================================================
   # CSS Animation
   #===========================================================================
-  animate:(duration, target_id, toparam, finished=undefined) ->
+  animate:(param) ->
+    duration = param.duration || 0.3
+    id = param.id || @uniqueID
+    toparam = param.param || {}
+    finished = param.finished || undefined
     anim_tmp = 10.0
 
     #=========================================================================
@@ -161,7 +165,7 @@ class plustick_core
           , 100
     #=========================================================================
 
-    element = document.getElementById(target_id)
+    element = document.getElementById(id)
     if (!element? || !toparam?)
       return
 

@@ -50,7 +50,10 @@ class viewController
 
   #----------------------
   #----------------------
-  addView:(obj, baseid=@uniqueID) ->
+  addView:(param) ->
+    obj = param.viewobj
+    baseid = param.baseid || @uniqueID
+
     obj.parent = @
     baseview = getElement(baseid) || undefined
     if (!baseview?)
@@ -63,15 +66,15 @@ class viewController
 
   #----------------------
   #----------------------
-  removeView:(obj) ->
-    obj = getElement(@uniqueID)
+  removeView:(param) ->
+    obj = param.viewobj || getElement(@uniqueID)
     obj.remove()
     return undefined
 
   #----------------------
   #----------------------
-  removeDiv:(removeid) ->
-    obj = getElement(removeid)
+  removeDiv:(param) ->
+    obj = getElement(param.id)
     obj.remove()
     return undefined
 
