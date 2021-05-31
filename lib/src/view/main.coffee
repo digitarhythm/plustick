@@ -52,10 +52,10 @@ class viewController
   #----------------------
   addView:(param) ->
     obj = param.viewobj
-    baseid = param.baseid || @uniqueID
+    id = param.id || @uniqueID
 
     obj.parent = @
-    baseview = getElement(baseid) || undefined
+    baseview = getElement(id) || undefined
     if (!baseview?)
       return
     else
