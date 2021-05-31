@@ -53,7 +53,6 @@ class viewController
   addView:(param) ->
     obj = param.viewobj
     id = param.id || @uniqueID
-
     obj.parent = @
     baseview = getElement(id) || undefined
     if (!baseview?)
