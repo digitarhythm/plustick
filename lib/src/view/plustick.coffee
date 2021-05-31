@@ -243,8 +243,8 @@ class plustick_core
           pos = [
             clientX: parseInt(event.clientX)
             clientY: parseInt(event.clientY)
-            offsetX: parseInt(event.offsetX)
-            offsetY: parseInt(event.offsetY)
+            offsetX: parseInt(event.clientX - rect.left)
+            offsetY: parseInt(event.clientY - rect.top)
             kind: "mouse"
             force: 1.0
           ]
