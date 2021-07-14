@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
@@ -26,6 +26,11 @@
     <title><%= @title %></title>
     <% if @favimg != "" : %>
       <link rel="icon" href="<%= @origin %>/<%= @pkgname %>/public/<%= @favimg %>" />
+    <% end %>
+
+    <% if @manifest != "" : %>
+      <link rel="manifest" href="<%= @manifest %>" />
+      <script async src="https://cdn.jsdelivr.net/npm/pwacompat" crossorigin="anonymous"></script>
     <% end %>
 
     <link rel="stylesheet" type="text/css" href="<%= @systemcss %>" />

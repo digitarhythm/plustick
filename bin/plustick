@@ -102,15 +102,15 @@ function environ_check() {
     mkdir -p $target
   fi
 
-  target="$APPSDIR/apps/public"
+  target="$APPSDIR/apps/public/img/icons"
   if [ ! -e $target ]; then
     mkdir -p $target
   fi
 
-  target="$APPSDIR/apps/usrlib"
-  if [ ! -e $target ]; then
-    mkdir -p $target
-  fi
+#  target="$APPSDIR/apps/usrlib"
+#  if [ ! -e $target ]; then
+#    mkdir -p $target
+#  fi
 
   # check main script
   target="$APPSDIR/apps/src/view/appsmain.coffee"
@@ -149,13 +149,13 @@ function environ_check() {
   fi
 
   # check loading indicator
-  target="$APPSDIR/apps/usrlib/loading_g.gif"
+  target="$APPSDIR/apps/public/img/loading_g.gif"
   if [ ! -e $target ]; then
-    cp $MODULE/lib/template/loading_g.gif $APPSDIR/apps/usrlib/
+    cp $MODULE/lib/template/loading_g.gif $APPSDIR/apps/public/img/
   fi
-  target="$APPSDIR/apps/usrlib/loading_w.gif"
+  target="$APPSDIR/apps/public/img/loading_w.gif"
   if [ ! -e $target ]; then
-    cp $MODULE/lib/template/loading_w.gif $APPSDIR/apps/usrlib/
+    cp $MODULE/lib/template/loading_w.gif $APPSDIR/apps/public/img/
   fi
 
   # check stylesheet file
@@ -165,9 +165,9 @@ function environ_check() {
   fi
 
   # check user lib file
-  target="$APPSDIR/apps/public/OGP.png"
+  target="$APPSDIR/apps/public/img/OGP.png"
   if [ ! -e $target ]; then
-    cp $MODULE/lib/template/OGP.png $APPSDIR/apps/public/
+    cp $MODULE/lib/template/OGP.png $APPSDIR/apps/public/img/
   fi
 
   echo $firstboot

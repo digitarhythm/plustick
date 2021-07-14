@@ -11,6 +11,8 @@ pathinfo = require("#{PLUSTICKLIBS}/pathinfo.min.js")
 router.use(express.json())
 router.use(express.urlencoded({ extended: true }))
 
+node_env = process.env['NODE_ENV']
+
 #=============================================================================
 # normal api
 #=============================================================================
@@ -21,11 +23,12 @@ router.all "/:endpoint", (req, res) ->
   headers = req.headers
   headers['method'] = method
 
-  origin = headers.origin
-  referer = headers.referer.replace(/\/\?.*$/, "") || ""
-  if (origin != referer.replace(/\/$/, ""))
-    res.json(-1)
-    return
+  if (node_env == "production")
+    origin = headers.origin
+    referer = headers.referer.replace(/\/\?.*$/, "") || ""
+    if (origin != referer.replace(/\/$/, ""))
+      res.json(-1)
+      return
 
   #--------------------------
   # get application info from server

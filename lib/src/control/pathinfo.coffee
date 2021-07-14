@@ -9,7 +9,6 @@ __pkgname = pkgjson.name
 # System directory
 __systemdir = fs.realpathSync(__dirname+"/../../..")
 # home directory
-#__homedir = fs.realpathSync(__dirname+"/../../../../..")
 __homedir = fs.realpathSync("./")
 # application directory
 __appsdir = "#{__homedir}/apps"
@@ -25,8 +24,6 @@ __stylesheetdir = "#{__appsdir}/stylesheet"
 __usrjsdir = "#{__appsdir}/js"
 __usrjsctrl = "#{__usrjsdir}/control"
 __usrjsview = "#{__usrjsdir}/view"
-# user Library directory
-__usrlibdir = "#{__appsdir}/usrlib"
 # user JavaScript directory
 __usrjssdir = "#{__appsdir}/js"
 __usrctrldir = "#{__usrjssdir}/control"
@@ -50,7 +47,6 @@ exports.stylesheetdir = __stylesheetdir
 exports.usrjsdir      = __usrjsdir
 exports.usrjsctrl     = __usrjsctrl
 exports.usrjsview     = __usrjsview
-exports.usrlibdir     = __usrlibdir
 exports.usrjssdir     = __usrjssdir
 exports.usrctrldir    = __usrctrldir
 exports.usrviewdir    = __usrviewdir

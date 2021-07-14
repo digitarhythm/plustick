@@ -4,12 +4,14 @@ app = express()
 Promise = require("bluebird")
 execSync = require("child_process").execSync
 exphttp = require("http").Server(app)
-https = require("https")
+httpolyglot = require("httpolyglot")
 path = require("path")
 config = require("config")
 fs = require("fs-extra")
 echo = require("ndlog").echo
 process = require("process")
+sharp = require("sharp")
+axios = require("axios")
 ECT = require("ect")
 
 __systemdir = fs.realpathSync(__dirname+"/../../..")
@@ -40,7 +42,6 @@ app.use("/#{pathinfo.pkgname}/stylesheet", express.static(pathinfo.stylesheetdir
 app.use("/#{pathinfo.pkgname}/public", express.static(pathinfo.publicdir))
 app.use("/#{pathinfo.pkgname}/view", express.static(pathinfo.usrjsview))
 app.use("/#{pathinfo.pkgname}/syslib", express.static(pathinfo.sysjsview))
-app.use("/#{pathinfo.pkgname}/usrlib", express.static(pathinfo.usrlibdir))
 app.use("/#{pathinfo.pkgname}/include", express.static(pathinfo.syslibdir))
 app.use("/#{pathinfo.pkgname}/template", express.static(pathinfo.templatedir))
 
@@ -64,26 +65,74 @@ appsjson = require("#{pathinfo.homedir}/config/application.json")
 sysjson = require("#{pathinfo.systemdir}/lib/config/system.json")
 sitejson = appsjson.site || {}
 snsjson = appsjson.sns || {}
+manifest_tmp = "#{pathinfo.templatedir}/manifest.json"
+manifest_uri = "/#{pathinfo.pkgname}/public/manifest.json"
+manifest_path = "#{pathinfo.publicdir}/manifest.json"
+serviceworker_tmp = "#{pathinfo.templatedir}/serviceworker.js"
+serviceworker_path = "#{pathinfo.publicdir}/serviceworker.js"
+
+#==========================================================================
+# Site info
+#==========================================================================
+if (sitejson?)
+  site_origin = sitejson.origin || req.headers.host
+else
+  site_origin = req.headers.host
 
 #==========================================================================
 # read file list function
 #==========================================================================
 __readFileList = (path) ->
-	return new Promise (resolve, reject) ->
-		fs.readdir path, (err, lists) ->
-			if (err)
-				reject(err)
-			else
-				resolve(lists)
+  try
+    lists = fs.readdirSync(path)
+    return(lists)
+  catch e
+    return(e)
 
 #==========================================================================
 # user API import
 #==========================================================================
-usrliblist = []
-__readFileList(pathinfo.usrctrldir).then (lists) ->
-	for fname in lists
-		if (fname.match(/^.*\.js$/))
-			require "/#{pathinfo.usrctrldir}/#{fname}"
+lists = __readFileList(pathinfo.usrctrldir)
+for fname in lists
+  if (fname.match(/^.*\.js$/))
+    require "/#{pathinfo.usrctrldir}/#{fname}"
+
+#==========================================================================
+# make directory file list
+#==========================================================================
+cssfilelist = [].concat(sysjson.additional.front.css) || []
+cssfilelist = cssfilelist.concat(appsjson.additional.front.css)
+jssyslist = [].concat(sysjson.additional.front.javascript) || []
+jssyslist = jssyslist.concat(appsjson.additional.front.javascript)
+
+#----------------------------------
+# System link file
+#----------------------------------
+systemcss = "#{pathinfo.pkgname}/template/system.css"
+
+#----------------------------------
+# User CSS file include
+#----------------------------------
+lists = __readFileList(pathinfo.stylesheetdir)
+for fname in lists
+  if (fname.match(/^.*\.css$/))
+    cssfilelist.push("#{pathinfo.pkgname}/stylesheet/#{fname}")
+
+#----------------------------------
+# User plugin include
+#----------------------------------
+lists = __readFileList(pathinfo.plugindir)
+for fname in lists
+  if (fname.match(/^.*\.js$/))
+    jssyslist.push("#{pathinfo.pkgname}/plugin/#{fname}")
+
+#----------------------------------
+# System library include
+#----------------------------------
+lists = __readFileList(pathinfo.syslibdir)
+for fname in lists
+  if (fname.match(/^.*\.min\.js$/))
+    jssyslist.push("#{pathinfo.pkgname}/include/#{fname}")
 
 #==========================================================================
 # get free port
@@ -105,41 +154,99 @@ get_free_port = (start, num=1, exclude_port=[]) ->
         portlist.push(i)
   return freeport
 
+#==============================================================================
+# generate manifest.json
+#==============================================================================
+generateManifest = ->
+  manifest = fs.readFileSync(manifest_tmp, 'utf8')
+  manifest = manifest.replace(/\[\[\[:short_name:\]\]\]/, pkgjson.name)
+  manifest = manifest.replace(/\[\[\[:name:\]\]\]/, pkgjson.name)
+  manifest = manifest.replace(/\[\[\[:start_url:\]\]\]/, site_origin)
+  fs.writeFileSync(manifest_path, manifest, 'utf8')
+
+#==============================================================================
+# generate service worker
+#==============================================================================
+generateServiceworker = ->
+  uri = "#{site_origin}/#{pathinfo.pkgname}/api/__getappsinfo__"
+  ret = await axios.get(uri)
+  jsfilelist = ret.data.jsfilelist
+
+  serviceworker = fs.readFileSync(serviceworker_tmp, 'utf8')
+  serviceworker = serviceworker.replace(/\[\[\[:name:\]\]\]/, pkgjson.name)
+  serviceworker = serviceworker.replace(/\[\[\[:version:\]\]\]/, pkgjson.version)
+
+  cache_contents_list = ["\"#{pathinfo.pkgname}/template/system.css\""]
+
+  cssfilelist.forEach (f) =>
+    cache_contents_list.push("  \"#{f}\"")
+
+  jssyslist.forEach (f) =>
+    cache_contents_list.push("  \"#{f}\"")
+
+  jsfilelist = ret.data.jsfilelist
+  jsfilelist.forEach (f) =>
+    cache_contents_list.push("  \"#{f}\"")
+
+  cache_contents = cache_contents_list.join(",\n")
+  serviceworker = serviceworker.replace(/\[\[\[:cache_contents:\]\]\]/, cache_contents)
+  fs.writeFileSync(serviceworker_path, serviceworker, 'utf8')
+
+#==============================================================================
+# generate ICON file
+#==============================================================================
+generateIconFile = ->
+  imgpath = "#{pathinfo.publicdir}/img/OGP.png"
+  pathtmp = "#{pathinfo.publicdir}/img/icons/icon-###x###.png"
+  sizelist = [72, 96, 128, 144, 152, 192, 384, 512]
+
+  convimage = (size) ->
+    topath = pathtmp.replace(/###/g, size)
+    await sharp(imgpath)
+      .resize
+        width: size,
+        height: size,
+        fit: "cover"
+      .toFile(topath)
+
+  for size in sizelist
+    convimage(size)
+
+#==============================================================================
+# startserver listen
+#==============================================================================
+startserver = ->
+  if (config.network? && config.network.port?)
+    port = config.network.port
+
+  if (port == "any")
+    startport = parseInt(config.network.startport) || 3000
+    port = parseInt(get_free_port(startport))
+
+  switch (config.network.protocol)
+    when "http"
+      await exphttp.listen(port)
+      console.log("listening HTTP:", port)
+
+    when "https"
+      app.use (req, res, next) ->
+        echo req.protocol
+        if (!req.secure)
+          echo "hogehoge"
+          res.redirect(301, 'https://' + req.hostname + ':port' + req.originalUrl)
+        next()
+      options =
+        key: fs.readFileSync(config.network.ssl_key)
+        cert: fs.readFileSync(config.network.ssl_cert)
+      httpolyglot.createServer(options, app).listen(port)
+      console.log("listening HTTP/HTTPS:", port)
+
+  module.exports = router
+
 #==========================================================================
 # router setting
 #==========================================================================
 app.get "/", (req, res) ->
-  #==========================================================================
-  # make directory file list
-  #==========================================================================
-  cssfilelist = [].concat(sysjson.additional.front.css) || []
-  cssfilelist = cssfilelist.concat(appsjson.additional.front.css)
-  jssyslist = [].concat(sysjson.additional.front.javascript) || []
-  jssyslist = jssyslist.concat(appsjson.additional.front.javascript)
-
-  #----------------------------------
-  # System CSS file
-  #----------------------------------
-  systemcss = "#{pathinfo.pkgname}/template/system.css"
-
-  #----------------------------------
-  # User CSS file include
-  #----------------------------------
-  lists = await __readFileList(pathinfo.stylesheetdir)
-  for fname in lists
-    if (fname.match(/^.*\.css$/))
-      cssfilelist.push("#{pathinfo.pkgname}/stylesheet/#{fname}")
-
-  lists = await __readFileList(pathinfo.plugindir)
-  for fname in lists
-    if (fname.match(/^.*\.js$/))
-      jssyslist.push("#{pathinfo.pkgname}/plugin/#{fname}")
-
-  lists = await __readFileList(pathinfo.syslibdir)
-  for fname in lists
-    if (fname.match(/^.*\.min\.js$/))
-      jssyslist.push("#{pathinfo.pkgname}/include/#{fname}")
-
   #----------------------------------
   # Template engine value
   #----------------------------------
@@ -148,15 +255,13 @@ app.get "/", (req, res) ->
   description = pkgjson.description
 
   #----------------------------------
-  # Site/SNS info
+  # Production build
   #----------------------------------
   if (node_env == "production")
     # Site info
     if (sitejson?)
-      origin = sitejson.origin || req.headers.host
       favimg = sitejson.favicon || ""
     else
-      origin = req.headers.host
       favimg = ""
 
     # SNS info
@@ -178,7 +283,7 @@ app.get "/", (req, res) ->
     cssfilelist: cssfilelist
     jssyslist: jssyslist
     node_env: node_env
-    origin: origin
+    origin: site_origin
     ogpimg: ogpimg
     favimg: favimg
     title: title
@@ -186,28 +291,13 @@ app.get "/", (req, res) ->
     description: description
     twitter: twitter
     facebook: facebook
+    manifest: manifest_uri
 
-#==============================================================================
-# run server
-#==============================================================================
-if (config.network? && config.network.port?)
-  port = config.network.port
-
-if (port == "any")
-  startport = parseInt(config.network.startport) || 3000
-  port = parseInt(get_free_port(startport))
-
-switch (config.network.protocol)
-  when "http"
-    exphttp.listen port, ->
-      console.log("listening on *:", port)
-  when "https"
-    options =
-      key: fs.readFileSync(config.network.ssl_key)
-      cert: fs.readFileSync(config.network.ssl_cert)
-    server = https.createServer(options, app)
-    server.listen(port)
-    console.log("listening on *:", port)
-
-module.exports = router
+#==========================================================================
+# execute modules
+#==========================================================================
+generateManifest()
+generateServiceworker()
+generateIconFile()
+startserver()
 

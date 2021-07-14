@@ -5,7 +5,7 @@ origintmp = window.location.href.replace(/\?.*$/, "")
 ORIGIN = origintmp.replace(/\/$/, "")
 SITEURL = "#{ORIGIN}/#{pkgname}"
 PUBLIC = "#{SITEURL}/public"
-USRLIB = "#{SITEURL}/usrlib"
+#USRLIB = "#{SITEURL}/usrlib"
 LANGUAGE = window.navigator.language
 
 APPLICATION = undefined
@@ -186,6 +186,17 @@ window.addEventListener "DOMContentLoaded", ->
   #===========================================================================
 
   #---------------------------------------------------------------------------
+  # Service Worker
+  #---------------------------------------------------------------------------
+  if ('serviceWorker' in navigator)
+    navigator.serviceWorker.register("#{PUBLIC}/serviceworker.js")
+    .then (registration) ->
+      if (typeof registration.update == 'function')
+        registration.update()
+    .catch (error) ->
+      console.log("Error Log: " + error)
+
+  #---------------------------------------------------------------------------
   # Gyro
   #---------------------------------------------------------------------------
   if (plustick.getBrowser().kind == "iOS")
@@ -217,120 +228,120 @@ window.addEventListener "DOMContentLoaded", ->
   # Get JS file list
   #------------------
   apiuri = "#{SITEURL}/api/__getappsinfo__"
-  axios
+  ret = await axios
     method: "POST"
     url: apiuri
-  .then (ret)->
+
+  #------------------
+  # JS file load
+  #------------------
+  if (ret.data.error? && ret.data.error < 0)
+    return
+  else
+    jsfilelist = ret.data.jsfilelist
+    pathinfo = ret.data.pathinfo
+    appsjson = pathinfo.appsjson
+    sitejson = appsjson.site || {}
+    snsjson = appsjson.sns || {}
+
+  #------------------
+  # body setting
+  #------------------
+  document.body.setAttribute("id", "body")
+  document.body.style.userSelect = "none"
+  document.body.style.display = "none"
+  document.body.style.backgroundColor = "white"
+
+  #---------------------------------------------------------------------------
+  # Splash screen
+  #---------------------------------------------------------------------------
+  splashimage = appsjson.site.splash.image || undefined
+  splashsize = appsjson.site.splash.size || "contain"
+  splash_banner = document.createElement("div")
+  splash_banner.style.display = "none"
+  document.body.append(splash_banner)
+  contents_size = fitContentsSize(splash_banner)
+  splash_banner.setAttribute("id", "splash_banner")
+  splash_banner.style.position = "absolute"
+  splash_banner.style.width = "#{contents_size.width}px"
+  splash_banner.style.height = "#{contents_size.height}px"
+  splash_banner.style.left = "#{contents_size.left}px"
+  splash_banner.style.top = "#{contents_size.top}px"
+  splash_banner.style.margin = "0px 0px 0px 0px"
+  splash_banner.style.backgroundColor = "transparent"
+  splash_banner.style.overflow = "hidden"
+  splash_banner.style.backgroundSize = splashsize
+  splash_banner.style.backgroundPosition = "center"
+  splash_banner.style.backgroundRepeat = "no-repeat"
+  splash_banner.style.backgroundAttachment = "fixed"
+  if (splashimage?)
+    url = "url(#{pathinfo.pkgname}/public/img/#{splashimage})"
+  else
+    url = "url(#{pathinfo.pkgname}/public/img/splash.png)"
+  splash_banner.style.backgroundImage = url
+  splash_banner.style.display = "inline"
+
+  #------------------
+  # body color
+  #------------------
+  document.body.style.backgroundColor = sitejson.basecolor || "black"
+  document.body.style.display = "inline"
+
+  setTimeout ->
     #------------------
     # JS file load
     #------------------
-    if (ret.data.error? && ret.data.error < 0)
-      return
-    else
-      jsfilelist = ret.data.jsfilelist
-      pathinfo = ret.data.pathinfo
-      appsjson = pathinfo.appsjson
-      sitejson = appsjson.site || {}
-      snsjson = appsjson.sns || {}
+    for fname in jsfilelist
+      script = document.createElement("script")
+      script.setAttribute("type", "text/javascript")
+      script.setAttribute("src", fname)
+      await pluginload(script)
 
     #------------------
-    # body setting
+    # disp root view
     #------------------
-    document.body.setAttribute("id", "body")
-    document.body.style.userSelect = "none"
-    document.body.style.display = "none"
-    document.body.style.backgroundColor = "white"
-
-    #---------------------------------------------------------------------------
-    # Splash screen
-    #---------------------------------------------------------------------------
-    splashimage = appsjson.site.splash.image || undefined
-    splashsize = appsjson.site.splash.size || "contain"
-    splash_banner = document.createElement("div")
-    splash_banner.style.display = "none"
-    document.body.append(splash_banner)
-    contents_size = fitContentsSize(splash_banner)
-    splash_banner.setAttribute("id", "splash_banner")
-    splash_banner.style.position = "absolute"
-    splash_banner.style.width = "#{contents_size.width}px"
-    splash_banner.style.height = "#{contents_size.height}px"
-    splash_banner.style.left = "#{contents_size.left}px"
-    splash_banner.style.top = "#{contents_size.top}px"
-    splash_banner.style.margin = "0px 0px 0px 0px"
-    splash_banner.style.backgroundColor = "transparent"
-    splash_banner.style.overflow = "hidden"
-    splash_banner.style.backgroundSize = splashsize
-    splash_banner.style.backgroundPosition = "center"
-    splash_banner.style.backgroundRepeat = "no-repeat"
-    splash_banner.style.backgroundAttachment = "fixed"
-    if (splashimage?)
-      url = "url(#{pathinfo.pkgname}/public/#{splashimage})"
-    else
-      url = "url(#{pathinfo.pkgname}/public/splash.png)"
-    splash_banner.style.backgroundImage = url
-    splash_banner.style.display = "inline"
-
-    #------------------
-    # body color
-    #------------------
-    document.body.style.backgroundColor = sitejson.basecolor || "black"
-    document.body.style.display = "inline"
-
+    splash_banner.className = "fadeout"
     setTimeout ->
-      #------------------
-      # JS file load
-      #------------------
-      for fname in jsfilelist
-        script = document.createElement("script")
-        script.setAttribute("type", "text/javascript")
-        script.setAttribute("src", fname)
-        await pluginload(script)
+      splash_banner.remove()
+
+      APPLICATION = new appsmain()
+
+      # get user setting
+      backgroundColor = APPLICATION.backgroundColor || "rgba(0, 0, 0, 1.0)"
 
       #------------------
-      # disp root view
+      # root view setting
       #------------------
-      splash_banner.className = "fadeout"
-      setTimeout ->
-        splash_banner.remove()
+      ROOTDIV = document.createElement("div")
+      ROOTDIV.setAttribute("id", "ROOTDIV")
+      document.body.append(ROOTDIV)
 
-        APPLICATION = new appsmain()
+      contents_size = fitContentsSize(APPLICATION)
 
-        # get user setting
-        backgroundColor = APPLICATION.backgroundColor || "rgba(0, 0, 0, 1.0)"
+      ROOTDIV.style.position = "absolute"
+      ROOTDIV.style.width = "#{contents_size.width}px"
+      ROOTDIV.style.height = "#{contents_size.height}px"
+      ROOTDIV.style.left = "#{contents_size.left}px"
+      ROOTDIV.style.top = "#{contents_size.top}px"
+      ROOTDIV.style.margin = "0px 0px 0px 0px"
+      ROOTDIV.style.backgroundColor = backgroundColor
+      ROOTDIV.style.overflow = "hidden"
 
-        #------------------
-        # root view setting
-        #------------------
-        ROOTDIV = document.createElement("div")
-        ROOTDIV.setAttribute("id", "ROOTDIV")
-        document.body.append(ROOTDIV)
+      document.oncontextmenu = =>
+        contextmenu = APPLICATION.contextmenu
+        return contextmenu
 
-        contents_size = fitContentsSize(APPLICATION)
+      if (typeof APPLICATION.createHtml == 'function')
+        APPLICATION.browser_frame = BROWSER_FRAME
+        html = await APPLICATION.createHtml()
+        ROOTDIV.insertAdjacentHTML('beforeend', html)
 
-        ROOTDIV.style.position = "absolute"
-        ROOTDIV.style.width = "#{contents_size.width}px"
-        ROOTDIV.style.height = "#{contents_size.height}px"
-        ROOTDIV.style.left = "#{contents_size.left}px"
-        ROOTDIV.style.top = "#{contents_size.top}px"
-        ROOTDIV.style.margin = "0px 0px 0px 0px"
-        ROOTDIV.style.backgroundColor = backgroundColor
-        ROOTDIV.style.overflow = "hidden"
+      if (typeof APPLICATION.viewDidLoad == 'function')
+        await APPLICATION.viewDidLoad()
 
-        document.oncontextmenu = =>
-          contextmenu = APPLICATION.contextmenu
-          return contextmenu
+      if (typeof APPLICATION.viewDidAppear == 'function')
+        await APPLICATION.viewDidAppear()
+    , 500
 
-        if (typeof APPLICATION.createHtml == 'function')
-          APPLICATION.browser_frame = BROWSER_FRAME
-          html = await APPLICATION.createHtml()
-          ROOTDIV.insertAdjacentHTML('beforeend', html)
-
-        if (typeof APPLICATION.viewDidLoad == 'function')
-          await APPLICATION.viewDidLoad()
-
-        if (typeof APPLICATION.viewDidAppear == 'function')
-          await APPLICATION.viewDidAppear()
-      , 500
-
-    , 1000
+  , 1000
 
