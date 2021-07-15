@@ -30,7 +30,6 @@
 
     <% if @manifest != "" : %>
       <link rel="manifest" href="<%= @manifest %>" />
-      <script async src="https://cdn.jsdelivr.net/npm/pwacompat" crossorigin="anonymous"></script>
     <% end %>
 
     <link rel="stylesheet" type="text/css" href="<%= @systemcss %>" />
@@ -43,6 +42,7 @@
       pkgname = "<%= @pkgname %>";
     </script>
 
+    <script async src="https://cdn.jsdelivr.net/npm/pwacompat" crossorigin="anonymous"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js" defer></script>
     <script type="text/javascript" src="<%= @pkgname %>/syslib/plustick.min.js" defer></script>
     <script type="text/javascript" src="<%= @pkgname %>/syslib/main.min.js" defer></script>

@@ -37,6 +37,7 @@ app.set("view engine", "ect")
 #==========================================================================
 # URI directory binding
 #==========================================================================
+app.use("/", express.static(pathinfo.rootdir))
 app.use("/#{pathinfo.pkgname}/plugin", express.static(pathinfo.plugindir))
 app.use("/#{pathinfo.pkgname}/stylesheet", express.static(pathinfo.stylesheetdir))
 app.use("/#{pathinfo.pkgname}/public", express.static(pathinfo.publicdir))
@@ -69,7 +70,7 @@ manifest_tmp = "#{pathinfo.templatedir}/manifest.json"
 manifest_uri = "/#{pathinfo.pkgname}/public/manifest.json"
 manifest_path = "#{pathinfo.publicdir}/manifest.json"
 serviceworker_tmp = "#{pathinfo.templatedir}/serviceworker.js"
-serviceworker_path = "#{pathinfo.publicdir}/serviceworker.js"
+serviceworker_path = "#{pathinfo.rootdir}/serviceworker.js"
 
 #==========================================================================
 # Site info
@@ -162,6 +163,10 @@ generateManifest = ->
   manifest = manifest.replace(/\[\[\[:short_name:\]\]\]/, pkgjson.name)
   manifest = manifest.replace(/\[\[\[:name:\]\]\]/, pkgjson.name)
   manifest = manifest.replace(/\[\[\[:start_url:\]\]\]/, site_origin)
+  manifest = manifest.replace(/\[\[\[:display:\]\]\]/, appsjson.site.pwa.display)
+  manifest = manifest.replace(/\[\[\[:theme_color:\]\]\]/, appsjson.site.pwa.theme_color)
+  manifest = manifest.replace(/\[\[\[:background_color:\]\]\]/, appsjson.site.pwa.background_color)
+  manifest = manifest.replace(/\[\[\[:orientation:\]\]\]/, appsjson.site.pwa.orientation)
   fs.writeFileSync(manifest_path, manifest, 'utf8')
 
 #==============================================================================
@@ -176,17 +181,17 @@ generateServiceworker = ->
   serviceworker = serviceworker.replace(/\[\[\[:name:\]\]\]/, pkgjson.name)
   serviceworker = serviceworker.replace(/\[\[\[:version:\]\]\]/, pkgjson.version)
 
-  cache_contents_list = ["\"#{pathinfo.pkgname}/template/system.css\""]
+  cache_contents_list = ["\"/\"", "  \"/#{pathinfo.pkgname}/template/system.css\""]
 
   cssfilelist.forEach (f) =>
-    cache_contents_list.push("  \"#{f}\"")
+    cache_contents_list.push("  \"/#{f}\"")
 
   jssyslist.forEach (f) =>
-    cache_contents_list.push("  \"#{f}\"")
+    cache_contents_list.push("  \"/#{f}\"")
 
   jsfilelist = ret.data.jsfilelist
   jsfilelist.forEach (f) =>
-    cache_contents_list.push("  \"#{f}\"")
+    cache_contents_list.push("  \"/#{f}\"")
 
   cache_contents = cache_contents_list.join(",\n")
   serviceworker = serviceworker.replace(/\[\[\[:cache_contents:\]\]\]/, cache_contents)
@@ -232,7 +237,6 @@ startserver = ->
       app.use (req, res, next) ->
         echo req.protocol
         if (!req.secure)
-          echo "hogehoge"
           res.redirect(301, 'https://' + req.hostname + ':port' + req.originalUrl)
         next()
       options =
@@ -273,6 +277,11 @@ app.get "/", (req, res) ->
       ogpimg = ""
       twitter = ""
       facebook = ""
+  else
+    favimg = sitejson.favicon || ""
+    ogpimg = snsjson.ogp || "OGP.png"
+    twitter = snsjson.twitter || ""
+    facebook = snsjson.facebook || ""
 
   #----------------------------------
   # rendering HTML

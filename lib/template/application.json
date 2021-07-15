@@ -6,6 +6,12 @@
     "splash": {
       "image": "OGP.png",
       "size": "contain"
+    },
+    "pwa": {
+      "display": "fullscreen",
+      "theme_color": "#00a0ff",
+      "background_color": "#ffffff",
+      "orientation": "any"
     }
   },
   "sns": {

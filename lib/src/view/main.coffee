@@ -188,9 +188,8 @@ window.addEventListener "DOMContentLoaded", ->
   #---------------------------------------------------------------------------
   # Service Worker
   #---------------------------------------------------------------------------
-  if ('serviceWorker' in navigator)
-    navigator.serviceWorker.register("#{PUBLIC}/serviceworker.js")
-    .then (registration) ->
+  if (navigator.serviceWorker?)
+    navigator.serviceWorker.register("/serviceworker.js").then (registration) ->
       if (typeof registration.update == 'function')
         registration.update()
     .catch (error) ->

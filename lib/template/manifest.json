@@ -1,7 +1,11 @@
 {
   "short_name": "[[[:short_name:]]]",
   "name": "[[[:name:]]]",
-  "display": "standalone",
+  "display": "[[[:display:]]]",
+  "theme_color": "[[[:theme_color:]]]",
+  "background_color": "[[[:background_color:]]]",
+  "orientation": "[[[:orientation:]]]",
+  "scope": "/",
   "start_url": "[[[:start_url:]]]",
   "icons": [
 		{
