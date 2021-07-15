@@ -4,6 +4,7 @@
     },
     "network": {
       "port": 5000,
+      "start_url": "",
       "protocol": "http",
       "ssl_key": "privkey.pem",
       "ssl_cert": "fullchain.pem"

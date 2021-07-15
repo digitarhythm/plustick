@@ -8,6 +8,7 @@
       "size": "contain"
     },
     "pwa": {
+      "start_url": "",
       "display": "fullscreen",
       "theme_color": "#00a0ff",
       "background_color": "#ffffff",

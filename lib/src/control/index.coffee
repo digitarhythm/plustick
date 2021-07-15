@@ -76,9 +76,9 @@ serviceworker_path = "#{pathinfo.rootdir}/serviceworker.js"
 # Site info
 #==========================================================================
 if (sitejson?)
-  site_origin = sitejson.origin || req.headers.host
+  site_origin = sitejson.origin || ""
 else
-  site_origin = req.headers.host
+  site_origin = ""
 
 #==========================================================================
 # read file list function
@@ -159,10 +159,11 @@ get_free_port = (start, num=1, exclude_port=[]) ->
 # generate manifest.json
 #==============================================================================
 generateManifest = ->
+  start_url = if (appsjson.site.pwa.start_url == "") then config.network.start_url else appsjson.site.pwa.start_url
   manifest = fs.readFileSync(manifest_tmp, 'utf8')
   manifest = manifest.replace(/\[\[\[:short_name:\]\]\]/, pkgjson.name)
   manifest = manifest.replace(/\[\[\[:name:\]\]\]/, pkgjson.name)
-  manifest = manifest.replace(/\[\[\[:start_url:\]\]\]/, site_origin)
+  manifest = manifest.replace(/\[\[\[:start_url:\]\]\]/, start_url)
   manifest = manifest.replace(/\[\[\[:display:\]\]\]/, appsjson.site.pwa.display)
   manifest = manifest.replace(/\[\[\[:theme_color:\]\]\]/, appsjson.site.pwa.theme_color)
   manifest = manifest.replace(/\[\[\[:background_color:\]\]\]/, appsjson.site.pwa.background_color)
@@ -225,8 +226,8 @@ startserver = ->
     port = config.network.port
 
   if (port == "any")
-    startport = parseInt(config.network.startport) || 3000
-    port = parseInt(get_free_port(startport))
+    start_port = parseInt(config.network.start_port) || 3000
+    port = parseInt(get_free_port(start_port))
 
   switch (config.network.protocol)
     when "http"
@@ -235,7 +236,6 @@ startserver = ->
 
     when "https"
       app.use (req, res, next) ->
-        echo req.protocol
         if (!req.secure)
           res.redirect(301, 'https://' + req.hostname + ':port' + req.originalUrl)
         next()
