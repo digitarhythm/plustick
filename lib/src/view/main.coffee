@@ -276,7 +276,7 @@ window.addEventListener "DOMContentLoaded", ->
   if (splashimage?)
     url = "url(/img/#{splashimage})"
   else
-    url = "url(/img/splash.png)"
+    url = "url(/splash.png)"
   splash_banner.style.backgroundImage = url
   splash_banner.style.display = "inline"
 
