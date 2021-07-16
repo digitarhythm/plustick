@@ -43,13 +43,14 @@ router.all "/:endpoint", (req, res) ->
             resolve(lists)
 
     # make load Javascript file list
-    jsfilelist = []
+    jsfilelist = {}
     lists = await readFileList(pathinfo.usrjsview)
 
+    jsfilelist['userjsview'] = []
     for fname in lists
       if (fname.match(/^.*\.min\.js$/))
         if (fname.match(/appsmain\.min\.js$/) == null)
-          jsfilelist.push("#{pathinfo.pkgname}/view/#{fname}")
+          jsfilelist['userjsview'].push("#{pathinfo.pkgname}/view/#{fname}")
 
     res.json
       error: 0

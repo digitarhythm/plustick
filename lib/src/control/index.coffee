@@ -26,17 +26,17 @@ echo "application loading time: [#{new Date().toLocaleString("ja-JP")}]"
 
 pkgjson = require("#{process.cwd()}/package.json")
 
-#==========================================================================
+#----------------------------------
 # template engine
-#==========================================================================
+#----------------------------------
 app.set("views", pathinfo.templatedir)
 ectRenderer = ECT({ watch: true, root: pathinfo.templatedir, ext : ".ect" })
 app.engine("ect", ectRenderer.render)
 app.set("view engine", "ect")
 
-#==========================================================================
-# URI directory binding
-#==========================================================================
+#----------------------------------
+# uri directory binding
+#----------------------------------
 app.use("/", express.static(pathinfo.rootdir))
 app.use("/#{pathinfo.pkgname}/plugin", express.static(pathinfo.plugindir))
 app.use("/#{pathinfo.pkgname}/stylesheet", express.static(pathinfo.stylesheetdir))
@@ -46,22 +46,22 @@ app.use("/#{pathinfo.pkgname}/syslib", express.static(pathinfo.sysjsview))
 app.use("/#{pathinfo.pkgname}/include", express.static(pathinfo.syslibdir))
 app.use("/#{pathinfo.pkgname}/template", express.static(pathinfo.templatedir))
 
-#==========================================================================
+#----------------------------------
 # routing function dictionary
-#==========================================================================
+#----------------------------------
 global.BIND_ROUTER = {}
 global.APPSDIR = pathinfo.homedir
 global.PLUSTICKLIBS = pathinfo.sysjsctrl
 
-#==========================================================================
+#----------------------------------
 # user API binding
-#==========================================================================
+#----------------------------------
 api = require("#{pathinfo.sysjsctrl}/sysapi.min.js")
 app.use("/#{pathinfo.pkgname}/api", api)
 
-#==========================================================================
+#----------------------------------
 # setting import
-#==========================================================================
+#----------------------------------
 appsjson = require("#{pathinfo.homedir}/config/application.json")
 sysjson = require("#{pathinfo.systemdir}/lib/config/system.json")
 sitejson = appsjson.site || {}
@@ -72,13 +72,36 @@ manifest_path = "#{pathinfo.publicdir}/manifest.json"
 serviceworker_tmp = "#{pathinfo.templatedir}/serviceworker.js"
 serviceworker_path = "#{pathinfo.rootdir}/serviceworker.js"
 
-#==========================================================================
+#----------------------------------
 # Site info
-#==========================================================================
+#----------------------------------
 if (sitejson?)
   site_origin = sitejson.origin || ""
 else
   site_origin = ""
+
+#----------------------------------
+# make directory file list
+#----------------------------------
+cssfilelist = [].concat(sysjson.additional.front.css) || []
+cssfilelist = cssfilelist.concat(appsjson.additional.front.css)
+jssyslist = [].concat(sysjson.additional.front.javascript) || []
+jssyslist = jssyslist.concat(appsjson.additional.front.javascript)
+
+#----------------------------------
+# System link file
+#----------------------------------
+systemcss = "#{pathinfo.pkgname}/template/system.css"
+
+#==========================================================================
+#==========================================================================
+#==========================================================================
+#
+# Function
+#
+#==========================================================================
+#==========================================================================
+#==========================================================================
 
 #==========================================================================
 # read file list function
@@ -91,49 +114,40 @@ __readFileList = (path) ->
     return(e)
 
 #==========================================================================
-# user API import
+# Library file include
 #==========================================================================
-lists = __readFileList(pathinfo.usrctrldir)
-for fname in lists
-  if (fname.match(/^.*\.js$/))
-    require "/#{pathinfo.usrctrldir}/#{fname}"
+libfileInclude = ->
+  #----------------------------------
+  # user API import
+  #----------------------------------
+  lists = __readFileList(pathinfo.usrctrldir)
+  for fname in lists
+    if (fname.match(/^.*\.js$/))
+      require "/#{pathinfo.usrctrldir}/#{fname}"
 
-#==========================================================================
-# make directory file list
-#==========================================================================
-cssfilelist = [].concat(sysjson.additional.front.css) || []
-cssfilelist = cssfilelist.concat(appsjson.additional.front.css)
-jssyslist = [].concat(sysjson.additional.front.javascript) || []
-jssyslist = jssyslist.concat(appsjson.additional.front.javascript)
+  #----------------------------------
+  # User CSS file include
+  #----------------------------------
+  lists = __readFileList(pathinfo.stylesheetdir)
+  for fname in lists
+    if (fname.match(/^.*\.css$/))
+      cssfilelist.push("#{pathinfo.pkgname}/stylesheet/#{fname}")
 
-#----------------------------------
-# System link file
-#----------------------------------
-systemcss = "#{pathinfo.pkgname}/template/system.css"
+  #----------------------------------
+  # User plugin include
+  #----------------------------------
+  lists = __readFileList(pathinfo.plugindir)
+  for fname in lists
+    if (fname.match(/^.*\.js$/))
+      jssyslist.push("#{pathinfo.pkgname}/plugin/#{fname}")
 
-#----------------------------------
-# User CSS file include
-#----------------------------------
-lists = __readFileList(pathinfo.stylesheetdir)
-for fname in lists
-  if (fname.match(/^.*\.css$/))
-    cssfilelist.push("#{pathinfo.pkgname}/stylesheet/#{fname}")
-
-#----------------------------------
-# User plugin include
-#----------------------------------
-lists = __readFileList(pathinfo.plugindir)
-for fname in lists
-  if (fname.match(/^.*\.js$/))
-    jssyslist.push("#{pathinfo.pkgname}/plugin/#{fname}")
-
-#----------------------------------
-# System library include
-#----------------------------------
-lists = __readFileList(pathinfo.syslibdir)
-for fname in lists
-  if (fname.match(/^.*\.min\.js$/))
-    jssyslist.push("#{pathinfo.pkgname}/include/#{fname}")
+  #----------------------------------
+  # System library include
+  #----------------------------------
+  lists = __readFileList(pathinfo.syslibdir)
+  for fname in lists
+    if (fname.match(/^.*\.min\.js$/))
+      jssyslist.push("#{pathinfo.pkgname}/include/#{fname}")
 
 #==========================================================================
 # get free port
@@ -159,7 +173,7 @@ get_free_port = (start, num=1, exclude_port=[]) ->
 # generate manifest.json
 #==============================================================================
 generateManifest = ->
-  start_url = if (appsjson.site.pwa.start_url == "") then config.network.start_url else appsjson.site.pwa.start_url
+  start_url = config.network.start_url
   manifest = fs.readFileSync(manifest_tmp, 'utf8')
   manifest = manifest.replace(/\[\[\[:short_name:\]\]\]/, pkgjson.name)
   manifest = manifest.replace(/\[\[\[:name:\]\]\]/, pkgjson.name)
@@ -174,9 +188,9 @@ generateManifest = ->
 # generate service worker
 #==============================================================================
 generateServiceworker = ->
-  uri = "#{site_origin}/#{pathinfo.pkgname}/api/__getappsinfo__"
+  uri = "#{config.network.start_url}/#{pathinfo.pkgname}/api/__getappsinfo__"
   ret = await axios.get(uri)
-  jsfilelist = ret.data.jsfilelist
+  jsfilelist = ret.data.jsfilelist['userjsview']
 
   serviceworker = fs.readFileSync(serviceworker_tmp, 'utf8')
   serviceworker = serviceworker.replace(/\[\[\[:name:\]\]\]/, pkgjson.name)
@@ -190,7 +204,6 @@ generateServiceworker = ->
   jssyslist.forEach (f) =>
     cache_contents_list.push("  \"/#{f}\"")
 
-  jsfilelist = ret.data.jsfilelist
   jsfilelist.forEach (f) =>
     cache_contents_list.push("  \"/#{f}\"")
 
@@ -222,6 +235,28 @@ generateIconFile = ->
 # startserver listen
 #==============================================================================
 startserver = ->
+  switch (config.network.protocol)
+    when "http"
+      await exphttp.listen(startport)
+      console.log("listening HTTP:", startport)
+
+    when "https"
+      app.use (req, res, next) ->
+        if (!req.secure)
+          res.redirect(301, 'https://' + req.hostname + ':startport' + req.originalUrl)
+        next()
+      options =
+        key: fs.readFileSync(config.network.ssl_key)
+        cert: fs.readFileSync(config.network.ssl_cert)
+      httpolyglot.createServer(options, app).listen(startport)
+      console.log("listening HTTP/HTTPS:", startport)
+
+  module.exports = router
+
+#==============================================================================
+# Application Initialize
+#==============================================================================
+appsInit = ->
   if (config.network? && config.network.port?)
     port = config.network.port
 
@@ -229,23 +264,7 @@ startserver = ->
     start_port = parseInt(config.network.start_port) || 3000
     port = parseInt(get_free_port(start_port))
 
-  switch (config.network.protocol)
-    when "http"
-      await exphttp.listen(port)
-      console.log("listening HTTP:", port)
-
-    when "https"
-      app.use (req, res, next) ->
-        if (!req.secure)
-          res.redirect(301, 'https://' + req.hostname + ':port' + req.originalUrl)
-        next()
-      options =
-        key: fs.readFileSync(config.network.ssl_key)
-        cert: fs.readFileSync(config.network.ssl_cert)
-      httpolyglot.createServer(options, app).listen(port)
-      console.log("listening HTTP/HTTPS:", port)
-
-  module.exports = router
+  return port
 
 #==========================================================================
 # router setting
@@ -305,6 +324,8 @@ app.get "/", (req, res) ->
 #==========================================================================
 # execute modules
 #==========================================================================
+startport = appsInit()
+libfileInclude()
 generateManifest()
 generateServiceworker()
 generateIconFile()

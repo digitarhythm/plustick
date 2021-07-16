@@ -237,7 +237,7 @@ window.addEventListener "DOMContentLoaded", ->
   if (ret.data.error? && ret.data.error < 0)
     return
   else
-    jsfilelist = ret.data.jsfilelist
+    jsfilelist = ret.data.jsfilelist['userjsview']
     pathinfo = ret.data.pathinfo
     appsjson = pathinfo.appsjson
     sitejson = appsjson.site || {}
