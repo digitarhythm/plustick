@@ -173,7 +173,7 @@ get_free_port = (start, num=1, exclude_port=[]) ->
 # generate manifest.json
 #==============================================================================
 generateManifest = ->
-  start_url = config.network.start_url
+  start_url = appsjson.site.pwa.start_url
   manifest = fs.readFileSync(manifest_tmp, 'utf8')
   manifest = manifest.replace(/\[\[\[:short_name:\]\]\]/, pkgjson.name)
   manifest = manifest.replace(/\[\[\[:name:\]\]\]/, pkgjson.name)
@@ -188,7 +188,7 @@ generateManifest = ->
 # generate service worker
 #==============================================================================
 generateServiceworker = ->
-  uri = "#{config.network.start_url}/#{pathinfo.pkgname}/api/__getappsinfo__"
+  uri = "#{appsjson.site.pwa.start_url}/#{pathinfo.pkgname}/api/__getappsinfo__"
   ret = await axios.get(uri)
   jsfilelist = ret.data.jsfilelist['userjsview']
 

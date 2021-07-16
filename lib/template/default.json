@@ -3,7 +3,6 @@
       "name": "no name"
     },
     "network": {
-      "start_url": "",
       "port": 5000,
       "protocol": "http",
       "ssl_key": "privkey.pem",

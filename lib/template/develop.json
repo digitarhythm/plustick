@@ -3,7 +3,6 @@
       "name": "no name"
     },
     "network": {
-      "start_url": "",
       "start_port": 5000,
       "port": "any",
       "protocol": "http",
