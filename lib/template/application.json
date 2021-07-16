@@ -6,8 +6,11 @@
       "image": "OGP.png",
       "size": "contain"
     },
+    "start_url": {
+      "develop": "",
+      "production": ""
+    },
     "pwa": {
-      "start_url": "",
       "display": "fullscreen",
       "theme_color": "#00a0ff",
       "background_color": "#ffffff",

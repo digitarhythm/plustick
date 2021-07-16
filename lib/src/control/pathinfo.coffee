@@ -12,8 +12,6 @@ __systemdir = fs.realpathSync(__dirname+"/../../..")
 __homedir = fs.realpathSync("./")
 # application directory
 __appsdir = "#{__homedir}/apps"
-# root directory
-__rootdir = "#{__appsdir}/public"
 # public directory
 __publicdir = "#{__appsdir}/public"
 # tmpl directory
@@ -42,7 +40,6 @@ exports.pkgname       = __pkgname
 exports.systemdir     = __systemdir
 exports.homedir       = __homedir
 exports.appsdir       = __appsdir
-exports.rootdir       = __rootdir
 exports.publicdir     = __publicdir
 exports.templatedir   = __templatedir
 exports.plugindir     = __plugindir
