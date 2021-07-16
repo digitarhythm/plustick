@@ -274,9 +274,9 @@ window.addEventListener "DOMContentLoaded", ->
   splash_banner.style.backgroundRepeat = "no-repeat"
   splash_banner.style.backgroundAttachment = "fixed"
   if (splashimage?)
-    url = "url(#{pathinfo.pkgname}/public/img/#{splashimage})"
+    url = "url(/img/#{splashimage})"
   else
-    url = "url(#{pathinfo.pkgname}/public/img/splash.png)"
+    url = "url(/img/splash.png)"
   splash_banner.style.backgroundImage = url
   splash_banner.style.display = "inline"
 

@@ -19,6 +19,16 @@ __sysjsdir = "#{__systemdir}/lib/js"
 __sysjsctrl = "#{__sysjsdir}/control"
 PATHINFO = require("#{__sysjsctrl}/pathinfo.min.js")
 
+#----------------------------------
+# super global value
+#----------------------------------
+global.BIND_ROUTER = {}
+global.APPSDIR = PATHINFO.homedir
+global.PLUSTICKLIBS = PATHINFO.sysjsctrl
+
+#----------------------------------
+# global value
+#----------------------------------
 APPSJSON = require("#{PATHINFO.homedir}/config/application.json")
 SYSJSON = require("#{PATHINFO.systemdir}/lib/config/system.json")
 PKGJSON = require("#{process.cwd()}/package.json")
@@ -40,12 +50,7 @@ SITEJSON = undefined
 SYSTEMCSS = undefined
 SNSJSON = undefined
 
-global.BIND_ROUTER = {}
-global.APPSDIR = PATHINFO.homedir
-global.PLUSTICKLIBS = PATHINFO.sysjsctrl
-
 SYSAPI = require("#{PATHINFO.sysjsctrl}/sysapi.min.js")
-app.use("/#{PATHINFO.pkgname}/api", SYSAPI)
 
 NETCONF = config.network
 
@@ -73,7 +78,7 @@ app.set("view engine", "ect")
 # uri directory binding
 #==========================================================================
 directoryBinding = ->
-  app.use("/", express.static(PATHINFO.publicdir))
+  app.use("/", express.static(PATHINFO.libdir))
   app.use("/#{PATHINFO.pkgname}/plugin", express.static(PATHINFO.plugindir))
   app.use("/#{PATHINFO.pkgname}/stylesheet", express.static(PATHINFO.stylesheetdir))
   app.use("/#{PATHINFO.pkgname}/public", express.static(PATHINFO.publicdir))
@@ -81,6 +86,7 @@ directoryBinding = ->
   app.use("/#{PATHINFO.pkgname}/syslib", express.static(PATHINFO.sysjsview))
   app.use("/#{PATHINFO.pkgname}/include", express.static(PATHINFO.syslibdir))
   app.use("/#{PATHINFO.pkgname}/template", express.static(PATHINFO.templatedir))
+  app.use("/#{PATHINFO.pkgname}/api", SYSAPI)
 
 #==========================================================================
 # read file list function
@@ -201,21 +207,23 @@ generateServiceworker = ->
 # generate ICON file
 #==============================================================================
 generateIconFile = ->
-  imgpath = "#{PATHINFO.publicdir}/img/OGP.png"
-  pathtmp = "#{PATHINFO.publicdir}/img/icons/icon-###x###.png"
-  sizelist = [72, 96, 128, 144, 152, 192, 384, 512]
-
-  convimage = (size) ->
-    topath = pathtmp.replace(/###/g, size)
-    await sharp(imgpath)
+  #------------------------
+  convimage = (size, ftmp) ->
+    origin_image = "#{PATHINFO.libdir}/img/OGP.png"
+    topath = ftmp.replace(/###/g, size)
+    await sharp(origin_image)
       .resize
         width: size,
         height: size,
         fit: "cover"
       .toFile(topath)
+  #------------------------
 
-  for size in sizelist
-    convimage(size)
+  web_pathtmp = "#{PATHINFO.libdir}/img/icons/icon-###x###.png"
+  web_icon = [72, 96, 128, 144, 152, 192, 384, 512]
+
+  for size in web_icon
+    convimage(size, web_pathtmp)
 
 #==============================================================================
 # startserver listen
@@ -247,10 +255,10 @@ appsInit = ->
   SITEJSON = APPSJSON.site || {}
   SNSJSON = APPSJSON.sns || {}
   MANIFEST_TMP = "#{PATHINFO.templatedir}/manifest.json"
-  MANIFEST_URI = "/#{PATHINFO.pkgname}/public/manifest.json"
-  MANIFEST_PATH = "#{PATHINFO.publicdir}/manifest.json"
+  MANIFEST_URI = "/manifest.json"
+  MANIFEST_PATH = "#{PATHINFO.libdir}/manifest.json"
   SERVICEWORKER_TMP = "#{PATHINFO.templatedir}/serviceworker.js"
-  SERVICEWORKER_PATH = "#{PATHINFO.publicdir}/serviceworker.js"
+  SERVICEWORKER_PATH = "#{PATHINFO.libdir}/serviceworker.js"
 
   if (NETCONF? && NETCONF.port?)
     port = NETCONF.port
