@@ -25,9 +25,9 @@
 
     <title><%= @title %></title>
     <% if @favimg != "" : %>
-      <link rel="icon" href="<%= @origin %>/<%= @pkgname %>/public/<%= @favimg %>" />
+      <link rel="icon" href="<%= @origin %>/<%= @pkgname %>/img/icon/<%= @favimg %>" />
     <% end %>
-    <link rel="apple-touch-icon" href="/public/img/icon/icon-192x192.png">
+    <link rel="apple-touch-icon" href="/img/icon/icon-192x192.png">
 
     <% if @manifest != "" : %>
       <link rel="manifest" href="<%= @manifest %>" />
