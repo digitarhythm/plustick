@@ -25,11 +25,11 @@
 
     <title><%= @title %></title>
     <% if @favimg != "" : %>
-      <link rel="icon" href="<%= @origin %>/<%= @pkgname %>/img/icon/<%= @favimg %>" />
+      <link rel="icon" href="<%= @origin %>/<%= @favimg %>" />
     <% end %>
-    <link rel="apple-touch-icon" href="/img/icon/icon-192x192.png">
+    <link rel="apple-touch-icon" href="/lib/img/icon/icon-192x192.png">
 
-    <% if @manifest != "" : %>
+    <% if @PWA == "activate" : %>
       <link rel="manifest" href="<%= @manifest %>" />
     <% end %>
 
@@ -39,17 +39,20 @@
     <% end %>
 
     <script type="text/javascript">
-      node_env = "<%= @node_env %>";
+      NODE_ENV = "<%= @NODE_ENV %>";
       pkgname = "<%= @pkgname %>";
+      PWA = "<%= @PWA %>";
     </script>
 
-    <script async src="https://cdn.jsdelivr.net/npm/pwacompat" crossorigin="anonymous"></script>
+    <% if @PWA == "activate" : %>
+      <script async type="text/javascript" src="https://cdn.jsdelivr.net/npm/pwacompat" crossorigin="anonymous"></script>
+    <% end %>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js" defer></script>
     <script type="text/javascript" src="<%= @pkgname %>/syslib/plustick.min.js" defer></script>
     <script type="text/javascript" src="<%= @pkgname %>/syslib/main.min.js" defer></script>
     <script type="text/javascript" src="<%= @pkgname %>/view/appsmain.min.js" defer></script>
     <% for f in @jssyslist : %>
-      <script type="text/javascript" src="<%= f %>" defer></script>
+      <script async type="text/javascript" src="<%= f %>" defer></script>
     <% end %>
   </head>
   <body style="margin: 0px 0px 0px 0px; overflow:hidden; background-color:rgba(255, 255, 255, 1.0); overscroll-behavior:none;">

@@ -49,6 +49,7 @@ JSFILELIST = undefined
 SITEJSON = undefined
 SYSTEMCSS = undefined
 SNSJSON = undefined
+PWA = if (APPSJSON.site.pwa.installed == true) then "activate" else "inactivate"
 
 SYSAPI = require("#{PATHINFO.sysjsctrl}/sysapi.min.js")
 
@@ -83,6 +84,7 @@ directoryBinding = ->
   app.use("/#{PATHINFO.pkgname}/stylesheet", express.static(PATHINFO.stylesheetdir))
   app.use("/#{PATHINFO.pkgname}/public", express.static(PATHINFO.publicdir))
   app.use("/#{PATHINFO.pkgname}/view", express.static(PATHINFO.usrjsview))
+  app.use("/#{PATHINFO.pkgname}/lib", express.static(PATHINFO.libdir))
   app.use("/#{PATHINFO.pkgname}/syslib", express.static(PATHINFO.sysjsview))
   app.use("/#{PATHINFO.pkgname}/include", express.static(PATHINFO.syslibdir))
   app.use("/#{PATHINFO.pkgname}/template", express.static(PATHINFO.templatedir))
@@ -174,6 +176,7 @@ generateManifest = ->
   manifest = manifest.replace(/\[\[\[:theme_color:\]\]\]/, APPSJSON.site.pwa.theme_color)
   manifest = manifest.replace(/\[\[\[:background_color:\]\]\]/, APPSJSON.site.pwa.background_color)
   manifest = manifest.replace(/\[\[\[:orientation:\]\]\]/, APPSJSON.site.pwa.orientation)
+  manifest = manifest.replace(/\[\[\[:pkgname:\]\]\]/g, PATHINFO.pkgname)
   fs.writeFileSync(MANIFEST_PATH, manifest, 'utf8')
 
 #==============================================================================
@@ -194,7 +197,8 @@ generateServiceworker = ->
     cache_contents_list.push("  \"/#{f}\"")
 
   JSSYSLIST.forEach (f) =>
-    cache_contents_list.push("  \"/#{f}\"")
+    if (!f.match(/main\.min\.js/))
+      cache_contents_list.push("  \"/#{f}\"")
 
   JSFILELIST.forEach (f) =>
     cache_contents_list.push("  \"/#{f}\"")
@@ -208,10 +212,9 @@ generateServiceworker = ->
 #==============================================================================
 generateIconFile = ->
   #------------------------
-  convimage = (size, ftmp) ->
-    origin_image = "#{PATHINFO.libdir}/img/OGP.png"
-    topath = ftmp.replace(/###/g, size)
-    await sharp(origin_image)
+  convimage = (size, src_image, dst_path) ->
+    topath = dst_path.replace(/###/g, size)
+    await sharp(src_image)
       .resize
         width: size,
         height: size,
@@ -219,11 +222,17 @@ generateIconFile = ->
       .toFile(topath)
   #------------------------
 
-  web_pathtmp = "#{PATHINFO.libdir}/img/icons/icon-###x###.png"
-  web_icon = [72, 96, 128, 144, 152, 192, 384, 512]
+  src_image = "#{PATHINFO.libdir}/img/icons/apps-img.png"
+  try
+    stats = fs.statSync(src_image)
+  catch
+    src_image = "#{PATHINFO.templatedir}/apps-img.png"
 
-  for size in web_icon
-    convimage(size, web_pathtmp)
+  dst_path = "#{PATHINFO.libdir}/img/icons/icon-###x###.png"
+  icon_size = [72, 96, 128, 144, 152, 192, 384, 512]
+
+  for size in icon_size
+    await convimage(size, src_image, dst_path)
 
 #==============================================================================
 # startserver listen
@@ -254,8 +263,8 @@ appsInit = ->
   SYSTEMCSS = "#{PATHINFO.pkgname}/template/system.css"
   SITEJSON = APPSJSON.site || {}
   SNSJSON = APPSJSON.sns || {}
+  MANIFEST_URI = "#{PATHINFO.pkgname}/lib/manifest.json"
   MANIFEST_TMP = "#{PATHINFO.templatedir}/manifest.json"
-  MANIFEST_URI = "/manifest.json"
   MANIFEST_PATH = "#{PATHINFO.libdir}/manifest.json"
   SERVICEWORKER_TMP = "#{PATHINFO.templatedir}/serviceworker.js"
   SERVICEWORKER_PATH = "#{PATHINFO.libdir}/serviceworker.js"
@@ -286,22 +295,22 @@ app.get "/", (req, res) ->
   if (NODE_ENV == "production")
     # Site info
     if (SITEJSON?)
-      favimg = SITEJSON.favicon || ""
+      favicon_uri = "#{PATHINFO.pkgname}/lib/img/icons/#{SITEJSON.favicon}"
     else
-      favimg = ""
+      favicon_uri = ""
 
     # SNS info
     if (SNSJSON?)
-      ogpimg = SNSJSON.ogp || "OGP.png"
+      ogpimg_uri = "#{PATHINFO.pkgname}/lib/img/#{SNSJSON.ogp}" || "OGP.png"
       twitter = SNSJSON.twitter || ""
       facebook = SNSJSON.facebook || ""
     else
-      ogpimg = ""
+      ogpimg_uri = ""
       twitter = ""
       facebook = ""
   else
-    favimg = SITEJSON.favicon || ""
-    ogpimg = SNSJSON.ogp || "OGP.png"
+    favicon_uri = "#{PATHINFO.pkgname}/lib/img/icons/#{SITEJSON.favicon}"
+    ogpimg_uri = "#{PATHINFO.pkgname}/lib/img/#{SNSJSON.ogp}" || "OGP.png"
     twitter = SNSJSON.twitter || ""
     facebook = SNSJSON.facebook || ""
 
@@ -321,15 +330,16 @@ app.get "/", (req, res) ->
     systemcss: SYSTEMCSS
     cssfilelist: CSSFILELIST
     jssyslist: JSSYSLIST
-    node_env: NODE_ENV
+    NODE_ENV: NODE_ENV
     origin: site_origin
-    ogpimg: ogpimg
-    favimg: favimg
+    ogpimg: ogpimg_uri
+    favimg: favicon_uri
     title: title
     site_name: site_name
     description: description
     twitter: twitter
     facebook: facebook
+    PWA: PWA
     manifest: MANIFEST_URI
 
 #==========================================================================

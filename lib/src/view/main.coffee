@@ -5,8 +5,8 @@ origintmp = window.location.href.replace(/\?.*$/, "")
 ORIGIN = origintmp.replace(/\/$/, "")
 SITEURL = "#{ORIGIN}/#{pkgname}"
 PUBLIC = "#{SITEURL}/public"
-#USRLIB = "#{SITEURL}/usrlib"
 LANGUAGE = window.navigator.language
+PWA = window.PWA
 
 APPLICATION = undefined
 BROWSER_FRAME = plustick.getBounds()
@@ -188,12 +188,19 @@ window.addEventListener "DOMContentLoaded", ->
   #---------------------------------------------------------------------------
   # Service Worker
   #---------------------------------------------------------------------------
-  if (navigator.serviceWorker?)
-    navigator.serviceWorker.register("/serviceworker.js").then (registration) ->
+  if (PWA == "activate")
+    if (navigator.serviceWorker?)
+      echo "serviceworker activation"
+      registration = await navigator.serviceWorker.register("/serviceworker.js")
       if (typeof registration.update == 'function')
         registration.update()
-    .catch (error) ->
-      console.log("Error Log: " + error)
+      else
+        PWA = "inactivate"
+    else
+      PWA = "inactivate"
+
+  if (PWA == "inactivate")
+    echo "Serviceworker Inactivation."
 
   #---------------------------------------------------------------------------
   # Gyro
@@ -249,7 +256,7 @@ window.addEventListener "DOMContentLoaded", ->
   document.body.setAttribute("id", "body")
   document.body.style.userSelect = "none"
   document.body.style.display = "none"
-  document.body.style.backgroundColor = "white"
+  document.body.style.backgroundColor = "black"
 
   #---------------------------------------------------------------------------
   # Splash screen
@@ -274,7 +281,7 @@ window.addEventListener "DOMContentLoaded", ->
   splash_banner.style.backgroundRepeat = "no-repeat"
   splash_banner.style.backgroundAttachment = "fixed"
   if (splashimage?)
-    url = "url(/img/#{splashimage})"
+    url = "url(#{SITEURL}/lib/img/#{splashimage})"
   else
     url = "url(/splash.png)"
   splash_banner.style.backgroundImage = url
@@ -299,9 +306,9 @@ window.addEventListener "DOMContentLoaded", ->
     #------------------
     # disp root view
     #------------------
-    splash_banner.className = "fadeout"
+    splash_banner.className = "fadeout" if (splash_banner?)
     setTimeout ->
-      splash_banner.remove()
+      splash_banner.remove() if (splash_banner?)
 
       APPLICATION = new appsmain()
 

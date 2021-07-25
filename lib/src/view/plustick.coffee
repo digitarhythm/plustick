@@ -28,7 +28,7 @@ __strFormatter__ = (a, b...) ->
 # debug write
 #=============================================================================
 echo = (a, b...) ->
-  if (node_env == "develop")
+  if (NODE_ENV == "develop")
     console.log(__strFormatter__(a, b...))
 
 

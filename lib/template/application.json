@@ -1,7 +1,7 @@
 {
   "site": {
     "favicon": "",
-    "basecolor": "rgba(255, 255, 255, 1.0)",
+    "basecolor": "rgba(0, 0, 0, 1.0)",
     "splash": {
       "image": "OGP.png",
       "size": "contain"
@@ -11,6 +11,7 @@
       "production": ""
     },
     "pwa": {
+      "installed": false,
       "display": "fullscreen",
       "theme_color": "#303030",
       "background_color": "#ffffff",
