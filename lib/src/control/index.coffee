@@ -295,13 +295,13 @@ app.get "/", (req, res) ->
   if (NODE_ENV == "production")
     # Site info
     if (SITEJSON?)
-      favicon_uri = "#{PATHINFO.pkgname}/lib/img/icons/#{SITEJSON.favicon}"
+      favicon_uri = "#{START_URL}/#{PATHINFO.pkgname}/lib/img/icons/#{SITEJSON.favicon}"
     else
       favicon_uri = ""
 
     # SNS info
     if (SNSJSON?)
-      ogpimg_uri = "#{PATHINFO.pkgname}/lib/img/#{SNSJSON.ogp}" || "OGP.png"
+      ogpimg_uri = "#{START_URL}/#{PATHINFO.pkgname}/lib/img/#{SNSJSON.ogp}" || "OGP.png"
       twitter = SNSJSON.twitter || ""
       facebook = SNSJSON.facebook || ""
     else
@@ -315,14 +315,6 @@ app.get "/", (req, res) ->
     facebook = SNSJSON.facebook || ""
 
   #----------------------------------
-  # Site info
-  #----------------------------------
-  if (SITEJSON?)
-    site_origin = SITEJSON.origin || ""
-  else
-    site_origin = ""
-
-  #----------------------------------
   # rendering HTML
   #----------------------------------
   res.render "main",
@@ -331,7 +323,7 @@ app.get "/", (req, res) ->
     cssfilelist: CSSFILELIST
     jssyslist: JSSYSLIST
     NODE_ENV: NODE_ENV
-    origin: site_origin
+    origin: START_URL
     ogpimg: ogpimg_uri
     favimg: favicon_uri
     title: title
