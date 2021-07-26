@@ -295,13 +295,14 @@ app.get "/", (req, res) ->
   if (NODE_ENV == "production")
     # Site info
     if (SITEJSON?)
-      favicon_uri = "#{START_URL}/#{PATHINFO.pkgname}/lib/img/icons/#{SITEJSON.favicon}"
+      favicon_uri = "#{PATHINFO.pkgname}/lib/img/icons/#{SITEJSON.favicon}"
     else
       favicon_uri = ""
 
     # SNS info
     if (SNSJSON?)
-      ogpimg_uri = "#{START_URL}/#{PATHINFO.pkgname}/lib/img/#{SNSJSON.ogp}" || "OGP.png"
+      img = SNSJSON.ogp || "OGP.png"
+      ogpimg_uri = "#{PATHINFO.pkgname}/lib/img/#{img}"
       twitter = SNSJSON.twitter || ""
       facebook = SNSJSON.facebook || ""
     else
@@ -309,10 +310,31 @@ app.get "/", (req, res) ->
       twitter = ""
       facebook = ""
   else
-    favicon_uri = "#{PATHINFO.pkgname}/lib/img/icons/#{SITEJSON.favicon}"
-    ogpimg_uri = "#{PATHINFO.pkgname}/lib/img/#{SNSJSON.ogp}" || "OGP.png"
-    twitter = SNSJSON.twitter || ""
-    facebook = SNSJSON.facebook || ""
+    if (SITEJSON? && SNSJSON?)
+      # Site info
+      if (SITEJSON.favicon?)
+        favicon_uri = "#{PATHINFO.pkgname}/lib/img/icons/#{SITEJSON.favicon}"
+      else
+        favicon_uri = ""
+
+      if (SITEJSON.ogp?)
+        ogpimg_uri = "#{PATHINFO.pkgname}/lib/img/#{SITEJSON.ogp}"
+      else
+        ogpimg_uri = "#{PATHINFO.pkgname}/lib/img/OGP.png"
+
+      # SNS info
+      if (SNSJSON?)
+        twitter = SNSJSON.twitter || ""
+        facebook = SNSJSON.facebook || ""
+      else
+        twitter = ""
+        facebook = ""
+
+    else
+      favicon_uri = ""
+      ogpimg_uri = "#{PATHINFO.pkgname}/lib/img/OGP.png"
+      twitter = ""
+      facebook = ""
 
   #----------------------------------
   # rendering HTML
