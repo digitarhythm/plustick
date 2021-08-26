@@ -191,7 +191,7 @@ window.addEventListener "DOMContentLoaded", ->
   if (PWA == "activate")
     if (navigator.serviceWorker?)
       echo "serviceworker activation"
-      registration = await navigator.serviceWorker.register("/serviceworker.js")
+      registration = await navigator.serviceWorker.register("#{ORIGIN}/serviceworker.js")
       if (typeof registration.update == 'function')
         registration.update()
       else

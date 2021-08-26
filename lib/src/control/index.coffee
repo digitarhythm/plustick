@@ -1,7 +1,7 @@
+Promise = require("bluebird")
 express = require("express")
 router = express.Router()
 app = express()
-Promise = require("bluebird")
 execSync = require("child_process").execSync
 exphttp = require("http").Server(app)
 httpolyglot = require("httpolyglot")
@@ -34,7 +34,7 @@ SYSJSON = require("#{PATHINFO.systemdir}/lib/config/system.json")
 PKGJSON = require("#{process.cwd()}/package.json")
 
 NODE_ENV = process.env.NODE_ENV || "production"
-START_URL = APPSJSON.site.start_url[NODE_ENV]
+START_URL = APPSJSON.site.start_url
 LISTEN_PORT = undefined
 
 MANIFEST_TMP = undefined
@@ -168,16 +168,17 @@ get_free_port = (start, num=1, exclude_port=[]) ->
 # generate manifest.json
 #==============================================================================
 generateManifest = ->
-  manifest = fs.readFileSync(MANIFEST_TMP, 'utf8')
-  manifest = manifest.replace(/\[\[\[:short_name:\]\]\]/, PKGJSON.name)
-  manifest = manifest.replace(/\[\[\[:name:\]\]\]/, PKGJSON.name)
-  manifest = manifest.replace(/\[\[\[:start_url:\]\]\]/, START_URL)
-  manifest = manifest.replace(/\[\[\[:display:\]\]\]/, APPSJSON.site.pwa.display)
-  manifest = manifest.replace(/\[\[\[:theme_color:\]\]\]/, APPSJSON.site.pwa.theme_color)
-  manifest = manifest.replace(/\[\[\[:background_color:\]\]\]/, APPSJSON.site.pwa.background_color)
-  manifest = manifest.replace(/\[\[\[:orientation:\]\]\]/, APPSJSON.site.pwa.orientation)
-  manifest = manifest.replace(/\[\[\[:pkgname:\]\]\]/g, PATHINFO.pkgname)
-  fs.writeFileSync(MANIFEST_PATH, manifest, 'utf8')
+  if (NODE_ENV == "production")
+    manifest = fs.readFileSync(MANIFEST_TMP, 'utf8')
+    manifest = manifest.replace(/\[\[\[:short_name:\]\]\]/, PKGJSON.name)
+    manifest = manifest.replace(/\[\[\[:name:\]\]\]/, PKGJSON.name)
+    manifest = manifest.replace(/\[\[\[:start_url:\]\]\]/, START_URL)
+    manifest = manifest.replace(/\[\[\[:display:\]\]\]/, APPSJSON.site.pwa.display)
+    manifest = manifest.replace(/\[\[\[:theme_color:\]\]\]/, APPSJSON.site.pwa.theme_color)
+    manifest = manifest.replace(/\[\[\[:background_color:\]\]\]/, APPSJSON.site.pwa.background_color)
+    manifest = manifest.replace(/\[\[\[:orientation:\]\]\]/, APPSJSON.site.pwa.orientation)
+    manifest = manifest.replace(/\[\[\[:pkgname:\]\]\]/g, PATHINFO.pkgname)
+    fs.writeFileSync(MANIFEST_PATH, manifest, 'utf8')
 
 #==============================================================================
 # generate service worker
@@ -254,8 +255,6 @@ startserver = ->
       httpolyglot.createServer(options, app).listen(LISTEN_PORT)
       console.log("listening HTTP/HTTPS:", LISTEN_PORT)
 
-  module.exports = router
-
 #==============================================================================
 # Application Initialize
 #==============================================================================
@@ -289,6 +288,11 @@ app.get "/", (req, res) ->
   site_name = PKGJSON.name
   description = PKGJSON.description
 
+  favicon_uri = ""
+  ogpimg_uri = "img/OGP.png"
+  twitter = ""
+  facebook = ""
+
   #----------------------------------
   # Production build
   #----------------------------------
@@ -302,7 +306,7 @@ app.get "/", (req, res) ->
     # SNS info
     if (SNSJSON?)
       img = SNSJSON.ogp || "OGP.png"
-      ogpimg_uri = "#{PATHINFO.pkgname}/lib/img/#{img}"
+      ogpimg_uri = "img/#{img}"
       twitter = SNSJSON.twitter || ""
       facebook = SNSJSON.facebook || ""
     else
@@ -318,9 +322,9 @@ app.get "/", (req, res) ->
         favicon_uri = ""
 
       if (SITEJSON.ogp?)
-        ogpimg_uri = "#{PATHINFO.pkgname}/lib/img/#{SITEJSON.ogp}"
+        ogpimg_uri = "img/#{SITEJSON.ogp}"
       else
-        ogpimg_uri = "#{PATHINFO.pkgname}/lib/img/OGP.png"
+        ogpimg_uri = "img/OGP.png"
 
       # SNS info
       if (SNSJSON?)
@@ -329,12 +333,6 @@ app.get "/", (req, res) ->
       else
         twitter = ""
         facebook = ""
-
-    else
-      favicon_uri = ""
-      ogpimg_uri = "#{PATHINFO.pkgname}/lib/img/OGP.png"
-      twitter = ""
-      facebook = ""
 
   #----------------------------------
   # rendering HTML
@@ -367,3 +365,4 @@ generateServiceworker()
 generateIconFile()
 startserver()
 
+module.exports = router

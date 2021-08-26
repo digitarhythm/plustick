@@ -1,6 +1,6 @@
+Promise = require("bluebird")
 express = require("express")
 router = express.Router()
-Promise = require("bluebird")
 path = require("path")
 config = require("config")
 echo = require("ndlog").echo

@@ -1,14 +1,11 @@
 {
   "site": {
+    "start_url": "",
     "favicon": "",
     "basecolor": "rgba(0, 0, 0, 1.0)",
     "splash": {
       "image": "OGP.png",
       "size": "contain"
-    },
-    "start_url": {
-      "develop": "",
-      "production": ""
     },
     "pwa": {
       "installed": false,

@@ -7,7 +7,7 @@
 
     <% if @twitter != "" || @facebook != "" : %>
       <% if @ogpimg != "" : %>
-        <meta property="og:image" content="<%= @origin %>/<%= @ogpimg %>" />
+        <meta property="og:image" content="<%= @origin %><%= @ogpimg %>" />
       <% end %>
       <meta property="og:url" content="<%= @origin %>" />
       <meta property="og:type" content="website" />
@@ -28,7 +28,7 @@
     <% if @favimg != "" : %>
       <link rel="icon" href="<%= @origin %>/<%= @favimg %>" />
     <% end %>
-    <link rel="apple-touch-icon" href="/lib/img/icon/icon-192x192.png">
+    <link rel="apple-touch-icon" href="img/icons/icon-192x192.png">
 
     <% if @PWA == "activate" : %>
       <link rel="manifest" href="<%= @manifest %>" />
