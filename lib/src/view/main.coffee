@@ -3,6 +3,7 @@
 #===========================================================================
 origintmp = window.location.href.replace(/\?.*$/, "")
 ORIGIN = origintmp.replace(/\/$/, "")
+PROTOCOL = (ORIGIN.match(/(^.*?):/))[1]
 SITEURL = "#{ORIGIN}/#{pkgname}"
 PUBLIC = "#{SITEURL}/public"
 LANGUAGE = window.navigator.language
@@ -188,19 +189,25 @@ window.addEventListener "DOMContentLoaded", ->
   #---------------------------------------------------------------------------
   # Service Worker
   #---------------------------------------------------------------------------
-  if (PWA == "activate")
-    if (navigator.serviceWorker?)
-      echo "serviceworker activation"
-      registration = await navigator.serviceWorker.register("#{ORIGIN}/serviceworker.js")
-      if (typeof registration.update == 'function')
-        registration.update()
+  if (PROTOCOL != "https")
+    echo "Application is not HTTPS"
+  else
+    if (PWA == "activate")
+      if (navigator.serviceWorker?)
+        if (NODE_ENV == "develop")
+          swfile = "serviceworker.develop.js"
+        else
+          swfile = "serviceworker.production.js"
+        registration = await navigator.serviceWorker.register(swfile)
+        if (typeof registration.update == 'function')
+          registration.update()
+        else
+          PWA = "inactivate"
       else
         PWA = "inactivate"
-    else
-      PWA = "inactivate"
 
-  if (PWA == "inactivate")
-    echo "Serviceworker Inactivation."
+    else if (PWA == "inactivate")
+      echo "Serviceworker Inactivation."
 
   #---------------------------------------------------------------------------
   # Gyro

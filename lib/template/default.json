@@ -1,6 +1,7 @@
 {
-    "Author": {
-      "name": "no name"
+    "application": {
+      "start_url": "",
+      "author": "no name"
     },
     "network": {
       "port": 5000,

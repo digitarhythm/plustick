@@ -11,7 +11,7 @@ pathinfo = require("#{PLUSTICKLIBS}/pathinfo.min.js")
 router.use(express.json())
 router.use(express.urlencoded({ extended: true }))
 
-node_env = process.env['NODE_ENV']
+NODE_ENV = process.env['NODE_ENV']
 
 #=============================================================================
 # normal api
@@ -23,7 +23,7 @@ router.all "/:endpoint", (req, res) ->
   headers = req.headers
   headers['method'] = method
 
-  if (node_env == "production")
+  if (NODE_ENV == "production")
     origin = headers.origin
     referer = headers.referer.replace(/\/\?.*$/, "") || ""
     if (origin != referer.replace(/\/$/, ""))
@@ -44,7 +44,8 @@ router.all "/:endpoint", (req, res) ->
 
     # make load Javascript file list
     jsfilelist = {}
-    lists = await readFileList(pathinfo.usrjsview)
+    lists = await readFileList(pathinfo.usrjsview).catch (e) =>
+      echo e
 
     jsfilelist['userjsview'] = []
     for fname in lists

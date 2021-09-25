@@ -3,7 +3,7 @@ path = require("path")
 config = require("config")
 fs = require("fs-extra")
 echo = require("ndlog").echo
-packjson = require("#{APPSDIR}/package.json")
+packjson = require("#{HOMEDIR}/package.json")
 
 #=============================================================================
 # API Sample

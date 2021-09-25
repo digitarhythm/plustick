@@ -23,18 +23,21 @@ PATHINFO = require("#{__sysjsctrl}/pathinfo.min.js")
 # super global value
 #----------------------------------
 global.BIND_ROUTER = {}
-global.APPSDIR = PATHINFO.homedir
+global.HOMEDIR = PATHINFO.homedir
+global.APPSDIR = PATHINFO.appsdir
 global.PLUSTICKLIBS = PATHINFO.sysjsctrl
 
 #----------------------------------
 # global value
 #----------------------------------
-APPSJSON = require("#{PATHINFO.homedir}/config/application.json")
+APPSJSON = require("#{PATHINFO.appsdir}/config/application.json")
 SYSJSON = require("#{PATHINFO.systemdir}/lib/config/system.json")
+SYSAPI = require("#{PATHINFO.sysjsctrl}/sysapi.min.js")
 PKGJSON = require("#{process.cwd()}/package.json")
 
 NODE_ENV = process.env.NODE_ENV || "production"
-START_URL = APPSJSON.site.start_url
+START_URL = undefined
+SITE_URL = undefined
 LISTEN_PORT = undefined
 
 MANIFEST_TMP = undefined
@@ -49,9 +52,9 @@ JSFILELIST = undefined
 SITEJSON = undefined
 SYSTEMCSS = undefined
 SNSJSON = undefined
-PWA = if (APPSJSON.site.pwa.installed == true) then "activate" else "inactivate"
 
-SYSAPI = require("#{PATHINFO.sysjsctrl}/sysapi.min.js")
+PKGNAME = PATHINFO.pkgname
+PWA = if (APPSJSON.site.pwa.installed == true) then "activate" else "inactivate"
 
 NETCONF = config.network
 
@@ -80,15 +83,15 @@ app.set("view engine", "ect")
 #==========================================================================
 directoryBinding = ->
   app.use("/", express.static(PATHINFO.libdir))
-  app.use("/#{PATHINFO.pkgname}/plugin", express.static(PATHINFO.plugindir))
-  app.use("/#{PATHINFO.pkgname}/stylesheet", express.static(PATHINFO.stylesheetdir))
-  app.use("/#{PATHINFO.pkgname}/public", express.static(PATHINFO.publicdir))
-  app.use("/#{PATHINFO.pkgname}/view", express.static(PATHINFO.usrjsview))
-  app.use("/#{PATHINFO.pkgname}/lib", express.static(PATHINFO.libdir))
-  app.use("/#{PATHINFO.pkgname}/syslib", express.static(PATHINFO.sysjsview))
-  app.use("/#{PATHINFO.pkgname}/include", express.static(PATHINFO.syslibdir))
-  app.use("/#{PATHINFO.pkgname}/template", express.static(PATHINFO.templatedir))
-  app.use("/#{PATHINFO.pkgname}/api", SYSAPI)
+  app.use("/#{PKGNAME}/plugin", express.static(PATHINFO.plugindir))
+  app.use("/#{PKGNAME}/stylesheet", express.static(PATHINFO.stylesheetdir))
+  app.use("/#{PKGNAME}/public", express.static(PATHINFO.publicdir))
+  app.use("/#{PKGNAME}/view", express.static(PATHINFO.usrjsview))
+  app.use("/#{PKGNAME}/lib", express.static(PATHINFO.libdir))
+  app.use("/#{PKGNAME}/syslib", express.static(PATHINFO.sysjsview))
+  app.use("/#{PKGNAME}/include", express.static(PATHINFO.syslibdir))
+  app.use("/#{PKGNAME}/template", express.static(PATHINFO.templatedir))
+  app.use("/#{PKGNAME}/api", SYSAPI)
 
 #==========================================================================
 # read file list function
@@ -126,7 +129,7 @@ libfileInclude = ->
   lists = __readFileList(PATHINFO.stylesheetdir)
   for fname in lists
     if (fname.match(/^.*\.css$/))
-      CSSFILELIST.push("#{PATHINFO.pkgname}/stylesheet/#{fname}")
+      CSSFILELIST.push("#{PKGNAME}/stylesheet/#{fname}")
 
   #----------------------------------
   # User plugin include
@@ -134,7 +137,7 @@ libfileInclude = ->
   lists = __readFileList(PATHINFO.plugindir)
   for fname in lists
     if (fname.match(/^.*\.js$/))
-      JSSYSLIST.push("#{PATHINFO.pkgname}/plugin/#{fname}")
+      JSSYSLIST.push("#{PKGNAME}/plugin/#{fname}")
 
   #----------------------------------
   # System library include
@@ -142,7 +145,7 @@ libfileInclude = ->
   lists = __readFileList(PATHINFO.syslibdir)
   for fname in lists
     if (fname.match(/^.*\.min\.js$/))
-      JSSYSLIST.push("#{PATHINFO.pkgname}/include/#{fname}")
+      JSSYSLIST.push("#{PKGNAME}/include/#{fname}")
 
 #==========================================================================
 # get free port
@@ -168,31 +171,34 @@ get_free_port = (start, num=1, exclude_port=[]) ->
 # generate manifest.json
 #==============================================================================
 generateManifest = ->
-  if (NODE_ENV == "production")
-    manifest = fs.readFileSync(MANIFEST_TMP, 'utf8')
-    manifest = manifest.replace(/\[\[\[:short_name:\]\]\]/, PKGJSON.name)
-    manifest = manifest.replace(/\[\[\[:name:\]\]\]/, PKGJSON.name)
-    manifest = manifest.replace(/\[\[\[:start_url:\]\]\]/, START_URL)
-    manifest = manifest.replace(/\[\[\[:display:\]\]\]/, APPSJSON.site.pwa.display)
-    manifest = manifest.replace(/\[\[\[:theme_color:\]\]\]/, APPSJSON.site.pwa.theme_color)
-    manifest = manifest.replace(/\[\[\[:background_color:\]\]\]/, APPSJSON.site.pwa.background_color)
-    manifest = manifest.replace(/\[\[\[:orientation:\]\]\]/, APPSJSON.site.pwa.orientation)
-    manifest = manifest.replace(/\[\[\[:pkgname:\]\]\]/g, PATHINFO.pkgname)
-    fs.writeFileSync(MANIFEST_PATH, manifest, 'utf8')
+  manifest = fs.readFileSync(MANIFEST_TMP, 'utf8')
+  manifest = manifest.replace(/\[\[\[:short_name:\]\]\]/g, PKGJSON.name)
+  manifest = manifest.replace(/\[\[\[:name:\]\]\]/g, PKGJSON.name)
+  manifest = manifest.replace(/\[\[\[:start_url:\]\]\]/g, START_URL)
+  manifest = manifest.replace(/\[\[\[:display:\]\]\]/g, APPSJSON.site.pwa.display)
+  manifest = manifest.replace(/\[\[\[:theme_color:\]\]\]/g, APPSJSON.site.pwa.theme_color)
+  manifest = manifest.replace(/\[\[\[:background_color:\]\]\]/g, APPSJSON.site.pwa.background_color)
+  manifest = manifest.replace(/\[\[\[:orientation:\]\]\]/g, APPSJSON.site.pwa.orientation)
+  manifest = manifest.replace(/\[\[\[:pkgname:\]\]\]/g, PKGNAME)
+  fs.writeFileSync(MANIFEST_PATH, manifest, 'utf8')
 
 #==============================================================================
 # generate service worker
 #==============================================================================
 generateServiceworker = ->
-  uri = "#{START_URL}/#{PATHINFO.pkgname}/api/__getappsinfo__"
-  ret = await axios.get(uri)
-  JSFILELIST = ret.data.jsfilelist['userjsview']
+  uri = "#{START_URL}/#{PKGNAME}/api/__getappsinfo__"
+
+  try
+    ret = await axios.get(uri)
+    JSFILELIST = ret.data.jsfilelist['userjsview']
+  catch
+    JSFILELIST = []
 
   serviceworker = fs.readFileSync(SERVICEWORKER_TMP, 'utf8')
   serviceworker = serviceworker.replace(/\[\[\[:name:\]\]\]/, PKGJSON.name)
   serviceworker = serviceworker.replace(/\[\[\[:version:\]\]\]/, PKGJSON.version)
 
-  cache_contents_list = ["\"/\"", "  \"/#{PATHINFO.pkgname}/template/system.css\""]
+  cache_contents_list = ["\"/\"", "  \"/#{PKGNAME}/template/system.css\""]
 
   CSSFILELIST.forEach (f) =>
     cache_contents_list.push("  \"/#{f}\"")
@@ -221,19 +227,23 @@ generateIconFile = ->
         height: size,
         fit: "cover"
       .toFile(topath)
+    .catch (e) ->
+      echo e
+
   #------------------------
 
   src_image = "#{PATHINFO.libdir}/img/icons/apps-img.png"
   try
     stats = fs.statSync(src_image)
-  catch
+  catch e
     src_image = "#{PATHINFO.templatedir}/apps-img.png"
 
   dst_path = "#{PATHINFO.libdir}/img/icons/icon-###x###.png"
   icon_size = [72, 96, 128, 144, 152, 192, 384, 512]
 
   for size in icon_size
-    await convimage(size, src_image, dst_path)
+    await convimage(size, src_image, dst_path).catch (e) ->
+      echo e
 
 #==============================================================================
 # startserver listen
@@ -241,7 +251,7 @@ generateIconFile = ->
 startserver = ->
   switch (NETCONF.protocol)
     when "http"
-      await exphttp.listen(LISTEN_PORT)
+      exphttp.listen(LISTEN_PORT)
       console.log("listening HTTP:", LISTEN_PORT)
 
     when "https"
@@ -259,14 +269,16 @@ startserver = ->
 # Application Initialize
 #==============================================================================
 appsInit = ->
-  SYSTEMCSS = "#{PATHINFO.pkgname}/template/system.css"
+  SYSTEMCSS = "#{PKGNAME}/template/system.css"
   SITEJSON = APPSJSON.site || {}
   SNSJSON = APPSJSON.sns || {}
-  MANIFEST_URI = "#{PATHINFO.pkgname}/lib/manifest.json"
+
   MANIFEST_TMP = "#{PATHINFO.templatedir}/manifest.json"
-  MANIFEST_PATH = "#{PATHINFO.libdir}/manifest.json"
   SERVICEWORKER_TMP = "#{PATHINFO.templatedir}/serviceworker.js"
-  SERVICEWORKER_PATH = "#{PATHINFO.libdir}/serviceworker.js"
+
+  MANIFEST_URI = "#{PKGNAME}/lib/manifest.#{NODE_ENV}.json"
+  MANIFEST_PATH = "#{PATHINFO.libdir}/manifest.#{NODE_ENV}.json"
+  SERVICEWORKER_PATH = "#{PATHINFO.libdir}/serviceworker.#{NODE_ENV}.js"
 
   if (NETCONF? && NETCONF.port?)
     port = NETCONF.port
@@ -276,6 +288,11 @@ appsInit = ->
     port = parseInt(get_free_port(start_port))
 
   LISTEN_PORT = port
+  if (config.application.start_url?)
+    START_URL = config.application.start_url
+  else
+    START_URL = "http://localhost:#{LISTEN_PORT}"
+  SITE_URL = "#{START_URL}/#{PKGNAME}"
 
 #==========================================================================
 # router setting
@@ -299,9 +316,10 @@ app.get "/", (req, res) ->
   if (NODE_ENV == "production")
     # Site info
     if (SITEJSON?)
-      favicon_uri = "#{PATHINFO.pkgname}/lib/img/icons/#{SITEJSON.favicon}"
-    else
-      favicon_uri = ""
+      if (SITEJSON.favicon? && SITEJSON.favicon != "")
+        favicon_uri = "#{SITE_URL}/lib/img/icons/#{SITEJSON.favicon}"
+      else
+        favicon_uri = "#{SITE_URL}/lib/img/icons/icon-144x144.png"
 
     # SNS info
     if (SNSJSON?)
@@ -313,11 +331,18 @@ app.get "/", (req, res) ->
       ogpimg_uri = ""
       twitter = ""
       facebook = ""
+
+  #----------------------------------
+  # Develop build
+  #----------------------------------
   else
-    if (SITEJSON? && SNSJSON?)
-      # Site info
-      if (SITEJSON.favicon?)
-        favicon_uri = "#{PATHINFO.pkgname}/lib/img/icons/#{SITEJSON.favicon}"
+    # Site info
+    if (SITEJSON?)
+      if (START_URL != "")
+        if (SITEJSON.favicon? && SITEJSON.favicon != "")
+          favicon_uri = "#{SITE_URL}/lib/img/icons/#{SITEJSON.favicon}"
+        else
+          favicon_uri = "#{SITE_URL}/lib/img/icons/icon-144x144.png"
       else
         favicon_uri = ""
 
@@ -326,24 +351,25 @@ app.get "/", (req, res) ->
       else
         ogpimg_uri = "img/OGP.png"
 
-      # SNS info
-      if (SNSJSON?)
-        twitter = SNSJSON.twitter || ""
-        facebook = SNSJSON.facebook || ""
-      else
-        twitter = ""
-        facebook = ""
+    # SNS info
+    if (SNSJSON?)
+      twitter = SNSJSON.twitter || ""
+      facebook = SNSJSON.facebook || ""
+    else
+      twitter = ""
+      facebook = ""
 
   #----------------------------------
   # rendering HTML
   #----------------------------------
   res.render "main",
-    pkgname: PATHINFO.pkgname
+    pkgname: PKGNAME
     systemcss: SYSTEMCSS
     cssfilelist: CSSFILELIST
     jssyslist: JSSYSLIST
     NODE_ENV: NODE_ENV
     origin: START_URL
+    site_url: SITE_URL
     ogpimg: ogpimg_uri
     favimg: favicon_uri
     title: title
