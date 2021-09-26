@@ -319,7 +319,7 @@ app.get "/", (req, res) ->
       if (SITEJSON.favicon? && SITEJSON.favicon != "")
         favicon_uri = "#{SITE_URL}/lib/img/icons/#{SITEJSON.favicon}"
       else
-        favicon_uri = "#{SITE_URL}/lib/img/icons/icon-144x144.png"
+        favicon_uri = "#{SITE_URL}/lib/img/icons/icon-192x192.png"
 
     # SNS info
     if (SNSJSON?)
@@ -342,7 +342,7 @@ app.get "/", (req, res) ->
         if (SITEJSON.favicon? && SITEJSON.favicon != "")
           favicon_uri = "#{SITE_URL}/lib/img/icons/#{SITEJSON.favicon}"
         else
-          favicon_uri = "#{SITE_URL}/lib/img/icons/icon-144x144.png"
+          favicon_uri = "#{SITE_URL}/lib/img/icons/icon-192x192.png"
       else
         favicon_uri = ""
 

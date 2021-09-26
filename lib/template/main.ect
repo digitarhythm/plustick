@@ -28,7 +28,7 @@
     <% if @favimg != "" : %>
       <link rel="icon" href="<%= @favimg %>" />
     <% end %>
-    <link rel="apple-touch-icon" href="<%= @site_url %>/lib/img/icons/icon-192x192.png">
+    <link rel="apple-touch-icon" href="<%= @favimg %>">
 
     <% if @PWA == "activate" : %>
       <link rel="manifest" href="<%= @manifest %>" />
