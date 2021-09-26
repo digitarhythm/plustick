@@ -27,8 +27,8 @@
     <title><%= @title %></title>
     <% if @favimg != "" : %>
       <link rel="icon" href="<%= @favimg %>" />
+      <link rel="apple-touch-icon" href="<%= @favimg %>">
     <% end %>
-    <link rel="apple-touch-icon" href="<%= @favimg %>">
 
     <% if @PWA == "activate" : %>
       <link rel="manifest" href="<%= @manifest %>" />
