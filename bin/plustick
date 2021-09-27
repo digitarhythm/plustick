@@ -168,6 +168,12 @@ function environ_check() {
     cp $MODULE/lib/template/loading_w.gif $APPSDIR/apps/lib/img/
   fi
 
+  # check application image
+  target="$APPSDIR/apps/lib/img/apps-img.png"
+  if [ ! -e $target ]; then
+    cp $MODULE/lib/template/apps-img.png $APPSDIR/apps/lib/img/
+  fi
+
   # check stylesheet file
   target="$APPSDIR/apps/stylesheet/appsmain.css"
   if [ ! -e $target ]; then

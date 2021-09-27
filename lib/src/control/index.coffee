@@ -37,7 +37,7 @@ PKGJSON = require("#{process.cwd()}/package.json")
 
 NODE_ENV = process.env.NODE_ENV || "production"
 START_URL = undefined
-SITE_URL = undefined
+#SITE_URL = undefined
 LISTEN_PORT = undefined
 
 MANIFEST_TMP = undefined
@@ -129,7 +129,7 @@ libfileInclude = ->
   lists = __readFileList(PATHINFO.stylesheetdir)
   for fname in lists
     if (fname.match(/^.*\.css$/))
-      CSSFILELIST.push("#{PKGNAME}/stylesheet/#{fname}")
+      CSSFILELIST.push("#{START_URL}/#{PKGNAME}/stylesheet/#{fname}")
 
   #----------------------------------
   # User plugin include
@@ -137,7 +137,7 @@ libfileInclude = ->
   lists = __readFileList(PATHINFO.plugindir)
   for fname in lists
     if (fname.match(/^.*\.js$/))
-      JSSYSLIST.push("#{PKGNAME}/plugin/#{fname}")
+      JSSYSLIST.push("#{START_URL}/#{PKGNAME}/plugin/#{fname}")
 
   #----------------------------------
   # System library include
@@ -145,7 +145,7 @@ libfileInclude = ->
   lists = __readFileList(PATHINFO.syslibdir)
   for fname in lists
     if (fname.match(/^.*\.min\.js$/))
-      JSSYSLIST.push("#{PKGNAME}/include/#{fname}")
+      JSSYSLIST.push("#{START_URL}/#{PKGNAME}/include/#{fname}")
 
 #==========================================================================
 # get free port
@@ -198,17 +198,17 @@ generateServiceworker = ->
   serviceworker = serviceworker.replace(/\[\[\[:name:\]\]\]/, PKGJSON.name)
   serviceworker = serviceworker.replace(/\[\[\[:version:\]\]\]/, PKGJSON.version)
 
-  cache_contents_list = ["\"/\"", "  \"/#{PKGNAME}/template/system.css\""]
+  cache_contents_list = ["'/'", "  '#{START_URL}/#{PKGNAME}/template/system.css'"]
 
   CSSFILELIST.forEach (f) =>
-    cache_contents_list.push("  \"/#{f}\"")
+    cache_contents_list.push("  '#{f}'")
 
   JSSYSLIST.forEach (f) =>
     if (!f.match(/main\.min\.js/))
-      cache_contents_list.push("  \"/#{f}\"")
+      cache_contents_list.push("  '#{f}'")
 
   JSFILELIST.forEach (f) =>
-    cache_contents_list.push("  \"/#{f}\"")
+    cache_contents_list.push("  '#{f}'")
 
   cache_contents = cache_contents_list.join(",\n")
   serviceworker = serviceworker.replace(/\[\[\[:cache_contents:\]\]\]/, cache_contents)
@@ -232,11 +232,11 @@ generateIconFile = ->
 
   #------------------------
 
-  src_image = "#{PATHINFO.libdir}/img/icons/apps-img.png"
+  src_image = "#{PATHINFO.libdir}/img/apps-img.png"
   try
     stats = fs.statSync(src_image)
   catch e
-    src_image = "#{PATHINFO.templatedir}/apps-img.png"
+    src_image = "#{PATHINFO.libdir}/img/icon/icon-512x512.png"
 
   dst_path = "#{PATHINFO.libdir}/img/icons/icon-###x###.png"
   icon_size = [72, 96, 128, 144, 152, 192, 384, 512]
@@ -269,16 +269,8 @@ startserver = ->
 # Application Initialize
 #==============================================================================
 appsInit = ->
-  SYSTEMCSS = "#{PKGNAME}/template/system.css"
   SITEJSON = APPSJSON.site || {}
   SNSJSON = APPSJSON.sns || {}
-
-  MANIFEST_TMP = "#{PATHINFO.templatedir}/manifest.json"
-  SERVICEWORKER_TMP = "#{PATHINFO.templatedir}/serviceworker.js"
-
-  MANIFEST_URI = "#{PKGNAME}/lib/manifest.#{NODE_ENV}.json"
-  MANIFEST_PATH = "#{PATHINFO.libdir}/manifest.#{NODE_ENV}.json"
-  SERVICEWORKER_PATH = "#{PATHINFO.libdir}/serviceworker.#{NODE_ENV}.js"
 
   if (NETCONF? && NETCONF.port?)
     port = NETCONF.port
@@ -288,11 +280,22 @@ appsInit = ->
     port = parseInt(get_free_port(start_port))
 
   LISTEN_PORT = port
-  if (config.application.start_url?)
-    START_URL = config.application.start_url
+  if (NODE_ENV == "production")
+    pkg = "/#{PKGNAME}"
   else
-    START_URL = "http://localhost:#{LISTEN_PORT}"
-  SITE_URL = "#{START_URL}/#{PKGNAME}"
+    pkg = ""
+
+  if (config.application.start_url?)
+    START_URL = "#{config.application.start_url}"
+  else
+    START_URL = "http://localhost:#{LISTEN_PORT}#{pkg}"
+
+  MANIFEST_TMP = "#{PATHINFO.templatedir}/manifest.json"
+  SERVICEWORKER_TMP = "#{PATHINFO.templatedir}/serviceworker.js"
+
+  MANIFEST_URI = "#{START_URL}/#{PKGNAME}/lib/manifest.#{NODE_ENV}.json"
+  MANIFEST_PATH = "#{PATHINFO.libdir}/manifest.#{NODE_ENV}.json"
+  SERVICEWORKER_PATH = "#{PATHINFO.libdir}/serviceworker.#{NODE_ENV}.js"
 
 #==========================================================================
 # router setting
@@ -317,9 +320,9 @@ app.get "/", (req, res) ->
     # Site info
     if (SITEJSON?)
       if (SITEJSON.favicon? && SITEJSON.favicon != "")
-        favicon_uri = "#{SITE_URL}/lib/img/icons/#{SITEJSON.favicon}"
+        favicon_uri = "#{START_URL}/#{PKGNAME}/lib/img/icons/#{SITEJSON.favicon}"
       else
-        favicon_uri = "#{SITE_URL}/lib/img/icons/icon-192x192.png"
+        favicon_uri = "#{START_URL}/#{PKGNAME}/lib/img/icons/icon-192x192.png"
 
     # SNS info
     if (SNSJSON?)
@@ -340,9 +343,9 @@ app.get "/", (req, res) ->
     if (SITEJSON?)
       if (START_URL != "")
         if (SITEJSON.favicon? && SITEJSON.favicon != "")
-          favicon_uri = "#{SITE_URL}/lib/img/icons/#{SITEJSON.favicon}"
+          favicon_uri = "#{START_URL}/#{PKGNAME}/lib/img/icons/#{SITEJSON.favicon}"
         else
-          favicon_uri = "#{SITE_URL}/lib/img/icons/icon-192x192.png"
+          favicon_uri = "#{START_URL}/#{PKGNAME}/lib/img/icons/icon-192x192.png"
       else
         favicon_uri = ""
 
@@ -359,6 +362,8 @@ app.get "/", (req, res) ->
       twitter = ""
       facebook = ""
 
+  SYSTEMCSS = "#{START_URL}/#{PKGNAME}/template/system.css"
+
   #----------------------------------
   # rendering HTML
   #----------------------------------
@@ -368,8 +373,8 @@ app.get "/", (req, res) ->
     cssfilelist: CSSFILELIST
     jssyslist: JSSYSLIST
     NODE_ENV: NODE_ENV
-    origin: START_URL
-    site_url: SITE_URL
+    start_url: START_URL
+    #site_url: SITE_URL
     ogpimg: ogpimg_uri
     favimg: favicon_uri
     title: title

@@ -7,9 +7,9 @@
 
     <% if @twitter != "" || @facebook != "" : %>
       <% if @ogpimg != "" : %>
-        <meta property="og:image" content="<%= @origin %><%= @ogpimg %>" />
+        <meta property="og:image" content="<%= @start_url %>/<%= @ogpimg %>" />
       <% end %>
-      <meta property="og:url" content="<%= @site_url %>" />
+      <meta property="og:url" content="<%= @start_url %>" />
       <meta property="og:type" content="website" />
       <meta property="og:title" content="<%= @title %>" />
       <meta property="og:description" content="<%= @description %>" />
@@ -51,7 +51,7 @@
     <% end %>
     -->
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js" defer></script>
-  <script type="text/javascript" src="<%= @pkgname %>/syslib/plustick.min.js" defer></script>
+    <script type="text/javascript" src="<%= @pkgname %>/syslib/plustick.min.js" defer></script>
     <% for f in @jssyslist : %>
       <script async type="text/javascript" src="<%= f %>" defer></script>
     <% end %>
