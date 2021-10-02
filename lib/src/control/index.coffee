@@ -36,8 +36,8 @@ SYSAPI = require("#{PATHINFO.sysjsctrl}/sysapi.min.js")
 PKGJSON = require("#{process.cwd()}/package.json")
 
 NODE_ENV = process.env.NODE_ENV || "production"
-START_URL = undefined
-#SITE_URL = undefined
+START_URL = config.application.start_url.replace(/\/$/, '')
+SITE_URL = undefined
 LISTEN_PORT = undefined
 
 MANIFEST_TMP = undefined
@@ -129,7 +129,7 @@ libfileInclude = ->
   lists = __readFileList(PATHINFO.stylesheetdir)
   for fname in lists
     if (fname.match(/^.*\.css$/))
-      CSSFILELIST.push("#{START_URL}/#{PKGNAME}/stylesheet/#{fname}")
+      CSSFILELIST.push("#{SITE_URL}/stylesheet/#{fname}")
 
   #----------------------------------
   # User plugin include
@@ -137,7 +137,7 @@ libfileInclude = ->
   lists = __readFileList(PATHINFO.plugindir)
   for fname in lists
     if (fname.match(/^.*\.js$/))
-      JSSYSLIST.push("#{START_URL}/#{PKGNAME}/plugin/#{fname}")
+      JSSYSLIST.push("/#{SITE_URL}/plugin/#{fname}")
 
   #----------------------------------
   # System library include
@@ -145,7 +145,7 @@ libfileInclude = ->
   lists = __readFileList(PATHINFO.syslibdir)
   for fname in lists
     if (fname.match(/^.*\.min\.js$/))
-      JSSYSLIST.push("#{START_URL}/#{PKGNAME}/include/#{fname}")
+      JSSYSLIST.push("include/#{fname}")
 
 #==========================================================================
 # get free port
@@ -174,7 +174,7 @@ generateManifest = ->
   manifest = fs.readFileSync(MANIFEST_TMP, 'utf8')
   manifest = manifest.replace(/\[\[\[:short_name:\]\]\]/g, PKGJSON.name)
   manifest = manifest.replace(/\[\[\[:name:\]\]\]/g, PKGJSON.name)
-  manifest = manifest.replace(/\[\[\[:start_url:\]\]\]/g, START_URL)
+  manifest = manifest.replace(/\[\[\[:site_url:\]\]\]/g, SITE_URL)
   manifest = manifest.replace(/\[\[\[:display:\]\]\]/g, APPSJSON.site.pwa.display)
   manifest = manifest.replace(/\[\[\[:theme_color:\]\]\]/g, APPSJSON.site.pwa.theme_color)
   manifest = manifest.replace(/\[\[\[:background_color:\]\]\]/g, APPSJSON.site.pwa.background_color)
@@ -186,7 +186,12 @@ generateManifest = ->
 # generate service worker
 #==============================================================================
 generateServiceworker = ->
-  uri = "#{START_URL}/#{PKGNAME}/api/__getappsinfo__"
+  if (NODE_ENV == "production")
+    uri = "#{SITE_URL}/api/__getappsinfo__"
+    cache_contents_list = ["'/'", "  '#{SITE_URL}/view/appsmain.min.js'", "  '#{SITE_URL}/template/system.css'"]
+  else
+    uri = "#{SITE_URL}/api/__getappsinfo__"
+    cache_contents_list = ["'/'", "  '#{SITE_URL}/view/appsmain.min.js'", "  '#{SITE_URL}/template/system.css'"]
 
   try
     ret = await axios.get(uri)
@@ -198,14 +203,13 @@ generateServiceworker = ->
   serviceworker = serviceworker.replace(/\[\[\[:name:\]\]\]/, PKGJSON.name)
   serviceworker = serviceworker.replace(/\[\[\[:version:\]\]\]/, PKGJSON.version)
 
-  cache_contents_list = ["'/'", "  '#{START_URL}/#{PKGNAME}/template/system.css'"]
-
+  SYSTEMCSS = "#{SITE_URL}/template/system.css"
   CSSFILELIST.forEach (f) =>
     cache_contents_list.push("  '#{f}'")
 
   JSSYSLIST.forEach (f) =>
     if (!f.match(/main\.min\.js/))
-      cache_contents_list.push("  '#{f}'")
+      cache_contents_list.push("  '#{SITE_URL}/#{f}'")
 
   JSFILELIST.forEach (f) =>
     cache_contents_list.push("  '#{f}'")
@@ -280,22 +284,23 @@ appsInit = ->
     port = parseInt(get_free_port(start_port))
 
   LISTEN_PORT = port
-  if (NODE_ENV == "production")
-    pkg = "/#{PKGNAME}"
-  else
-    pkg = ""
 
   if (config.application.start_url?)
-    START_URL = "#{config.application.start_url}"
+    SITE_URL = "#{START_URL}/#{PKGNAME}"
   else
-    START_URL = "http://localhost:#{LISTEN_PORT}#{pkg}"
+    SITE_URL = "http://localhost:#{LISTEN_PORT}/#{PKGNAME}"
 
   MANIFEST_TMP = "#{PATHINFO.templatedir}/manifest.json"
   SERVICEWORKER_TMP = "#{PATHINFO.templatedir}/serviceworker.js"
 
-  MANIFEST_URI = "#{START_URL}/#{PKGNAME}/lib/manifest.#{NODE_ENV}.json"
-  MANIFEST_PATH = "#{PATHINFO.libdir}/manifest.#{NODE_ENV}.json"
-  SERVICEWORKER_PATH = "#{PATHINFO.libdir}/serviceworker.#{NODE_ENV}.js"
+  if (NODE_ENV == "develop")
+    MANIFEST_URI = "#{SITE_URL}/lib/manifest.#{NODE_ENV}.json"
+    MANIFEST_PATH = "#{PATHINFO.libdir}/manifest.#{NODE_ENV}.json"
+    SERVICEWORKER_PATH = "#{PATHINFO.libdir}/serviceworker.#{NODE_ENV}.js"
+  else
+    MANIFEST_URI = "#{SITE_URL}/lib/manifest.json"
+    MANIFEST_PATH = "#{PATHINFO.libdir}/manifest.json"
+    SERVICEWORKER_PATH = "#{PATHINFO.libdir}/serviceworker.js"
 
 #==========================================================================
 # router setting
@@ -314,16 +319,26 @@ app.get "/", (req, res) ->
   facebook = ""
 
   #----------------------------------
+  # favicon setting
+  #----------------------------------
+  if (SITEJSON?)
+    if (SITE_URL != "")
+      if (SITEJSON.favicon? && SITEJSON.favicon != "")
+        favicon_uri = "/#{SITE_URL}/lib/img/icons/#{SITEJSON.favicon}"
+      else
+        favicon_uri = "#{SITE_URL}/lib/img/icons/icon-192x192.png"
+    else
+      favicon_uri = ""
+
+    if (SITEJSON.ogp?)
+      ogpimg_uri = "img/#{SITEJSON.ogp}"
+    else
+      ogpimg_uri = "img/OGP.png"
+
+  #----------------------------------
   # Production build
   #----------------------------------
   if (NODE_ENV == "production")
-    # Site info
-    if (SITEJSON?)
-      if (SITEJSON.favicon? && SITEJSON.favicon != "")
-        favicon_uri = "#{START_URL}/#{PKGNAME}/lib/img/icons/#{SITEJSON.favicon}"
-      else
-        favicon_uri = "#{START_URL}/#{PKGNAME}/lib/img/icons/icon-192x192.png"
-
     # SNS info
     if (SNSJSON?)
       img = SNSJSON.ogp || "OGP.png"
@@ -339,21 +354,6 @@ app.get "/", (req, res) ->
   # Develop build
   #----------------------------------
   else
-    # Site info
-    if (SITEJSON?)
-      if (START_URL != "")
-        if (SITEJSON.favicon? && SITEJSON.favicon != "")
-          favicon_uri = "#{START_URL}/#{PKGNAME}/lib/img/icons/#{SITEJSON.favicon}"
-        else
-          favicon_uri = "#{START_URL}/#{PKGNAME}/lib/img/icons/icon-192x192.png"
-      else
-        favicon_uri = ""
-
-      if (SITEJSON.ogp?)
-        ogpimg_uri = "img/#{SITEJSON.ogp}"
-      else
-        ogpimg_uri = "img/OGP.png"
-
     # SNS info
     if (SNSJSON?)
       twitter = SNSJSON.twitter || ""
@@ -361,8 +361,6 @@ app.get "/", (req, res) ->
     else
       twitter = ""
       facebook = ""
-
-  SYSTEMCSS = "#{START_URL}/#{PKGNAME}/template/system.css"
 
   #----------------------------------
   # rendering HTML
@@ -373,8 +371,7 @@ app.get "/", (req, res) ->
     cssfilelist: CSSFILELIST
     jssyslist: JSSYSLIST
     NODE_ENV: NODE_ENV
-    start_url: START_URL
-    #site_url: SITE_URL
+    site_url: SITE_URL
     ogpimg: ogpimg_uri
     favimg: favicon_uri
     title: title

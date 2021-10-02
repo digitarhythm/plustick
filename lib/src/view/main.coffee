@@ -197,7 +197,7 @@ window.addEventListener "DOMContentLoaded", ->
         if (NODE_ENV == "develop")
           swfile = "serviceworker.develop.js"
         else
-          swfile = "serviceworker.production.js"
+          swfile = "serviceworker.js"
         registration = await navigator.serviceWorker.register(swfile)
         if (typeof registration.update == 'function')
           registration.update()

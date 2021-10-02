@@ -54,7 +54,7 @@ router.all "/:endpoint", (req, res) ->
           jsfilelist['userjsview'].push("#{pathinfo.pkgname}/view/#{fname}")
 
     res.json
-      error: 0
+      jrror: 0
       pathinfo: pathinfo
       jsfilelist: jsfilelist
 

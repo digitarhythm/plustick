@@ -7,9 +7,9 @@
 
     <% if @twitter != "" || @facebook != "" : %>
       <% if @ogpimg != "" : %>
-        <meta property="og:image" content="<%= @start_url %>/<%= @ogpimg %>" />
+        <meta property="og:image" content="<%= @site_url %>/<%= @ogpimg %>" />
       <% end %>
-      <meta property="og:url" content="<%= @start_url %>" />
+      <meta property="og:url" content="<%= @site_url %>" />
       <meta property="og:type" content="website" />
       <meta property="og:title" content="<%= @title %>" />
       <meta property="og:description" content="<%= @description %>" />
@@ -45,20 +45,15 @@
       PWA = "<%= @PWA %>";
     </script>
 
-    <!--
-    <% if @PWA == "activate" : %>
-      <script async type="text/javascript" src="https://cdn.jsdelivr.net/npm/pwacompat" crossorigin="anonymous"></script>
-    <% end %>
-    -->
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js" defer></script>
-    <script type="text/javascript" src="<%= @pkgname %>/syslib/plustick.min.js" defer></script>
+    <script type="text/javascript" src="<%= @site_url %>/syslib/plustick.min.js" defer></script>
     <% for f in @jssyslist : %>
-      <script async type="text/javascript" src="<%= f %>" defer></script>
+      <script async type="text/javascript" src="<%= @site_url %>/<%= f %>" defer></script>
     <% end %>
   </head>
   <body style="margin: 0px 0px 0px 0px; overflow:hidden; background-color:rgba(255, 255, 255, 1.0); overscroll-behavior:none;">
-    <script type="text/javascript" src="<%= @pkgname %>/syslib/main.min.js" defer></script>
-    <script type="text/javascript" src="<%= @pkgname %>/view/appsmain.min.js" defer></script>
+    <script type="text/javascript" src="<%= @site_url %>/syslib/main.min.js" defer></script>
+    <script type="text/javascript" src="<%= @site_url %>/view/appsmain.min.js" defer></script>
   </body>
 </html>
 
