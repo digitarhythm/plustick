@@ -324,7 +324,7 @@ app.get "/", (req, res) ->
   if (SITEJSON?)
     if (SITE_URL != "")
       if (SITEJSON.favicon? && SITEJSON.favicon != "")
-        favicon_uri = "/#{SITE_URL}/lib/img/icons/#{SITEJSON.favicon}"
+        favicon_uri = "#{SITE_URL}/lib/img/icons/#{SITEJSON.favicon}"
       else
         favicon_uri = "#{SITE_URL}/lib/img/icons/icon-192x192.png"
     else
