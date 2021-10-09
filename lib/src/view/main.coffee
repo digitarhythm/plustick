@@ -12,6 +12,8 @@ PWA = window.PWA
 APPLICATION = undefined
 BROWSER_FRAME = plustick.getBounds()
 ROOTDIV = undefined
+SITE_WIDTH = SITE_WIDTH
+SITE_HEIGHT = SITE_HEIGHT
 
 GLOBAL =
   PROC: {}
@@ -212,6 +214,27 @@ window.addEventListener "DOMContentLoaded", ->
       aspect: aspect
 
   #===========================================================================
+  # plugin load
+  #===========================================================================
+  pluginload = (script) ->
+    return new Promise (resolve, reject) ->
+      head = document.getElementsByTagName('head')[0]
+      try
+        script.onload = (e) ->
+          resolve(e)
+        head.appendChild(script)
+      catch e
+        reject(e)
+
+  #===========================================================================
+  #===========================================================================
+  #===========================================================================
+  #
+  # Main process
+  #
+  #===========================================================================
+  #===========================================================================
+  #===========================================================================
 
   #---------------------------------------------------------------------------
   # Service Worker
@@ -246,23 +269,6 @@ window.addEventListener "DOMContentLoaded", ->
           DEVICEORIENTATION = true
   else
     DEVICEORIENTATION = true
-
-  #---------------------------------------------------------------------------
-  # plugin load
-  #---------------------------------------------------------------------------
-
-  #------------------
-  # JS file loding function
-  #------------------
-  pluginload = (script) ->
-    return new Promise (resolve, reject) ->
-      head = document.getElementsByTagName('head')[0]
-      try
-        script.onload = (e) ->
-          resolve(e)
-        head.appendChild(script)
-      catch e
-        reject(e)
 
   #------------------
   # Get JS file list
@@ -301,7 +307,6 @@ window.addEventListener "DOMContentLoaded", ->
   splash_banner.style.display = "none"
   document.body.append(splash_banner)
   contents_size = fitContentsSize()
-  echo contents_size
   splash_banner.setAttribute("id", "splash_banner")
   splash_banner.style.position = "absolute"
   splash_banner.style.width = "#{contents_size.width}px"
@@ -345,6 +350,12 @@ window.addEventListener "DOMContentLoaded", ->
     setTimeout ->
       splash_banner.remove() if (splash_banner?)
 
+      APPLICATION = new appsmain()
+      if (APPLICATION.width?)
+        SITE_WIDTH = APPLICATION.width
+      if (APPLICATION.height?)
+        SITE_HEIGHT = APPLICATION.height
+
       #------------------
       # create root view
       #------------------
@@ -368,7 +379,6 @@ window.addEventListener "DOMContentLoaded", ->
       # create APPLICATION
       #------------------
       contents_size = fitContentsSize()
-      APPLICATION = new appsmain()
       APPLICATION.width = contents_size.width
       APPLICATION.height = contents_size.height
       document.oncontextmenu = =>
@@ -385,6 +395,9 @@ window.addEventListener "DOMContentLoaded", ->
 
       if (typeof APPLICATION.viewDidAppear == 'function')
         await APPLICATION.viewDidAppear()
+
+
+
 
     , 500
 
