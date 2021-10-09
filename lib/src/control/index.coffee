@@ -40,8 +40,6 @@ START_URL = config.application.start_url.replace(/\/$/, '')
 LISTEN_PORT = undefined
 
 SITE_URL = undefined
-SITE_WIDTH = APPSJSON.site.display.width || "any"
-SITE_HEIGHT = APPSJSON.site.display.height || "any"
 
 MANIFEST_TMP = undefined
 MANIFEST_URI = undefined
@@ -60,6 +58,13 @@ PKGNAME = PATHINFO.pkgname
 PWA = if (APPSJSON.site.pwa.installed == true) then "activate" else "inactivate"
 
 NETCONF = config.network
+
+if (APPSJSON.site.display?)
+  SITE_WIDTH = APPSJSON.site.display.width || "any"
+  SITE_HEIGHT = APPSJSON.site.display.height || "any"
+else
+  SITE_WIDTH = "any"
+  SITE_HEIGHT = "any"
 
 echo "application loading time: [#{new Date().toLocaleString("ja-JP")}]"
 
@@ -332,8 +337,6 @@ app.get "/", (req, res) ->
         favicon_uri = "#{SITE_URL}/lib/img/icons/icon-192x192.png"
     else
       favicon_uri = ""
-
-    echo "favicon=%@", favicon_uri
 
     if (SITEJSON.ogp?)
       ogpimg_uri = "img/#{SITEJSON.ogp}"
