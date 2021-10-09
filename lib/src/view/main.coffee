@@ -135,8 +135,8 @@ window.addEventListener "DOMContentLoaded", ->
       #contents_size = fitContentsSize(APPLICATION)
       #contents_size = fitContentsSize({width:APPLICATION.width,height:APPLICATION.height})
       contents_size = fitContentsSize()
-      APPLICATION.width = contents_size.width
-      APPLICATION.height = contents_size.height
+      #APPLICATION.width = contents_size.width
+      #APPLICATION.height = contents_size.height
       ROOTDIV.style.transformOrigin = "0px 0px 0px"
       ROOTDIV.style.transform = "scale(#{contents_size.scale}, #{contents_size.scale})"
       ROOTDIV.style.width = "#{contents_size.width}px"
