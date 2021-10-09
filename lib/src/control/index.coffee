@@ -37,8 +37,11 @@ PKGJSON = require("#{process.cwd()}/package.json")
 
 NODE_ENV = process.env.NODE_ENV || "production"
 START_URL = config.application.start_url.replace(/\/$/, '')
-SITE_URL = undefined
 LISTEN_PORT = undefined
+
+SITE_URL = undefined
+SITE_WIDTH = APPSJSON.site.display.width || "any"
+SITE_HEIGHT = APPSJSON.site.display.height || "any"
 
 MANIFEST_TMP = undefined
 MANIFEST_URI = undefined
@@ -174,11 +177,11 @@ generateManifest = ->
   manifest = fs.readFileSync(MANIFEST_TMP, 'utf8')
   manifest = manifest.replace(/\[\[\[:short_name:\]\]\]/g, PKGJSON.name)
   manifest = manifest.replace(/\[\[\[:name:\]\]\]/g, PKGJSON.name)
-  manifest = manifest.replace(/\[\[\[:start_url:\]\]\]/g, START_URL)
+  manifest = manifest.replace(/\[\[\[:start_url:\]\]\]/g, SITE_URL)
   manifest = manifest.replace(/\[\[\[:display:\]\]\]/g, APPSJSON.site.pwa.display)
   manifest = manifest.replace(/\[\[\[:theme_color:\]\]\]/g, APPSJSON.site.pwa.theme_color)
   manifest = manifest.replace(/\[\[\[:background_color:\]\]\]/g, APPSJSON.site.pwa.background_color)
-  manifest = manifest.replace(/\[\[\[:orientation:\]\]\]/g, APPSJSON.site.pwa.orientation)
+  janifest = manifest.replace(/\[\[\[:orientation:\]\]\]/g, APPSJSON.site.pwa.orientation)
   manifest = manifest.replace(/\[\[\[:pkgname:\]\]\]/g, PKGNAME)
   fs.writeFileSync(MANIFEST_PATH, manifest, 'utf8')
 
@@ -330,6 +333,8 @@ app.get "/", (req, res) ->
     else
       favicon_uri = ""
 
+    echo "favicon=%@", favicon_uri
+
     if (SITEJSON.ogp?)
       ogpimg_uri = "img/#{SITEJSON.ogp}"
     else
@@ -379,8 +384,11 @@ app.get "/", (req, res) ->
     description: description
     twitter: twitter
     facebook: facebook
+    bgcolor: APPSJSON.site.basecolor
     PWA: PWA
     manifest: MANIFEST_URI
+    site_width: SITE_WIDTH
+    site_height: SITE_HEIGHT
 
 #==========================================================================
 # execute modules

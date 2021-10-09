@@ -43,6 +43,8 @@
       NODE_ENV = "<%= @NODE_ENV %>";
       pkgname = "<%= @pkgname %>";
       PWA = "<%= @PWA %>";
+      SITE_WIDTH = "<%= @site_width %>";
+      SITE_HEIGHT = "<%= @site_height %>";
     </script>
 
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js" defer></script>
@@ -51,7 +53,7 @@
       <script async type="text/javascript" src="<%= @site_url %>/<%= f %>" defer></script>
     <% end %>
   </head>
-  <body style="margin: 0px 0px 0px 0px; overflow:hidden; background-color:rgba(255, 255, 255, 1.0); overscroll-behavior:none;">
+  <body style="margin: 0px 0px 0px 0px; overflow:hidden; background-color:<%= @bgcolor %>; overscroll-behavior:none;">
     <script type="text/javascript" src="<%= @site_url %>/syslib/main.min.js" defer></script>
     <script type="text/javascript" src="<%= @site_url %>/view/appsmain.min.js" defer></script>
   </body>

@@ -62,13 +62,13 @@ class plustick_core
   # get browser size(include scrolling bar)
   #===========================================================================
   getBounds: ->
-    width = window.innerWidth
-    height = window.innerHeight
+    width = parseInt(window.innerWidth)
+    height = parseInt(window.innerHeight)
     frame =
       size:
-        width: width
-        height: height
-        aspect: width / height
+        width: parseInt(width)
+        height: parseInt(height)
+        aspect: parseFloat(parseInt(width) / parseInt(height))
     return frame
 
   #===========================================================================

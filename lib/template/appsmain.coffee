@@ -7,9 +7,6 @@ class appsmain extends viewController
   #===========================================================================
   constructor: ->
     super()
-    @width = undefined
-    @height = undefined
-    @backgroundColor = "black"
     @contextmenu = true
     @orientation = false
     @motion = false
@@ -21,14 +18,13 @@ class appsmain extends viewController
   #===========================================================================
   createHtml: ->
     html = await super()
-    return new Promise (resolve, reject) =>
-      html = """
-        <div id="contents">
-          Hello World!
-        </div>
-      """
+    html = """
+      <div id="#{@uniqueID}" class="appsmain">
+        Hello World!
+      </div>
+    """
 
-      resolve(html)
+    return(html)
 
   #===========================================================================
   # After the HTML is loaded, but before it is displayed, it is executed.

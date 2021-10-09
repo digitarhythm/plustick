@@ -44,7 +44,7 @@ class viewController
   constructor:(param=undefined) ->
     S4 = ->
       return (((1+Math.random())*0x10000)|0).toString(16).substring(1)
-    @uniqueID = (S4()+S4()+"_"+S4()+"_"+S4()+"_"+S4()+"_"+S4()+S4()+S4())
+    @uniqueID = "id_"+(S4()+S4()+"_"+S4()+"_"+S4()+"_"+S4()+"_"+S4()+S4()+S4())
     @browser_frame = BROWSER_FRAME
     @parent = undefined
 
@@ -80,6 +80,25 @@ class viewController
     return undefined
 
   #----------------------
+  # view translation
+  #----------------------
+  nextView:(param) ->
+    return if (!param?)
+
+    obj = param.viewobj || undefined
+    return if (!obj?)
+
+    target = getElement(obj.uniqueID) || undefined
+    return if (!target?)
+
+    curr = getElement(APPLICATION.uniqueID)
+    @removeView
+      viewobj: curr
+
+    APPLICATION = new curr()
+
+
+  #----------------------
   #----------------------
   createHtml: ->
 
@@ -111,7 +130,13 @@ window.addEventListener "DOMContentLoaded", ->
     if (__RESIZETIMEOUT__?)
       clearTimeout(__RESIZETIMEOUT__)
     __RESIZETIMEOUT__ = setTimeout ->
-      contents_size = fitContentsSize(APPLICATION)
+      #contents_size = fitContentsSize(APPLICATION)
+      #contents_size = fitContentsSize({width:APPLICATION.width,height:APPLICATION.height})
+      contents_size = fitContentsSize()
+      APPLICATION.width = contents_size.width
+      APPLICATION.height = contents_size.height
+      ROOTDIV.style.transformOrigin = "0px 0px 0px"
+      ROOTDIV.style.transform = "scale(#{contents_size.scale}, #{contents_size.scale})"
       ROOTDIV.style.width = "#{contents_size.width}px"
       ROOTDIV.style.height = "#{contents_size.height}px"
       ROOTDIV.style.left = "#{contents_size.left}px"
@@ -126,18 +151,23 @@ window.addEventListener "DOMContentLoaded", ->
   #===========================================================================
   # fit contents size to browser
   #===========================================================================
-  fitContentsSize = (apps)->
+  fitContentsSize = ->
     # get browser size
     BROWSER_FRAME = plustick.getBounds()
 
     # get browser size
     aspect = BROWSER_FRAME.size.aspect
 
-    if (apps.width? || apps.height?)
-      contents_width = apps.width || parseInt(Math.floor(apps.height * aspect))
-      contents_height = apps.height || parseInt(Math.floor(apps.width / aspect))
-      apps.width = contents_width
-      apps.height = contents_height
+    if (SITE_WIDTH != 'any' || SITE_HEIGHT != 'any')
+      if (SITE_WIDTH != 'any')
+        contents_width = SITE_WIDTH
+      else
+        contents_width = parseInt(Math.floor(SITE_HEIGHT * aspect))
+
+      if (SITE_HEIGHT != 'any')
+        contents_height = SITE_HEIGHT
+      else
+        contents_height = parseInt(Math.floor(SITE_WIDTH / aspect))
 
       # calc scale
       scale_x = BROWSER_FRAME.size.width / contents_width
@@ -161,15 +191,10 @@ window.addEventListener "DOMContentLoaded", ->
         top = 0
         scale = scale_y
 
-      ROOTDIV.style.transformOrigin = "0px 0px 0px"
-      ROOTDIV.style.transform = "scale(#{scale}, #{scale})"
-
     # does not fit contents size to browser
     else
       contents_width = BROWSER_FRAME.size.width
       contents_height = BROWSER_FRAME.size.height
-      apps.width = BROWSER_FRAME.size.width
-      apps.height = BROWSER_FRAME.size.height
       left = 0
       top = 0
       scale = 1.0
@@ -184,6 +209,8 @@ window.addEventListener "DOMContentLoaded", ->
       left: left
       top: top
       scale: scale
+      aspect: aspect
+
   #===========================================================================
 
   #---------------------------------------------------------------------------
@@ -273,7 +300,8 @@ window.addEventListener "DOMContentLoaded", ->
   splash_banner = document.createElement("div")
   splash_banner.style.display = "none"
   document.body.append(splash_banner)
-  contents_size = fitContentsSize(splash_banner)
+  contents_size = fitContentsSize()
+  echo contents_size
   splash_banner.setAttribute("id", "splash_banner")
   splash_banner.style.position = "absolute"
   splash_banner.style.width = "#{contents_size.width}px"
@@ -317,19 +345,16 @@ window.addEventListener "DOMContentLoaded", ->
     setTimeout ->
       splash_banner.remove() if (splash_banner?)
 
-      APPLICATION = new appsmain()
-
-      # get user setting
-      backgroundColor = APPLICATION.backgroundColor || "rgba(0, 0, 0, 1.0)"
-
       #------------------
-      # root view setting
+      # create root view
       #------------------
       ROOTDIV = document.createElement("div")
       ROOTDIV.setAttribute("id", "ROOTDIV")
       document.body.append(ROOTDIV)
 
-      contents_size = fitContentsSize(APPLICATION)
+      contents_size = fitContentsSize()
+      ROOTDIV.style.transformOrigin = "0px 0px 0px"
+      ROOTDIV.style.transform = "scale(#{contents_size.scale}, #{contents_size.scale})"
 
       ROOTDIV.style.position = "absolute"
       ROOTDIV.style.width = "#{contents_size.width}px"
@@ -337,9 +362,15 @@ window.addEventListener "DOMContentLoaded", ->
       ROOTDIV.style.left = "#{contents_size.left}px"
       ROOTDIV.style.top = "#{contents_size.top}px"
       ROOTDIV.style.margin = "0px 0px 0px 0px"
-      ROOTDIV.style.backgroundColor = backgroundColor
       ROOTDIV.style.overflow = "hidden"
 
+      #------------------
+      # create APPLICATION
+      #------------------
+      contents_size = fitContentsSize()
+      APPLICATION = new appsmain()
+      APPLICATION.width = contents_size.width
+      APPLICATION.height = contents_size.height
       document.oncontextmenu = =>
         contextmenu = APPLICATION.contextmenu
         return contextmenu
@@ -354,6 +385,7 @@ window.addEventListener "DOMContentLoaded", ->
 
       if (typeof APPLICATION.viewDidAppear == 'function')
         await APPLICATION.viewDidAppear()
+
     , 500
 
   , 1000
