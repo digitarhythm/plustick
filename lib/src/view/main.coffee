@@ -157,7 +157,6 @@ window.addEventListener "DOMContentLoaded", ->
   fitContentsSize = ->
     # get browser size
     BROWSER_FRAME = plustick.getBounds()
-    echo "BROWSER_FRAME.width=%@, BROWSER_FRAME.height=%@", BROWSER_FRAME.size.width, BROWSER_FRAME.size.height
 
     # calc browser aspect
     aspect = BROWSER_FRAME.size.aspect
@@ -177,16 +176,11 @@ window.addEventListener "DOMContentLoaded", ->
       scale_x = BROWSER_FRAME.size.width / contents_width
       scale_y = BROWSER_FRAME.size.height / contents_height
 
-      echo "contents_width=%@, contents_height=%@", contents_width, contents_height
-      echo "scale_x=%@, scale_y=%@", scale_x, scale_y
-
       height_tmp = contents_height * scale_x
       scale_mode = 1
 
       if (height_tmp > BROWSER_FRAME.size.height)
         scale_mode = 2
-
-      echo "scale_mode=%@", scale_mode
 
       # calc width/height
       if (scale_mode == 1)
@@ -395,7 +389,6 @@ window.addEventListener "DOMContentLoaded", ->
       if (typeof APPLICATION.createHtml == 'function')
         APPLICATION.browser_frame = BROWSER_FRAME
         html = await APPLICATION.createHtml()
-        echo html
         ROOTDIV.insertAdjacentHTML('beforeend', html)
 
       if (typeof APPLICATION.viewDidLoad == 'function')
