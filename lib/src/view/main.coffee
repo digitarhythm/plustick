@@ -131,6 +131,7 @@ window.addEventListener "DOMContentLoaded", ->
   window.addEventListener 'resize', ->
     if (__RESIZETIMEOUT__?)
       clearTimeout(__RESIZETIMEOUT__)
+
     __RESIZETIMEOUT__ = setTimeout ->
       #contents_size = fitContentsSize(APPLICATION)
       #contents_size = fitContentsSize({width:APPLICATION.width,height:APPLICATION.height})
@@ -156,30 +157,36 @@ window.addEventListener "DOMContentLoaded", ->
   fitContentsSize = ->
     # get browser size
     BROWSER_FRAME = plustick.getBounds()
+    echo "BROWSER_FRAME.width=%@, BROWSER_FRAME.height=%@", BROWSER_FRAME.size.width, BROWSER_FRAME.size.height
 
-    # get browser size
+    # calc browser aspect
     aspect = BROWSER_FRAME.size.aspect
 
     if (SITE_WIDTH != 'any' || SITE_HEIGHT != 'any')
-      if (SITE_WIDTH != 'any')
-        contents_width = SITE_WIDTH
-      else
+      if (SITE_WIDTH == 'any')
         contents_width = parseInt(Math.floor(SITE_HEIGHT * aspect))
-
-      if (SITE_HEIGHT != 'any')
-        contents_height = SITE_HEIGHT
       else
+        contents_width = SITE_WIDTH
+
+      if (SITE_HEIGHT == 'any')
         contents_height = parseInt(Math.floor(SITE_WIDTH / aspect))
+      else
+        contents_height = SITE_HEIGHT
 
       # calc scale
       scale_x = BROWSER_FRAME.size.width / contents_width
       scale_y = BROWSER_FRAME.size.height / contents_height
 
-      scale_mode = 1
+      echo "contents_width=%@, contents_height=%@", contents_width, contents_height
+      echo "scale_x=%@, scale_y=%@", scale_x, scale_y
+
       height_tmp = contents_height * scale_x
+      scale_mode = 1
 
       if (height_tmp > BROWSER_FRAME.size.height)
         scale_mode = 2
+
+      echo "scale_mode=%@", scale_mode
 
       # calc width/height
       if (scale_mode == 1)
@@ -296,13 +303,13 @@ window.addEventListener "DOMContentLoaded", ->
   document.body.setAttribute("id", "body")
   document.body.style.userSelect = "none"
   document.body.style.display = "none"
-  document.body.style.backgroundColor = "black"
 
   #---------------------------------------------------------------------------
   # Splash screen
   #---------------------------------------------------------------------------
-  splashimage = appsjson.site.splash.image || undefined
-  splashsize = appsjson.site.splash.size || "contain"
+  splash_image = appsjson.site.splash.image || undefined
+  splash_size = appsjson.site.splash.size || "contain"
+  splash_bgcolor = appsjson.site.splash.background_color || "rgba(255, 255, 255, 1.0)"
   splash_banner = document.createElement("div")
   splash_banner.style.display = "none"
   document.body.append(splash_banner)
@@ -314,23 +321,22 @@ window.addEventListener "DOMContentLoaded", ->
   splash_banner.style.left = "#{contents_size.left}px"
   splash_banner.style.top = "#{contents_size.top}px"
   splash_banner.style.margin = "0px 0px 0px 0px"
-  splash_banner.style.backgroundColor = "transparent"
+  splash_banner.style.backgroundColor = splash_bgcolor
   splash_banner.style.overflow = "hidden"
-  splash_banner.style.backgroundSize = splashsize
+  splash_banner.style.backgroundSize = splash_size
   splash_banner.style.backgroundPosition = "center"
   splash_banner.style.backgroundRepeat = "no-repeat"
   splash_banner.style.backgroundAttachment = "fixed"
-  if (splashimage?)
-    url = "url(#{SITEURL}/lib/img/#{splashimage})"
+  if (splash_image?)
+    url = "url(#{SITEURL}/lib/img/#{splash_image})"
   else
     url = "url(/splash.png)"
   splash_banner.style.backgroundImage = url
   splash_banner.style.display = "inline"
 
   #------------------
-  # body color
+  # body display
   #------------------
-  document.body.style.backgroundColor = sitejson.basecolor || "black"
   document.body.style.display = "inline"
 
   setTimeout ->
@@ -374,13 +380,14 @@ window.addEventListener "DOMContentLoaded", ->
       ROOTDIV.style.top = "#{contents_size.top}px"
       ROOTDIV.style.margin = "0px 0px 0px 0px"
       ROOTDIV.style.overflow = "hidden"
+      ROOTDIV.style.backgroundColor = "transparent"
 
       #------------------
       # create APPLICATION
       #------------------
       contents_size = fitContentsSize()
-      APPLICATION.width = contents_size.width
-      APPLICATION.height = contents_size.height
+      #APPLICATION.width = contents_size.width
+      #APPLICATION.height = contents_size.height
       document.oncontextmenu = =>
         contextmenu = APPLICATION.contextmenu
         return contextmenu
@@ -388,6 +395,7 @@ window.addEventListener "DOMContentLoaded", ->
       if (typeof APPLICATION.createHtml == 'function')
         APPLICATION.browser_frame = BROWSER_FRAME
         html = await APPLICATION.createHtml()
+        echo html
         ROOTDIV.insertAdjacentHTML('beforeend', html)
 
       if (typeof APPLICATION.viewDidLoad == 'function')
@@ -395,9 +403,6 @@ window.addEventListener "DOMContentLoaded", ->
 
       if (typeof APPLICATION.viewDidAppear == 'function')
         await APPLICATION.viewDidAppear()
-
-
-
 
     , 500
 

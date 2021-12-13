@@ -241,10 +241,14 @@ class plustick_core
           passive = true
         else
           pos = [
-            clientX: parseInt(event.clientX)
-            clientY: parseInt(event.clientY)
-            offsetX: parseInt(event.clientX - rect.left)
-            offsetY: parseInt(event.clientY - rect.top)
+            clientX: parseInt(event.clientX / BROWSER_FRAME.scale)
+            clientY: parseInt(event.clientY / BROWSER_FRAME.scale)
+            offsetX: parseInt((event.clientX - rect.left) / BROWSER_FRAME.scale)
+            offsetY: parseInt((event.clientY - rect.top) / BROWSER_FRAME.scale)
+            #clientX: parseInt(event.clientX)
+            #clientY: parseInt(event.clientY)
+            #offsetX: parseInt(event.clientX - rect.left)
+            #offsetY: parseInt(event.clientY - rect.top)
             kind: "mouse"
             force: 1.0
           ]

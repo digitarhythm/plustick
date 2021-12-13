@@ -128,8 +128,7 @@ libfileInclude = ->
   #----------------------------------
   CSSFILELIST = [].concat(SYSJSON.additional.front.css) || []
   CSSFILELIST = CSSFILELIST.concat(APPSJSON.additional.front.css)
-  JSSYSLIST = [].concat(SYSJSON.additional.front.javascript) || []
-  JSSYSLIST = JSSYSLIST.concat(APPSJSON.additional.front.javascript)
+  JSSYSLIST = []
 
   #----------------------------------
   # User CSS file include
@@ -145,7 +144,10 @@ libfileInclude = ->
   lists = __readFileList(PATHINFO.plugindir)
   for fname in lists
     if (fname.match(/^.*\.js$/))
-      JSSYSLIST.push("/#{SITE_URL}/plugin/#{fname}")
+      JSSYSLIST.push("#{SITE_URL}/plugin/#{fname}")
+  jsonsyslib = APPSJSON.additional.front.javascript
+  for fname in jsonsyslib
+    JSSYSLIST.push(fname)
 
   #----------------------------------
   # System library include
@@ -153,7 +155,7 @@ libfileInclude = ->
   lists = __readFileList(PATHINFO.syslibdir)
   for fname in lists
     if (fname.match(/^.*\.min\.js$/))
-      JSSYSLIST.push("include/#{fname}")
+      JSSYSLIST.push("#{SITE_URL}/include/#{fname}")
 
 #==========================================================================
 # get free port
@@ -183,11 +185,11 @@ generateManifest = ->
   manifest = manifest.replace(/\[\[\[:short_name:\]\]\]/g, PKGJSON.name)
   manifest = manifest.replace(/\[\[\[:name:\]\]\]/g, PKGJSON.name)
   manifest = manifest.replace(/\[\[\[:start_url:\]\]\]/g, SITE_URL)
+  manifest = manifest.replace(/\[\[\[:pkgname:\]\]\]/g, PKGNAME)
+  manifest = manifest.replace(/\[\[\[:background_color:\]\]\]/g, APPSJSON.site.basecolor)
   manifest = manifest.replace(/\[\[\[:display:\]\]\]/g, APPSJSON.site.pwa.display)
   manifest = manifest.replace(/\[\[\[:theme_color:\]\]\]/g, APPSJSON.site.pwa.theme_color)
-  manifest = manifest.replace(/\[\[\[:background_color:\]\]\]/g, APPSJSON.site.pwa.background_color)
-  janifest = manifest.replace(/\[\[\[:orientation:\]\]\]/g, APPSJSON.site.pwa.orientation)
-  manifest = manifest.replace(/\[\[\[:pkgname:\]\]\]/g, PKGNAME)
+  manifest = manifest.replace(/\[\[\[:orientation:\]\]\]/g, APPSJSON.site.pwa.orientation)
   fs.writeFileSync(MANIFEST_PATH, manifest, 'utf8')
 
 #==============================================================================
@@ -217,7 +219,10 @@ generateServiceworker = ->
 
   JSSYSLIST.forEach (f) =>
     if (!f.match(/main\.min\.js/))
-      cache_contents_list.push("  '#{SITE_URL}/#{f}'")
+      if (f.match(/^.*:\/\//))
+        cache_contents_list.push("  '#{f}'")
+      else
+        cache_contents_list.push("  '#{SITE_URL}/#{f}'")
 
   JSFILELIST.forEach (f) =>
     cache_contents_list.push("  '#{f}'")
@@ -242,8 +247,9 @@ generateIconFile = ->
     .catch (e) ->
       echo e
 
-  #------------------------
-
+  #----------------------------------
+  # create ICON file
+  #----------------------------------
   src_image = "#{PATHINFO.libdir}/img/apps-img.png"
   try
     stats = fs.statSync(src_image)
@@ -255,6 +261,13 @@ generateIconFile = ->
 
   for size in icon_size
     await convimage(size, src_image, dst_path).catch (e) ->
+      echo e
+
+  #----------------------------------
+  # favicon setting
+  #----------------------------------
+  favicon_path = "#{PATHINFO.libdir}/img/icons/favicon.png"
+  await convimage(144, src_image, favicon_path).catch (e) ->
       echo e
 
 #==============================================================================
@@ -321,7 +334,7 @@ app.get "/", (req, res) ->
   site_name = PKGJSON.name
   description = PKGJSON.description
 
-  favicon_uri = ""
+  favicon_uri = "#{SITE_URL}/lib/img/icons/favicon.png"
   ogpimg_uri = "img/OGP.png"
   twitter = ""
   facebook = ""
@@ -329,19 +342,19 @@ app.get "/", (req, res) ->
   #----------------------------------
   # favicon setting
   #----------------------------------
-  if (SITEJSON?)
-    if (SITE_URL != "")
-      if (SITEJSON.favicon? && SITEJSON.favicon != "")
-        favicon_uri = "#{SITE_URL}/lib/img/icons/#{SITEJSON.favicon}"
-      else
-        favicon_uri = "#{SITE_URL}/lib/img/icons/icon-192x192.png"
-    else
-      favicon_uri = ""
+  #if (SITEJSON?)
+  #  if (SITE_URL != "")
+  #    if (SITEJSON.favicon? && SITEJSON.favicon != "")
+  #      favicon_uri = "#{SITE_URL}/lib/img/icons/#{SITEJSON.favicon}"
+  #    else
+  #      favicon_uri = "#{SITE_URL}/lib/img/icons/icon-192x192.png"
+  #  else
+  #    favicon_uri = ""
 
-    if (SITEJSON.ogp?)
-      ogpimg_uri = "img/#{SITEJSON.ogp}"
-    else
-      ogpimg_uri = "img/OGP.png"
+  if (SITEJSON? && SITEJSON.ogp?)
+    ogpimg_uri = "#{SITE_URL}/lib/img/#{SITEJSON.ogp}"
+  else
+    ogpimg_uri = "#{SITE_URL}/lib/img/OGP.png"
 
   #----------------------------------
   # Production build
@@ -350,7 +363,7 @@ app.get "/", (req, res) ->
     # SNS info
     if (SNSJSON?)
       img = SNSJSON.ogp || "OGP.png"
-      ogpimg_uri = "img/#{img}"
+      ogpimg_uri = "#{SITE_URL}/lib/img/#{img}"
       twitter = SNSJSON.twitter || ""
       facebook = SNSJSON.facebook || ""
     else

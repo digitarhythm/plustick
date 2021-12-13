@@ -2,7 +2,7 @@ sqlite3 = require('sqlite3').verbose()
 echo = require("ndlog").echo
 fs = require("fs-extra")
 
-DBDIR = "#{APPSDIR}/apps/lib"
+DBDIR = "#{APPSDIR}/apps/database"
 
 class plustickdb_sqlite3
   constructor: ->
