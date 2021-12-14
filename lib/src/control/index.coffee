@@ -184,7 +184,7 @@ generateManifest = ->
   manifest = fs.readFileSync(MANIFEST_TMP, 'utf8')
   manifest = manifest.replace(/\[\[\[:short_name:\]\]\]/g, PKGJSON.name)
   manifest = manifest.replace(/\[\[\[:name:\]\]\]/g, PKGJSON.name)
-  manifest = manifest.replace(/\[\[\[:start_url:\]\]\]/g, SITE_URL)
+  manifest = manifest.replace(/\[\[\[:start_url:\]\]\]/g, START_URL)
   manifest = manifest.replace(/\[\[\[:pkgname:\]\]\]/g, PKGNAME)
   manifest = manifest.replace(/\[\[\[:background_color:\]\]\]/g, APPSJSON.site.basecolor)
   manifest = manifest.replace(/\[\[\[:display:\]\]\]/g, APPSJSON.site.pwa.display)
@@ -334,27 +334,22 @@ app.get "/", (req, res) ->
   site_name = PKGJSON.name
   description = PKGJSON.description
 
-  favicon_uri = "#{SITE_URL}/lib/img/icons/favicon.png"
-  ogpimg_uri = "img/OGP.png"
+  ogpimg_uri = "lib/img/OGP.png"
   twitter = ""
   facebook = ""
 
   #----------------------------------
   # favicon setting
   #----------------------------------
-  #if (SITEJSON?)
-  #  if (SITE_URL != "")
-  #    if (SITEJSON.favicon? && SITEJSON.favicon != "")
-  #      favicon_uri = "#{SITE_URL}/lib/img/icons/#{SITEJSON.favicon}"
-  #    else
-  #      favicon_uri = "#{SITE_URL}/lib/img/icons/icon-192x192.png"
-  #  else
-  #    favicon_uri = ""
+  favicon_uri = "#{SITE_URL}/lib/img/icons/favicon.png"
 
+  #----------------------------------
+  # OGP image setting
+  #----------------------------------
   if (SITEJSON? && SITEJSON.ogp?)
-    ogpimg_uri = "#{SITE_URL}/lib/img/#{SITEJSON.ogp}"
+    ogpimg_uri = "lib/img/#{SITEJSON.ogp}"
   else
-    ogpimg_uri = "#{SITE_URL}/lib/img/OGP.png"
+    ogpimg_uri = "lib/img/OGP.png"
 
   #----------------------------------
   # Production build
@@ -363,7 +358,7 @@ app.get "/", (req, res) ->
     # SNS info
     if (SNSJSON?)
       img = SNSJSON.ogp || "OGP.png"
-      ogpimg_uri = "#{SITE_URL}/lib/img/#{img}"
+      ogpimg_uri = "lib/img/#{img}"
       twitter = SNSJSON.twitter || ""
       facebook = SNSJSON.facebook || ""
     else
@@ -393,6 +388,7 @@ app.get "/", (req, res) ->
     jssyslist: JSSYSLIST
     NODE_ENV: NODE_ENV
     site_url: SITE_URL
+    start_url: START_URL
     ogpimg: ogpimg_uri
     favimg: favicon_uri
     title: title
