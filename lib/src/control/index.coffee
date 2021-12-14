@@ -185,6 +185,7 @@ generateManifest = ->
   manifest = manifest.replace(/\[\[\[:short_name:\]\]\]/g, PKGJSON.name)
   manifest = manifest.replace(/\[\[\[:name:\]\]\]/g, PKGJSON.name)
   manifest = manifest.replace(/\[\[\[:start_url:\]\]\]/g, START_URL)
+  manifest = manifest.replace(/\[\[\[:site_url:\]\]\]/g, SITE_URL)
   manifest = manifest.replace(/\[\[\[:pkgname:\]\]\]/g, PKGNAME)
   manifest = manifest.replace(/\[\[\[:background_color:\]\]\]/g, APPSJSON.site.basecolor)
   manifest = manifest.replace(/\[\[\[:display:\]\]\]/g, APPSJSON.site.pwa.display)
