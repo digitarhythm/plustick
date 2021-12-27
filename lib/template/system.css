@@ -29,3 +29,21 @@
     opacity: 0.0;
   }
 }
+
+table {
+	border-collapse: collapse;
+}
+
+th {
+  text-align: center;
+  vertical-align: middle;
+  border: 1px solid rgba(100, 100, 100, 0.5);
+  padding: 4px;
+}
+
+td {
+  text-align: left;
+  vertical-align: middle;
+  border: 1px solid rgba(100, 100, 100, 0.5);
+  padding: 4px;
+}
