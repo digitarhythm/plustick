@@ -6,6 +6,7 @@
   "background_color": "[[[:background_color:]]]",
   "orientation": "[[[:orientation:]]]",
   "scope": "/",
+  "id": "[[[:start_url:]]]",
   "start_url": "[[[:start_url:]]]",
   "icons": [
 		{
