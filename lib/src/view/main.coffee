@@ -373,7 +373,6 @@ window.addEventListener "DOMContentLoaded", ->
       ROOTDIV.style.left = "#{contents_size.left}px"
       ROOTDIV.style.top = "#{contents_size.top}px"
       ROOTDIV.style.margin = "0px 0px 0px 0px"
-      ROOTDIV.style.overflow = "hidden"
       ROOTDIV.style.backgroundColor = "transparent"
 
       #------------------
