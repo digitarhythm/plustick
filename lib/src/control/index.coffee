@@ -23,9 +23,14 @@ PATHINFO = require("#{__sysjsctrl}/pathinfo.min.js")
 # super global value
 #----------------------------------
 global.BIND_ROUTER = {}
+global.PLUSTICKLIBS = PATHINFO.sysjsctrl
+
 global.HOMEDIR = PATHINFO.homedir
 global.APPSDIR = PATHINFO.appsdir
-global.PLUSTICKLIBS = PATHINFO.sysjsctrl
+global.PUBLICDIR = PATHINFO.publicdir
+global.LIBDIR = PATHINFO.libdir
+global.PLUGINDIR = PATHINFO.plugindir
+global.STYLESHEETDIR = PATHINFO.stylesheetdir
 
 #----------------------------------
 # global value
