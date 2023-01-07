@@ -32,7 +32,7 @@ class appsmain extends viewController
   viewDidLoad: ->
     super()
     plustick.addListener
-      id: "contents"
+      id: @uniqueID
       type: "mousedown touchstart"
       listener: (event, frame) =>
         @click()
