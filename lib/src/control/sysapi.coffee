@@ -20,6 +20,7 @@ router.all "/:endpoint", (req, res) ->
   method = req.method
   endpoint = req.params.endpoint
   data = req.body
+  query = req.query
   headers = req.headers
   headers['method'] = method
 
@@ -60,7 +61,7 @@ router.all "/:endpoint", (req, res) ->
 
   else
     if (bind_router[endpoint]? && typeof(bind_router[endpoint]) == 'function')
-      bind_router[endpoint](headers, data).then (ret)=>
+      bind_router[endpoint](headers, data, query).then (ret)=>
         res.json(ret)
       .catch (e)=>
         res.json
