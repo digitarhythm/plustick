@@ -57,7 +57,7 @@ class appsmain extends viewController
     ret = await plustick.APICALL
       endpoint: 'version'
 
-    getElement("contents").innerHTML = """
+    setHtml("contents", """
       Apps Version: #{ret.version}
-    """
+    """)
 
