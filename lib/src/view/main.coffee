@@ -64,13 +64,13 @@ class viewController
     else
       html = await obj.createHtml()
       baseview.insertAdjacentHTML('beforeend', html)
-      obj.viewDidLoad()
-      obj.viewDidAppear()
+      await obj.viewDidLoad()
+      await obj.viewDidAppear()
 
   #----------------------
   #----------------------
   removeView:(param) ->
-    obj = param.viewobj || getElement(@uniqueID)
+    obj = getElement(param.viewobj.uniqueID) || getElement(@uniqueID)
     obj.remove()
     return undefined
 
@@ -97,7 +97,7 @@ class viewController
     @removeView
       viewobj: curr
 
-    APPLICATION = new curr()
+    APPLICATION = new obj()
 
 
   #----------------------

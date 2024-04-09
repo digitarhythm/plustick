@@ -31,13 +31,15 @@ echo = (a, b...) ->
   if (NODE_ENV == "develop")
     console.log(__strFormatter__(a, b...))
 
-
 #=============================================================================
 # DOM Operation
 #=============================================================================
 getElement = (id) ->
   return document.getElementById(id)
 
+#=============================================================================
+# HTML text into target index
+#=============================================================================
 setHtml = (id, html) ->
   elm = document.getElementById(id)
   if (elm?)
@@ -221,6 +223,7 @@ class plustick_core
         "mouseup"
         "touchstart"
         "touchmove"
+        "touchend"
       ]
       if (posevent.indexOf(type) >= 0)
         if (type.match(/touch.*/) || type == "tap")
@@ -286,7 +289,9 @@ class plustick_core
         if (!propagation)
           event.stopPropagation()
         method(event)
-      , capture, {passive: true}
+      , capture
+      , {passive: true}
+
       key="#{id}_#{t}"
       @eventlistener[key] =
         target: target
