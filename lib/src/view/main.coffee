@@ -99,6 +99,12 @@ class viewController
 
     APPLICATION = new obj()
 
+  #----------------------
+  # Bring view to front
+  #----------------------
+  bringViewToFront: ->
+    node = getElement(@uniqueID)
+    node.parentNode.appendChild(node)
 
   #----------------------
   #----------------------

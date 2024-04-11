@@ -436,11 +436,15 @@ class plustick_core
               beta: e.beta
               gamma: e.gamma
 
+  #=========================================================================
+  #=========================================================================
   removeOrientationProc: ->
     @removeListener
       id: "window"
       type: "deviceorientationabsolute"
 
+  #=========================================================================
+  #=========================================================================
   addMotionProc:(proc) ->
     if (APPLICATION.motion)
       @addListener
@@ -454,11 +458,15 @@ class plustick_core
               y: e.accelerationIncludingGravity.y
               z: e.accelerationIncludingGravity.z
 
+  #=========================================================================
+  #=========================================================================
   removeMotionProc: ->
     @removeListener
       id: "window"
       type: "devicemotion"
 
+  #=========================================================================
+  #=========================================================================
   enum:(arr) ->
     ret = {}
     for d, idx in arr
