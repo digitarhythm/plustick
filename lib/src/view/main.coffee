@@ -19,9 +19,9 @@ GLOBAL =
 
 DEVICEORIENTATION = false
 
-LIBDIR = "#{SITEURL}/lib"
-IMGDIR = "#{LIBDIR}/img"
-PUBLIC = "#{SITEURL}/public"
+global.LIBDIR = "#{SITEURL}/lib"
+global.IMGDIR = "#{LIBDIR}/img"
+global.PUBLIC = "#{SITEURL}/public"
 
 #===========================================================================
 # Query parameter
