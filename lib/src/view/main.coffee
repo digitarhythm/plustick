@@ -5,7 +5,6 @@ origintmp = window.location.href.replace(/\?.*$/, "")
 ORIGIN = origintmp.replace(/\/$/, "")
 PROTOCOL = (ORIGIN.match(/(^.*?):/))[1]
 SITEURL = "#{ORIGIN}/#{pkgname}"
-PUBLIC = "#{SITEURL}/public"
 LANGUAGE = window.navigator.language
 PWA = window.PWA
 
@@ -19,6 +18,10 @@ GLOBAL =
   PROC: {}
 
 DEVICEORIENTATION = false
+
+LIBDIR = "#{SITEURL}/lib"
+IMGDIR = "#{LIBDIR}/img"
+PUBLIC = "#{SITEURL}/public"
 
 #===========================================================================
 # Query parameter
