@@ -473,5 +473,29 @@ class plustick_core
       ret[d] = idx
     return ret
 
+  versionSort:(a, b) ->
+    splitRegExp = /\./
+
+    aHash = a.split(splitRegExp)
+    bHash = b.split(splitRegExp)
+
+    diffIndex = aHash.findIndex((aa, i) => aa != bHash[i])
+    if (diffIndex == -1)
+      return bHash.length - aHash.length
+
+    ax = aHash[diffIndex]
+    bx = bHash[diffIndex]
+
+    if (!bx)
+      return -1
+
+    na = Number(ax)
+    nb = Number(bx)
+
+    if (isNaN(na + nb))
+      return bx.localeCompare(ax)
+
+    return na - nb
+
 plustick = new plustick_core()
 
