@@ -10,10 +10,9 @@ packjson = require("#{HOMEDIR}/package.json")
 # API Sample
 #=============================================================================
 BIND_ROUTER.version = (headers, data, query) ->
-  return new Promise (resolve, reject) =>
-    version = packjson.version
-    ret =
-      version: version
+  version = packjson.version
+  ret =
+    version: version
 
-    resolve(ret)
+  return(ret)
 

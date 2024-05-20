@@ -61,11 +61,9 @@ router.all "/:endpoint", (req, res) ->
 
   else
     if (bind_router[endpoint]? && typeof(bind_router[endpoint]) == 'function')
-      bind_router[endpoint](headers, data, query).then (ret)=>
-        res.json(ret)
-      .catch (e)=>
-        res.json
-          error: e
+      echo("endpoint=%@", endpoint)
+      ret = await (bind_router[endpoint])(headers, data, query)
+      res.json(ret)
 
 module.exports = router
 
