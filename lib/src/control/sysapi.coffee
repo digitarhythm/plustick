@@ -61,7 +61,6 @@ router.all "/:endpoint", (req, res) ->
 
   else
     if (bind_router[endpoint]? && typeof(bind_router[endpoint]) == 'function')
-      echo("endpoint=%@", endpoint)
       ret = await (bind_router[endpoint])(headers, data, query)
       res.json(ret)
 
