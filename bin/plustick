@@ -17,9 +17,9 @@ function error() {
       echo "  -b: build application"
       echo "  -n: create new class"
       echo "  -w: build application(source watch)"
-      echo "  -a: activate application(forever)"
+      echo "  -a: activate application(pm2)"
       echo "  -d: debug exec application"
-      echo "  -t: terminate application(forever)"
+      echo "  -t: terminate application(pm2)"
       echo "  -h: print this"
       echo ""
       ;;
@@ -228,12 +228,13 @@ function optproc() {
         compile 0
       fi
       uid=`pwd -P`
-      list=`forever list | grep $uid`
+      list=`pm2 id ${uid}|awk '{print $2}'`
       num=${#list[*]}
       if [ $num -ge 1 ] && [ ! "$list" = "" ]; then
-        forever stop `pwd` > /dev/null 2>&1
+        pm2 id ${uid}|awk '{print $2}'|xargs -I'{}' pm2 delete {} > /dev/null 2>&1
       fi
-      forever start --uid `pwd` ./node_modules/plustick/lib/js/control/index.min.js > /dev/null 2>&1
+
+      pm2 start --name=`pwd` ./node_modules/plustick/lib/js/control/index.min.js > /dev/null 2>&1
       printf "${ESC}${YELLOW}Execute [${ESC}${GREEN}`pwd`${ESC}${YELLOW}] process.\n"
       ;;
     [d] )
@@ -244,10 +245,10 @@ function optproc() {
       ;;
     [t] )
       uid=`pwd -P`
-      list=`forever list | grep $uid`
+      list=`pm2 id ${uid}|awk '{print $2}'`
       num=${#list[*]}
       if [ $num -ge 1 ] && [ ! "$list" = "" ]; then
-        forever stop `pwd` > /dev/null 2>&1
+        pm2 id ${uid}|awk '{print $2}'|xargs -I'{}' pm2 delete {} > /dev/null 2>&1
         printf "${ESC}${YELLOW}[${ESC}${GREEN}`pwd`${ESC}${YELLOW}] process stopped.\n"
       fi
       ;;
