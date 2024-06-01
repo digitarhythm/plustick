@@ -4,8 +4,8 @@
   "description": "rapid build node.js frame work.",
   "main": "index.min.js",
   "scripts": {
-    "start": "NODE_ENV=production forever start --uid `pwd` ./apps/js/control/index.min.js",
-    "stop": "forever stop `pwd`",
+    "start": "NODE_ENV=production pm2 start --name=`pwd` ./apps/js/control/index.min.js",
+    "stop": "pm2 stop --name=`pwd`",
     "debug": "NODE_ENV=develop node-dev ./apps/js/control/index.min.js"
   },
   "repository": {
@@ -33,13 +33,13 @@
     "config": "^3.3.2",
     "ect": "^0.5.9",
     "express": "^4.17.1",
-    "forever": "^0.15.3",
     "fs-extra": "^9.0.1",
     "httpolyglot": "^0.1.2",
     "ndlog": "^0.3.2",
     "net": "^1.0.2",
     "node-dev": "^5.2.0",
     "path": "^0.12.7",
+    "pm2": "^5.4.0",
     "process": "^0.11.10",
     "sharp": "^0.28.3",
     "sqlite3": "^5.0.0",
