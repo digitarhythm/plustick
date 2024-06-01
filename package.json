@@ -40,6 +40,7 @@
     "node-dev": "^5.2.0",
     "path": "^0.12.7",
     "process": "^0.11.10",
+    "request-promise": "^4.2.6",
     "sharp": "^0.28.3",
     "sqlite3": "^5.0.0",
     "terffee": "^1.7.2",
