@@ -195,19 +195,19 @@ class plustick_core
   # add event listener
   #===========================================================================
   addListener:(param) ->
-    id = param.id || undefined
+    target_id = param.id || undefined
     type = param.type || undefined
     listener = param.listener || undefined
     capture = param.capture || false
     propagation = param.propagation || false
 
-    if (!id? || !type?)
+    if (!target_id? || !type?)
       return
 
     typelist = type.split(/ /)
     for t in typelist
       @removeListener
-        id: id
+        id: target_id
         type: t
 
     method1 = (event) ->
@@ -270,11 +270,14 @@ class plustick_core
           size: size
           pos: pos
 
+        event.target_id = target_id
         listener(event, frame)
       else
+        event.target_id = target_id
         listener(event)
 
     method2 = (event) ->
+      event.target_id = target_id
       listener(event)
 
     if (id == "window")
@@ -283,8 +286,6 @@ class plustick_core
     else
       target = getElement(id)
       method = method1
-
-    event.target_id = id
 
     for t in typelist
       target.addEventListener t, (event) =>
