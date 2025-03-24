@@ -211,7 +211,6 @@ class plustick_core
         type: t
 
     method1 = (event) ->
-      event.target_id = id
       rect = event.currentTarget.getBoundingClientRect()
       type = event.type
       posevent = [
@@ -276,7 +275,6 @@ class plustick_core
         listener(event)
 
     method2 = (event) ->
-      event.target_id = id
       listener(event)
 
     if (id == "window")
@@ -290,7 +288,7 @@ class plustick_core
       target.addEventListener t, (event) =>
         if (!propagation)
           event.stopPropagation()
-        method(event)
+        method(event, id)
       , capture
       , {passive: true}
 
