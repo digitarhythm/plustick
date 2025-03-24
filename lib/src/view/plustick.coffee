@@ -284,6 +284,8 @@ class plustick_core
       target = getElement(id)
       method = method1
 
+    event.target_id = id
+
     for t in typelist
       target.addEventListener t, (event) =>
         if (!propagation)
