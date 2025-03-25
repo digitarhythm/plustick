@@ -269,6 +269,7 @@ class plustick_core
         frame =
           size: size
           pos: pos
+          id: event.target.id
 
         listener(event, frame)
       else
@@ -288,7 +289,7 @@ class plustick_core
       target.addEventListener t, (event) =>
         if (!propagation)
           event.stopPropagation()
-        method(event, id)
+        method(event)
       , capture
       , {passive: true}
 
