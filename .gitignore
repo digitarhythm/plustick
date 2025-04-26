@@ -1,5 +1,4 @@
 .git
-*.js
 
 !lib/include/*
 
