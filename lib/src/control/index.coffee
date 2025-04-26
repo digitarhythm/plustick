@@ -44,7 +44,7 @@ NODE_ENV = process.env.NODE_ENV || "production"
 START_URL = config.application.start_url.replace(/\/$/, '')
 LISTEN_PORT = undefined
 
-SITE_URL = undefined
+SITE_NAME = PKGJSON.name
 
 MANIFEST_TMP = undefined
 MANIFEST_URI = undefined
@@ -141,7 +141,7 @@ libfileInclude = ->
   lists = __readFileList(PATHINFO.stylesheetdir)
   for fname in lists
     if (fname.match(/^.*\.css$/))
-      CSSFILELIST.push("#{SITE_URL}/stylesheet/#{fname}")
+      CSSFILELIST.push("#{SITE_NAME}/stylesheet/#{fname}")
 
   #----------------------------------
   # User plugin include
@@ -149,7 +149,7 @@ libfileInclude = ->
   lists = __readFileList(PATHINFO.plugindir)
   for fname in lists
     if (fname.match(/^.*\.js$/))
-      JSSYSLIST.push("#{SITE_URL}/plugin/#{fname}")
+      JSSYSLIST.push("#{SITE_NAME}/plugin/#{fname}")
   jsonsyslib = APPSJSON.additional.front.javascript
   for fname in jsonsyslib
     JSSYSLIST.push(fname)
@@ -160,7 +160,7 @@ libfileInclude = ->
   lists = __readFileList(PATHINFO.syslibdir)
   for fname in lists
     if (fname.match(/^.*\.min\.js$/))
-      JSSYSLIST.push("#{SITE_URL}/include/#{fname}")
+      JSSYSLIST.push("#{SITE_NAME}/include/#{fname}")
 
 #==========================================================================
 # get free port
@@ -190,7 +190,6 @@ generateManifest = ->
   manifest = manifest.replace(/\[\[\[:short_name:\]\]\]/g, PKGJSON.name)
   manifest = manifest.replace(/\[\[\[:name:\]\]\]/g, PKGJSON.name)
   manifest = manifest.replace(/\[\[\[:start_url:\]\]\]/g, START_URL)
-  manifest = manifest.replace(/\[\[\[:site_url:\]\]\]/g, SITE_URL)
   manifest = manifest.replace(/\[\[\[:pkgname:\]\]\]/g, PKGNAME)
   manifest = manifest.replace(/\[\[\[:background_color:\]\]\]/g, APPSJSON.site.basecolor)
   manifest = manifest.replace(/\[\[\[:display:\]\]\]/g, APPSJSON.site.pwa.display)
@@ -203,11 +202,11 @@ generateManifest = ->
 #==============================================================================
 generateServiceworker = ->
   if (NODE_ENV == "production")
-    uri = "#{SITE_URL}/api/__getappsinfo__"
-    cache_contents_list = ["'/'", "  '#{SITE_URL}/view/appsmain.min.js'", "  '#{SITE_URL}/template/system.css'"]
+    uri = "#{SITE_NAME}/api/__getappsinfo__"
+    cache_contents_list = ["'/'", "  '#{SITE_NAME}/view/appsmain.min.js'", "  '#{SITE_NAME}/template/system.css'"]
   else
-    uri = "#{SITE_URL}/api/__getappsinfo__"
-    cache_contents_list = ["'/'", "  '#{SITE_URL}/view/appsmain.min.js'", "  '#{SITE_URL}/template/system.css'"]
+    uri = "#{SITE_NAME}/api/__getappsinfo__"
+    cache_contents_list = ["'/'", "  '#{SITE_NAME}/view/appsmain.min.js'", "  '#{SITE_NAME}/template/system.css'"]
 
   try
     ret = await axios.get(uri)
@@ -219,7 +218,7 @@ generateServiceworker = ->
   serviceworker = serviceworker.replace(/\[\[\[:name:\]\]\]/, PKGJSON.name)
   serviceworker = serviceworker.replace(/\[\[\[:version:\]\]\]/, PKGJSON.version)
 
-  SYSTEMCSS = "#{SITE_URL}/template/system.css"
+  SYSTEMCSS = "#{SITE_NAME}/template/system.css"
   CSSFILELIST.forEach (f) =>
     cache_contents_list.push("  '#{f}'")
 
@@ -228,7 +227,7 @@ generateServiceworker = ->
       if (f.match(/^.*:\/\//))
         cache_contents_list.push("  '#{f}'")
       else
-        cache_contents_list.push("  '#{SITE_URL}/#{f}'")
+        cache_contents_list.push("  '#{SITE_NAME}/#{f}'")
 
   JSFILELIST.forEach (f) =>
     cache_contents_list.push("  '#{f}'")
@@ -312,32 +311,29 @@ appsInit = ->
 
   LISTEN_PORT = port
 
-  if (config.application.start_url?)
-    SITE_URL = "#{START_URL}/#{PKGNAME}"
-  else
-    SITE_URL = "http://localhost:#{LISTEN_PORT}/#{PKGNAME}"
-
   MANIFEST_TMP = "#{PATHINFO.templatedir}/manifest.json"
   SERVICEWORKER_TMP = "#{PATHINFO.templatedir}/serviceworker.js"
 
   if (NODE_ENV == "develop")
-    MANIFEST_URI = "#{SITE_URL}/lib/manifest.#{NODE_ENV}.json"
+    MANIFEST_URI = "#{SITE_NAME}/lib/manifest.#{NODE_ENV}.json"
     MANIFEST_PATH = "#{PATHINFO.libdir}/manifest.#{NODE_ENV}.json"
     SERVICEWORKER_PATH = "#{PATHINFO.libdir}/serviceworker.#{NODE_ENV}.js"
   else
-    MANIFEST_URI = "#{SITE_URL}/lib/manifest.json"
+    MANIFEST_URI = "#{SITE_NAME}/lib/manifest.json"
     MANIFEST_PATH = "#{PATHINFO.libdir}/manifest.json"
     SERVICEWORKER_PATH = "#{PATHINFO.libdir}/serviceworker.js"
 
 #==========================================================================
 # router setting
 #==========================================================================
-app.get "/", (req, res) ->
+appget = (req, res) ->
+  name = req.params.name
+  echo("name=%@", name)
+
   #----------------------------------
   # Template engine value
   #----------------------------------
   title = PKGJSON.name
-  site_name = PKGJSON.name
   description = PKGJSON.description
 
   ogpimg_uri = "lib/img/OGP.png"
@@ -347,7 +343,7 @@ app.get "/", (req, res) ->
   #----------------------------------
   # favicon setting
   #----------------------------------
-  favicon_uri = "#{SITE_URL}/lib/img/icons/favicon.png"
+  favicon_uri = "#{SITE_NAME}/lib/img/icons/favicon.png"
 
   #----------------------------------
   # OGP image setting
@@ -393,12 +389,11 @@ app.get "/", (req, res) ->
     cssfilelist: CSSFILELIST
     jssyslist: JSSYSLIST
     NODE_ENV: NODE_ENV
-    site_url: SITE_URL
     start_url: START_URL
     ogpimg: ogpimg_uri
     favimg: favicon_uri
     title: title
-    site_name: site_name
+    site_name: SITE_NAME
     description: description
     twitter: twitter
     facebook: facebook
@@ -407,6 +402,16 @@ app.get "/", (req, res) ->
     manifest: MANIFEST_URI
     site_width: SITE_WIDTH
     site_height: SITE_HEIGHT
+
+#==========================================================================
+# Express dispatcher
+#==========================================================================
+app.get "/:name", (req, res) ->
+  appget(req, res)
+
+app.get "/", (req, res) ->
+  echo("root access")
+  appget(req, res)
 
 #==========================================================================
 # execute modules
