@@ -41,7 +41,6 @@ SYSAPI = require("#{PATHINFO.sysjsctrl}/sysapi.min.js")
 PKGJSON = require("#{process.cwd()}/package.json")
 
 NODE_ENV = process.env.NODE_ENV || "production"
-START_URL = config.application.start_url.replace(/\/$/, '')
 LISTEN_PORT = undefined
 
 SITE_NAME = PKGJSON.name
@@ -189,7 +188,6 @@ generateManifest = ->
   manifest = fs.readFileSync(MANIFEST_TMP, 'utf8')
   manifest = manifest.replace(/\[\[\[:short_name:\]\]\]/g, PKGJSON.name)
   manifest = manifest.replace(/\[\[\[:name:\]\]\]/g, PKGJSON.name)
-  manifest = manifest.replace(/\[\[\[:start_url:\]\]\]/g, START_URL)
   manifest = manifest.replace(/\[\[\[:pkgname:\]\]\]/g, PKGNAME)
   manifest = manifest.replace(/\[\[\[:background_color:\]\]\]/g, APPSJSON.site.basecolor)
   manifest = manifest.replace(/\[\[\[:display:\]\]\]/g, APPSJSON.site.pwa.display)
@@ -389,7 +387,6 @@ appget = (req, res) ->
     cssfilelist: CSSFILELIST
     jssyslist: JSSYSLIST
     NODE_ENV: NODE_ENV
-    start_url: START_URL
     ogpimg: ogpimg_uri
     favimg: favicon_uri
     title: title
