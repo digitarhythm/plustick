@@ -55,6 +55,7 @@ else
   SUBPATH = "/#{envpath}"
 
 SITE_NAME = PKGJSON.name
+START_URL = "#{SUBPATH}/#{SITE_NAME}"
 
 MANIFEST_TMP = undefined
 MANIFEST_URI = undefined
@@ -199,7 +200,7 @@ generateManifest = ->
   manifest = fs.readFileSync(MANIFEST_TMP, 'utf8')
   manifest = manifest.replace(/\[\[\[:short_name:\]\]\]/g, PKGJSON.name)
   manifest = manifest.replace(/\[\[\[:name:\]\]\]/g, PKGJSON.name)
-  #manifest = manifest.replace(/\[\[\[:start_url:\]\]\]/g, START_URL)
+  manifest = manifest.replace(/\[\[\[:start_url:\]\]\]/g, START_URL)
   #manifest = manifest.replace(/\[\[\[:site_url:\]\]\]/g, SITE_URL)
   manifest = manifest.replace(/\[\[\[:pkgname:\]\]\]/g, PKGNAME)
   manifest = manifest.replace(/\[\[\[:background_color:\]\]\]/g, APPSJSON.site.basecolor)
