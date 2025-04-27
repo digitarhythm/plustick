@@ -199,8 +199,12 @@ generateManifest = ->
 # generate service worker
 #==============================================================================
 generateServiceworker = ->
-  uri = "#{SITE_NAME}/api/__getappsinfo__"
-  cache_contents_list = ["'/'", "  '#{SITE_NAME}/view/appsmain.min.js'", "  '#{SITE_NAME}/template/system.css'"]
+  if (NODE_ENV == "production")
+    uri = "#{SITE_NAME}/api/__getappsinfo__"
+    cache_contents_list = ["'/'", "  '#{SITE_NAME}/view/appsmain.min.js'", "  '#{SITE_NAME}/template/system.css'"]
+  else
+    uri = "#{SITE_NAME}/api/__getappsinfo__"
+    cache_contents_list = ["'/'", "  '#{SITE_NAME}/view/appsmain.min.js'", "  '#{SITE_NAME}/template/system.css'"]
 
   try
     ret = await axios.get(uri)
@@ -399,9 +403,6 @@ appget = (req, res) ->
 # Express dispatcher
 #==========================================================================
 app.get "/", (req, res) ->
-  appget(req, res)
-
-app.get "/:name", (req, res) ->
   appget(req, res)
 
 #==========================================================================
