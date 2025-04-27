@@ -41,8 +41,14 @@ SYSAPI = require("#{PATHINFO.sysjsctrl}/sysapi.min.js")
 PKGJSON = require("#{process.cwd()}/package.json")
 
 NODE_ENV = process.env.NODE_ENV || "production"
+if (NODE_ENV == "develop")
+  ENVJSON = require("#{PATHINFO.appsdir}/config/develop.json")
+else
+  ENVJSON = require("#{PATHINFO.appsdir}/config/default.json")
+
 LISTEN_PORT = undefined
 
+SUBPATH = "/#{ENVJSON.application.path}"
 SITE_NAME = PKGJSON.name
 
 MANIFEST_TMP = undefined
@@ -95,15 +101,15 @@ app.set("view engine", "ect")
 #==========================================================================
 directoryBinding = ->
   app.use("/", express.static(PATHINFO.libdir))
-  app.use("/#{PKGNAME}/plugin", express.static(PATHINFO.plugindir))
-  app.use("/#{PKGNAME}/stylesheet", express.static(PATHINFO.stylesheetdir))
-  app.use("/#{PKGNAME}/public", express.static(PATHINFO.publicdir))
-  app.use("/#{PKGNAME}/view", express.static(PATHINFO.usrjsview))
-  app.use("/#{PKGNAME}/lib", express.static(PATHINFO.libdir))
-  app.use("/#{PKGNAME}/syslib", express.static(PATHINFO.sysjsview))
-  app.use("/#{PKGNAME}/include", express.static(PATHINFO.syslibdir))
-  app.use("/#{PKGNAME}/template", express.static(PATHINFO.templatedir))
-  app.use("/#{PKGNAME}/api", SYSAPI)
+  app.use("#{SUBPATH}/#{PKGNAME}/plugin", express.static(PATHINFO.plugindir))
+  app.use("#{SUBPATH}/#{PKGNAME}/stylesheet", express.static(PATHINFO.stylesheetdir))
+  app.use("#{SUBPATH}/#{PKGNAME}/public", express.static(PATHINFO.publicdir))
+  app.use("#{SUBPATH}/#{PKGNAME}/view", express.static(PATHINFO.usrjsview))
+  app.use("#{SUBPATH}/#{PKGNAME}/lib", express.static(PATHINFO.libdir))
+  app.use("#{SUBPATH}/#{PKGNAME}/syslib", express.static(PATHINFO.sysjsview))
+  app.use("#{SUBPATH}/#{PKGNAME}/include", express.static(PATHINFO.syslibdir))
+  app.use("#{SUBPATH}/#{PKGNAME}/template", express.static(PATHINFO.templatedir))
+  app.use("#{SUBPATH}/#{PKGNAME}/api", SYSAPI)
 
 #==========================================================================
 # read file list function
@@ -403,6 +409,11 @@ appget = (req, res) ->
 # Express dispatcher
 #==========================================================================
 app.get "/", (req, res) ->
+  appget(req, res)
+
+app.get "/:name", (req, res) ->
+  name = req.params.name
+  SUBPATH += "/#{name}"
   appget(req, res)
 
 #==========================================================================
