@@ -24,7 +24,7 @@ router.all "/:endpoint", (req, res) ->
   headers = req.headers
   headers['method'] = method
 
-  if (NODE_ENV == "production")
+  if (NODE_ENV != "develop")
     origin = headers.origin
     referer = headers.referer.replace(/\/\?.*$/, "") || ""
     if (origin != referer.replace(/\/$/, ""))

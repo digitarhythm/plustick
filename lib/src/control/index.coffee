@@ -53,6 +53,7 @@ if (envpath == "")
   SUBPATH = ""
 else
   SUBPATH = "/#{envpath}"
+
 SITE_NAME = PKGJSON.name
 
 MANIFEST_TMP = undefined
@@ -104,7 +105,7 @@ app.set("view engine", "ect")
 # uri directory binding
 #==========================================================================
 directoryBinding = ->
-  app.use("#{SUBPATH}/", express.static(PATHINFO.libdir))
+  app.use("/", express.static(PATHINFO.libdir))
   app.use("#{SUBPATH}/#{PKGNAME}/plugin", express.static(PATHINFO.plugindir))
   app.use("#{SUBPATH}/#{PKGNAME}/stylesheet", express.static(PATHINFO.stylesheetdir))
   app.use("#{SUBPATH}/#{PKGNAME}/public", express.static(PATHINFO.publicdir))
@@ -209,12 +210,8 @@ generateManifest = ->
 # generate service worker
 #==============================================================================
 generateServiceworker = ->
-  if (NODE_ENV == "production")
-    uri = "#{SITE_NAME}/api/__getappsinfo__"
-    cache_contents_list = ["'/'", "  '#{SITE_NAME}/view/appsmain.min.js'", "  '#{SITE_NAME}/template/system.css'"]
-  else
-    uri = "#{SITE_NAME}/api/__getappsinfo__"
-    cache_contents_list = ["'/'", "  '#{SITE_NAME}/view/appsmain.min.js'", "  '#{SITE_NAME}/template/system.css'"]
+  uri = "#{SITE_NAME}/api/__getappsinfo__"
+  cache_contents_list = ["'/'", "  '#{SITE_NAME}/view/appsmain.min.js'", "  '#{SITE_NAME}/template/system.css'"]
 
   try
     ret = await axios.get(uri)
@@ -363,7 +360,7 @@ appget = (req, res) ->
   #----------------------------------
   # Production build
   #----------------------------------
-  if (NODE_ENV == "production")
+  if (NODE_ENV != "develop")
     # SNS info
     if (SNSJSON?)
       img = SNSJSON.ogp || "OGP.png"
@@ -413,6 +410,7 @@ appget = (req, res) ->
 # Express dispatcher
 #==========================================================================
 app.get "/", (req, res) ->
+  SUBPATH = ""
   appget(req, res)
 
 app.get "/:name", (req, res) ->
