@@ -48,7 +48,11 @@ else
 
 LISTEN_PORT = undefined
 
-SUBPATH = "/#{ENVJSON.application.path}"
+envpath = ENVJSON.application.path
+if (envpath == "")
+  SUBPATH = ""
+else
+  SUBPATH = "/#{envpath}"
 SITE_NAME = PKGJSON.name
 
 MANIFEST_TMP = undefined
@@ -100,7 +104,7 @@ app.set("view engine", "ect")
 # uri directory binding
 #==========================================================================
 directoryBinding = ->
-  app.use("/", express.static(PATHINFO.libdir))
+  app.use("#{SUBPATH}/", express.static(PATHINFO.libdir))
   app.use("#{SUBPATH}/#{PKGNAME}/plugin", express.static(PATHINFO.plugindir))
   app.use("#{SUBPATH}/#{PKGNAME}/stylesheet", express.static(PATHINFO.stylesheetdir))
   app.use("#{SUBPATH}/#{PKGNAME}/public", express.static(PATHINFO.publicdir))
@@ -413,7 +417,7 @@ app.get "/", (req, res) ->
 
 app.get "/:name", (req, res) ->
   name = req.params.name
-  SUBPATH += "/#{name}"
+  SUBPATH = "/#{name}/"
   appget(req, res)
 
 #==========================================================================
