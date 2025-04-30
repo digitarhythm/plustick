@@ -380,20 +380,18 @@ class plustick_core
     data = param.data || {}
     headers = param.headers || {}
     timeout = param.timeout || 1000
-
     headers['content-type'] = "application/json"
 
-    if (uri?)
-      apiuri = uri
-    else
-      apiuri = "#{SITEURL}/api/#{endpoint}"
-
-    ret = await axios
-      method: method
-      url: apiuri
-      headers: headers
-      data: data
+    apiuri = uri || endpoint
+    client = await axios.create
       timeout: timeout
+      headers: headers
+      baseURL: "#{SITEURL}/api"
+    switch method
+      when "POST"
+        ret = await client.post(apiuri, data)
+      when "GET"
+        ret = await client.get(apiuri, data)
 
     if (ret.data.error? && ret.data.error < 0)
       return -2
