@@ -379,7 +379,7 @@ class plustick_core
     uri = param.uri || undefined
     data = param.data || {}
     headers = param.headers || {}
-    timeout = param.timeout || 1000
+    timeout = param.timeout || 1000*30
     headers['content-type'] = "application/json"
 
     apiuri = uri || endpoint
