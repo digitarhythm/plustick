@@ -379,6 +379,8 @@ class plustick_core
     uri = param.uri || undefined
     data = param.data || {}
     headers = param.headers || {}
+    timeout = param.timeout || 1000
+
     headers['content-type'] = "application/json"
 
     if (uri?)
@@ -391,6 +393,7 @@ class plustick_core
       url: apiuri
       headers: headers
       data: data
+      timeout: timeout
 
     if (ret.data.error? && ret.data.error < 0)
       return -2
