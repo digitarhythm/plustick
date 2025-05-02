@@ -70,6 +70,8 @@ SITEJSON = undefined
 SYSTEMCSS = undefined
 SNSJSON = undefined
 
+#SITE_URL = APPJSON.site.pwa.site_url
+
 PKGNAME = PATHINFO.pkgname
 PWA = if (APPSJSON.site.pwa.installed == true) then "activate" else "inactivate"
 
@@ -213,8 +215,8 @@ generateManifest = ->
 # generate service worker
 #==============================================================================
 generateServiceworker = ->
-  uri = "#{SITE_NAME}/api/__getappsinfo__"
-  cache_contents_list = ["'/'", "  '#{SITE_NAME}/view/appsmain.min.js'", "  '#{SITE_NAME}/template/system.css'"]
+  uri = "#{START_URL}/api/__getappsinfo__"
+  cache_contents_list = ["'/'", "  '#{START_URL}/view/appsmain.min.js'", "  '#{SITE_NAME}/template/system.css'"]
 
   try
     ret = await axios.get(uri)
@@ -413,10 +415,16 @@ appget = (req, res) ->
 # Express dispatcher
 #==========================================================================
 app.get "/", (req, res) ->
+  address = req.headers['x-real-ip']
+  uagent = req.headers['user-agent']
+  echo("address:%@, user-agent:%@", address, uagent)
   SUBPATH = ""
   appget(req, res)
 
 app.get "/:name", (req, res) ->
+  address = req.headers['x-real-ip']
+  uagent = req.headers['user-agent']
+  echo("address:%@, user-agent:%@", address, uagent)
   name = req.params.name
   SUBPATH = "/#{name}/"
   appget(req, res)
