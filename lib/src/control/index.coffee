@@ -416,15 +416,17 @@ appget = (req, res) ->
 #==========================================================================
 app.get "/", (req, res) ->
   address = req.headers['x-real-ip']
+  address2 = req.headers['X-Forwarded-For']
   uagent = req.headers['user-agent']
-  echo("address:%@, user-agent:%@", address, uagent)
+  echo("%@/%@, user-agent:%@", address, address2, uagent)
   SUBPATH = ""
   appget(req, res)
 
 app.get "/:name", (req, res) ->
   address = req.headers['x-real-ip']
+  address2 = req.headers['X-Forwarded-For']
   uagent = req.headers['user-agent']
-  echo("address:%@, user-agent:%@", address, uagent)
+  echo("%@/%@, user-agent:%@", address, address2, uagent)
   name = req.params.name
   SUBPATH = "/#{name}/"
   appget(req, res)
