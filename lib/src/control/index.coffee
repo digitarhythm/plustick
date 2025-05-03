@@ -232,15 +232,15 @@ generateServiceworker = ->
   CSSFILELIST.forEach (f) =>
     cache_contents_list.push("  '#{f}'")
 
+  JSFILELIST.forEach (f) =>
+    cache_contents_list.push("  '#{f}'")
+
   JSSYSLIST.forEach (f) =>
     if (!f.match(/main\.min\.js/))
       if (f.match(/^.*:\/\//))
         cache_contents_list.push("  '#{f}'")
       else
         cache_contents_list.push("  '#{SITE_NAME}/#{f}'")
-
-  JSFILELIST.forEach (f) =>
-    cache_contents_list.push("  '#{f}'")
 
   cache_contents = cache_contents_list.join(",\n")
   serviceworker = serviceworker.replace(/\[\[\[:cache_contents:\]\]\]/, cache_contents)

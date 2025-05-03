@@ -47,16 +47,15 @@
       SITE_HEIGHT = "<%= @site_height %>";
     </script>
 
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js" defer></script>
     <script type="text/javascript" src="<%= @site_name %>/syslib/plustick.min.js" defer></script>
+    <% for f in @jssyslist : %>
+      <script async type="text/javascript" src="<%= f %>" defer></script>
+    <% end %>
   </head>
   <body style="margin: 0px 0px 0px 0px; overflow:hidden; background-color:<%= @bgcolor %>; overscroll-behavior:none;">
     <script type="text/javascript" src="<%= @site_name %>/syslib/main.min.js" defer></script>
     <script type="text/javascript" src="<%= @site_name %>/view/appsmain.min.js" defer></script>
-
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js" defer></script>
-    <% for f in @jssyslist : %>
-      <script async type="text/javascript" src="<%= f %>" defer></script>
-    <% end %>
   </body>
 </html>
 
