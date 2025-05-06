@@ -108,7 +108,7 @@ app.set("view engine", "ect")
 # uri directory binding
 #==========================================================================
 directoryBinding = ->
-  app.use("/", express.static(PATHINFO.libdir))
+  app.use("#{SUBPATH}/#{PKGNAME}", express.static(PATHINFO.libdir))
   app.use("#{SUBPATH}/#{PKGNAME}/plugin", express.static(PATHINFO.plugindir))
   app.use("#{SUBPATH}/#{PKGNAME}/stylesheet", express.static(PATHINFO.stylesheetdir))
   app.use("#{SUBPATH}/#{PKGNAME}/public", express.static(PATHINFO.publicdir))
@@ -216,7 +216,7 @@ generateManifest = ->
 #==============================================================================
 generateServiceworker = ->
   uri = "#{START_URL}/api/__getappsinfo__"
-  cache_contents_list = ["'/'", "  '#{START_URL}/view/appsmain.min.js'", "  '#{SITE_NAME}/template/system.css'"]
+  cache_contents_list = ["'/'", "  '#{SUBPATH}/#{PKGNAME}/view/appsmain.min.js'", "  '#{SUBPATH}/#{PKGNAME}/template/system.css'"]
 
   try
     ret = await axios.get(uri)
@@ -228,19 +228,19 @@ generateServiceworker = ->
   serviceworker = serviceworker.replace(/\[\[\[:name:\]\]\]/, PKGJSON.name)
   serviceworker = serviceworker.replace(/\[\[\[:version:\]\]\]/, PKGJSON.version)
 
-  SYSTEMCSS = "#{SITE_NAME}/template/system.css"
+  SYSTEMCSS = "#{SUBPATH}/#{PKGNAME}/template/system.css"
   CSSFILELIST.forEach (f) =>
-    cache_contents_list.push("  '#{f}'")
+    cache_contents_list.push("  '#{SUBPATH}/#{f}'")
 
   JSFILELIST.forEach (f) =>
-    cache_contents_list.push("  '#{f}'")
+    cache_contents_list.push("  '#{SUBPATH}/#{f}'")
 
   JSSYSLIST.forEach (f) =>
     if (!f.match(/main\.min\.js/))
       if (f.match(/^.*:\/\//))
         cache_contents_list.push("  '#{f}'")
       else
-        cache_contents_list.push("  '#{SITE_NAME}/#{f}'")
+        cache_contents_list.push("  '#{SUBPATH}/#{f}'")
 
   cache_contents = cache_contents_list.join(",\n")
   serviceworker = serviceworker.replace(/\[\[\[:cache_contents:\]\]\]/, cache_contents)

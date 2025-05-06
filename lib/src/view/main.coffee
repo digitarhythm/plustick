@@ -5,7 +5,6 @@ origintmp = window.location.href.replace(/\?.*$/, "")
 ORIGIN = origintmp.replace(/\/$/, "")
 PROTOCOL = (ORIGIN.match(/(^.*?):/))[1]
 SITEURL = "#{ORIGIN}/#{pkgname}"
-LANGUAGE = window.navigator.language
 PWA = window.PWA
 
 APPLICATION = undefined
@@ -255,9 +254,9 @@ window.addEventListener "DOMContentLoaded", ->
     if (PWA == "activate")
       if (navigator.serviceWorker?)
         if (NODE_ENV == "develop")
-          swfile = "serviceworker.develop.js"
+          swfile = "#{pkgname}/serviceworker.develop.js"
         else
-          swfile = "serviceworker.js"
+          swfile = "#{pkgname}/serviceworker.js"
         registration = await navigator.serviceWorker.register(swfile)
         if (typeof registration.update == 'function')
           registration.update()
