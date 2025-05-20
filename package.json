@@ -1,6 +1,6 @@
 {
   "name": "plustick",
-  "version": "1.45.0",
+  "version": "1.46.0",
   "description": "rapid build node.js frame work.",
   "main": "index.min.js",
   "scripts": {
