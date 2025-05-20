@@ -13,6 +13,22 @@ router.use(express.urlencoded({ extended: true }))
 
 NODE_ENV = process.env['NODE_ENV']
 
+__systemdir = fs.realpathSync(__dirname+"/../../..")
+__sysjsdir = "#{__systemdir}/lib/js"
+__sysjsctrl = "#{__sysjsdir}/control"
+
+PATHINFO = require("#{__sysjsctrl}/pathinfo.min.js")
+if (NODE_ENV == "develop")
+  ENVJSON = require("#{PATHINFO.appsdir}/config/develop.json")
+else
+  ENVJSON = require("#{PATHINFO.appsdir}/config/default.json")
+
+envpath = ENVJSON.application.path
+if (envpath == "")
+  SUBPATH = ""
+else
+  SUBPATH = "/#{envpath}"
+
 #=============================================================================
 # normal api
 #=============================================================================
@@ -25,7 +41,7 @@ router.all "/:endpoint", (req, res) ->
   headers['method'] = method
 
   if (NODE_ENV != "develop")
-    origin = headers.origin
+    origin = "#{headers.origin}#{SUBPATH}"
     referer = headers.referer.replace(/\/\?.*$/, "") || ""
     if (origin != referer.replace(/\/$/, ""))
       res.json(-1)
@@ -46,7 +62,7 @@ router.all "/:endpoint", (req, res) ->
     # make load Javascript file list
     jsfilelist = {}
     lists = await readFileList(pathinfo.usrjsview).catch (e) =>
-      echo e
+      console.log(e)
 
     jsfilelist['userjsview'] = []
     for fname in lists

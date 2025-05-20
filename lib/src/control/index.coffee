@@ -392,7 +392,7 @@ appget = (req, res) ->
   #----------------------------------
   # rendering HTML
   #----------------------------------
-  res.render "main",
+  render_param =
     pkgname: PKGNAME
     systemcss: SYSTEMCSS
     cssfilelist: CSSFILELIST
@@ -411,6 +411,8 @@ appget = (req, res) ->
     site_width: SITE_WIDTH
     site_height: SITE_HEIGHT
 
+  res.render "main", render_param
+
 #==========================================================================
 # Express dispatcher
 #==========================================================================
@@ -418,7 +420,7 @@ app.get "/", (req, res) ->
   address = req.headers['x-real-ip']
   address2 = req.headers['X-Forwarded-For']
   uagent = req.headers['user-agent']
-  echo("%@/%@, user-agent:%@", address, address2, uagent)
+  console.log("1: #{address}/#{address2} user-agent:#{uagent}")
   SUBPATH = ""
   appget(req, res)
 
@@ -426,7 +428,7 @@ app.get "/:name", (req, res) ->
   address = req.headers['x-real-ip']
   address2 = req.headers['X-Forwarded-For']
   uagent = req.headers['user-agent']
-  echo("%@/%@, user-agent:%@", address, address2, uagent)
+  console.log("2: #{address}/#{address2} user-agent:#{uagent}")
   name = req.params.name
   SUBPATH = "/#{name}/"
   appget(req, res)
