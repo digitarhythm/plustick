@@ -387,8 +387,8 @@ window.addEventListener "DOMContentLoaded", ->
       # create APPLICATION
       #------------------
       contents_size = fitContentsSize()
-      #APPLICATION.width = contents_size.width
-      #APPLICATION.height = contents_size.height
+      APPLICATION.vwidth = contents_size.width
+      APPLICATION.vheight = contents_size.height
       document.oncontextmenu = =>
         contextmenu = APPLICATION.contextmenu
         return contextmenu

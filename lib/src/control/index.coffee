@@ -339,6 +339,11 @@ appsInit = ->
 appget = (req, res) ->
   name = req.params.name
 
+  address = req.headers['x-real-ip']
+  address2 = req.headers['X-Forwarded-For']
+  uagent = req.headers['user-agent']
+  console.log("2: #{address}/#{address2} user-agent:#{uagent}")
+
   #----------------------------------
   # Template engine value
   #----------------------------------
@@ -417,18 +422,19 @@ appget = (req, res) ->
 # Express dispatcher
 #==========================================================================
 app.get "/", (req, res) ->
-  address = req.headers['x-real-ip']
-  address2 = req.headers['X-Forwarded-For']
-  uagent = req.headers['user-agent']
-  console.log("1: #{address}/#{address2} user-agent:#{uagent}")
   SUBPATH = ""
   appget(req, res)
 
 app.get "/:name", (req, res) ->
-  address = req.headers['x-real-ip']
-  address2 = req.headers['X-Forwarded-For']
-  uagent = req.headers['user-agent']
-  console.log("2: #{address}/#{address2} user-agent:#{uagent}")
+  echo("one path")
+  echo(req.params)
+  name = req.params.name
+  SUBPATH = "/#{name}/"
+  appget(req, res)
+
+app.get "/:name/:path", (req, res) ->
+  echo("two path")
+  echo(req.params)
   name = req.params.name
   SUBPATH = "/#{name}/"
   appget(req, res)
