@@ -383,20 +383,28 @@ class plustick_core
     headers['content-type'] = "application/json"
 
     apiuri = uri || endpoint
-    client = await axios.create
-      timeout: timeout
-      headers: headers
-      baseURL: "#{SITEURL}/api"
     switch method
       when "POST"
-        ret = await client.post(apiuri, data)
+        method = "POST"
       when "GET"
-        ret = await client.get(apiuri, data)
+        method = "GET"
+    fetch "#{SITEURL}/api/#{apiuri}",
+      method: method
+      mode: 'cors'
+      headers: headers
+      body: JSON.stringify(data)
+      signal: AbortSignal.timeout(timeout)
+    .then (response) =>
+      data = await response.json()
 
-    if (ret.data.error? && ret.data.error < 0)
-      return -2
-    else
-      return ret.data
+      if (!data?)
+        return undefined
+      else
+        return data
+
+    .catch (err) =>
+      if (err.name == "TimeoutError")
+        throw new Error("Timeout error.")
 
   #=========================================================================
   # copy object auto classification

@@ -283,18 +283,21 @@ window.addEventListener "DOMContentLoaded", ->
   # Get JS file list
   #------------------
   apiuri = "#{SITEURL}/api/__getappsinfo__"
-  ret = await axios
+  response = await fetch apiuri,
     method: "POST"
-    url: apiuri
+    mode: 'cors'
+    headers:
+      'Content-Type': 'application/json'
+  data = await response.json()
 
   #------------------
   # JS file load
   #------------------
-  if (ret.data.error? && ret.data.error < 0)
+  if (!data?)
     return
   else
-    jsfilelist = ret.data.jsfilelist['userjsview']
-    pathinfo = ret.data.pathinfo
+    jsfilelist = data.jsfilelist['userjsview']
+    pathinfo = data.pathinfo
     appsjson = pathinfo.appsjson
     sitejson = appsjson.site || {}
     snsjson = appsjson.sns || {}

@@ -426,15 +426,11 @@ app.get "/", (req, res) ->
   appget(req, res)
 
 app.get "/:name", (req, res) ->
-  echo("one path")
-  echo(req.params)
   name = req.params.name
   SUBPATH = "/#{name}/"
   appget(req, res)
 
 app.get "/:name/:path", (req, res) ->
-  echo("two path")
-  echo(req.params)
   name = req.params.name
   SUBPATH = "/#{name}/"
   appget(req, res)
