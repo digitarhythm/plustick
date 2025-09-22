@@ -213,6 +213,9 @@ function compile() {
 function optproc() {
   OPT2=$1
   case $OPT in
+    [i] )
+      echo "Project initialized."
+      ;;
     [b] )
       compile 0
       ;;
@@ -304,7 +307,7 @@ FIRSTBOOT=`environ_check`
 # valid option
 # 有効なオプション
 #---------------------------
-option=":bnwadth"
+option=":ibnwadth"
 
 #---------------------------
 # option loop
