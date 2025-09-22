@@ -14,6 +14,7 @@ function error() {
     [12] )
       echo "Usage:"
       echo "$APPSDIR [option]"
+      echo "  -i: application initialize"
       echo "  -b: build application"
       echo "  -n: create new class"
       echo "  -w: build application(source watch)"
