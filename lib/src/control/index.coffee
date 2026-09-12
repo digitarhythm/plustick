@@ -421,25 +421,27 @@ appget = (req, res) ->
 #==========================================================================
 # Express dispatcher
 #==========================================================================
-app.get "/", (req, res) ->
-  SUBPATH = ""
-  appget(req, res)
+routerBinding = ->
+  app.get "/", (req, res) ->
+    SUBPATH = ""
+    appget(req, res)
 
-app.get "/:name", (req, res) ->
-  name = req.params.name
-  SUBPATH = "/#{name}/"
-  appget(req, res)
+  app.get "/:name", (req, res) ->
+    name = req.params.name
+    SUBPATH = "/#{name}/"
+    appget(req, res)
 
-app.get "/:name/:path", (req, res) ->
-  name = req.params.name
-  SUBPATH = "/#{name}/"
-  appget(req, res)
+  app.get "/:name/:path", (req, res) ->
+    name = req.params.name
+    SUBPATH = "/#{name}/"
+    appget(req, res)
 
 #==========================================================================
 # execute modules
 #==========================================================================
 appsInit()
 directoryBinding()
+routerBinding()
 libfileInclude()
 generateManifest()
 generateServiceworker()
