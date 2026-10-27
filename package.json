@@ -27,24 +27,34 @@
   "homepage": "https://github.com/digitarhythm/plustick",
   "dependencies": {
     "argv": "0.0.2",
-    "axios": "^0.21.1",
     "bluebird": "^3.7.2",
     "coffeescript": "^2.5.1",
-    "config": "^3.3.2",
+    "config": "^5.0.1",
     "ect": "^0.5.9",
     "express": "^4.17.1",
     "fs-extra": "^9.0.1",
     "httpolyglot": "^0.1.2",
     "ndlog": "^0.3.2",
-    "net": "^1.0.2",
-    "node-dev": "^5.2.0",
-    "path": "^0.12.7",
-    "process": "^0.11.10",
-    "request": "^2.88.2",
-    "request-promise": "^4.2.6",
-    "sharp": "^0.28.3",
-    "sqlite3": "^5.0.0",
+    "node-dev": "^8.0.0",
+    "sharp": "^0.35.5",
+    "sqlite3": "^5.1.7",
     "terffee": "^1.7.2",
     "terser": "^5.3.2"
+  },
+  "overrides": {
+    "node-notifier": {
+      "uuid": "^11.1.1"
+    },
+    "sqlite3": {
+      "node-gyp": "^11.0.0",
+      "tar": "^7.5.21",
+      "prebuild-install": {
+        "minimist": "^1.2.6",
+        "simple-get": "^4.0.0"
+      }
+    }
+  },
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
   }
 }

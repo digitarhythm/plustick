@@ -11,7 +11,6 @@ fs = require("fs-extra")
 echo = require("ndlog").echo
 process = require("process")
 sharp = require("sharp")
-axios = require("axios")
 ECT = require("ect")
 
 __systemdir = fs.realpathSync(__dirname+"/../../..")
@@ -93,6 +92,7 @@ app.set("views", PATHINFO.templatedir)
 ectRenderer = ECT({ watch: true, root: PATHINFO.templatedir, ext : ".ect" })
 app.engine("ect", ectRenderer.render)
 app.set("view engine", "ect")
+app.disable("x-powered-by")
 
 #==========================================================================
 #==========================================================================
@@ -103,6 +103,22 @@ app.set("view engine", "ect")
 #==========================================================================
 #==========================================================================
 #==========================================================================
+
+#==========================================================================
+# security headers / https redirect
+#==========================================================================
+securityBinding = ->
+  app.use (req, res, next) ->
+    res.set("X-Content-Type-Options", "nosniff")
+    res.set("Referrer-Policy", "strict-origin-when-cross-origin")
+    next()
+
+  if (NETCONF?.protocol == "https")
+    app.use (req, res, next) ->
+      if (!req.secure)
+        res.redirect(301, "https://#{req.hostname}:#{LISTEN_PORT}#{req.originalUrl}")
+        return
+      next()
 
 #==========================================================================
 # uri directory binding
@@ -178,9 +194,23 @@ libfileInclude = ->
 #==========================================================================
 # get free port
 #==========================================================================
+__listenPorts = ->
+  # Linux: read listening sockets from /proc (no sudo required)
+  ports = []
+  for f in ["/proc/net/tcp", "/proc/net/tcp6"]
+    try
+      for line in fs.readFileSync(f, "utf8").split("\n").slice(1)
+        cols = line.trim().split(/\s+/)
+        if (cols[3] == "0A")
+          ports.push(parseInt(cols[1].split(":")[1], 16))
+  if (ports.length > 0)
+    return ports
+  # other OS: netstat (no sudo required for listening port list)
+  port = execSync("netstat -an | grep 'LISTEN ' | awk 'match($4, /[\:\.][0-9]*$/) {print substr($4, RSTART+1, RLENGTH)}' | sort -nu").toString().trim()
+  return port.split("\n")
+
 get_free_port = (start, num=1, exclude_port=[]) ->
-  port = execSync("sudo -i netstat -an | grep 'LISTEN ' | awk 'match($4, /[\:\.][0-9]*$/) {print substr($4, RSTART+1, RLENGTH)}' | sort -nu").toString().trim()
-  portlist = port.split("\n")
+  portlist = __listenPorts()
   exclude_port.forEach (p) ->
     portlist.push(p)
   freeport = []
@@ -215,14 +245,13 @@ generateManifest = ->
 # generate service worker
 #==============================================================================
 generateServiceworker = ->
-  uri = "#{START_URL}/api/__getappsinfo__"
   cache_contents_list = ["'/'", "  '#{SUBPATH}/#{PKGNAME}/view/appsmain.min.js'", "  '#{SUBPATH}/#{PKGNAME}/template/system.css'"]
 
+  JSFILELIST = []
   try
-    ret = await axios.get(uri)
-    JSFILELIST = ret.data.jsfilelist['userjsview']
-  catch
-    JSFILELIST = []
+    for fname in fs.readdirSync(PATHINFO.usrjsview)
+      if (fname.match(/^.*\.min\.js$/) && fname.match(/appsmain\.min\.js$/) == null)
+        JSFILELIST.push("#{PKGNAME}/view/#{fname}")
 
   serviceworker = fs.readFileSync(SERVICEWORKER_TMP, 'utf8')
   serviceworker = serviceworker.replace(/\[\[\[:name:\]\]\]/, PKGJSON.name)
@@ -295,10 +324,6 @@ startserver = ->
       console.log("listening HTTP:", LISTEN_PORT)
 
     when "https"
-      app.use (req, res, next) ->
-        if (!req.secure)
-          res.redirect(301, 'https://' + req.hostname + ':LISTEN_PORT' + req.originalUrl)
-        next()
       options =
         key: fs.readFileSync(NETCONF.ssl_key)
         cert: fs.readFileSync(NETCONF.ssl_cert)
@@ -340,7 +365,7 @@ appget = (req, res) ->
   name = req.params.name
 
   address = req.headers['x-real-ip']
-  address2 = req.headers['X-Forwarded-For']
+  address2 = req.headers['x-forwarded-for']
   uagent = req.headers['user-agent']
   console.log("2: #{address}/#{address2} user-agent:#{uagent}")
 
@@ -440,6 +465,7 @@ routerBinding = ->
 # execute modules
 #==========================================================================
 appsInit()
+securityBinding()
 directoryBinding()
 routerBinding()
 libfileInclude()

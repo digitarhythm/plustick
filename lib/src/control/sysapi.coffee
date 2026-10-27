@@ -33,52 +33,63 @@ else
 # normal api
 #=============================================================================
 router.all "/:endpoint", (req, res) ->
-  method = req.method
-  endpoint = req.params.endpoint
-  data = req.body
-  query = req.query
-  headers = req.headers
-  headers['method'] = method
+  try
+    method = req.method
+    endpoint = req.params.endpoint
+    data = req.body
+    query = req.query
+    headers = req.headers
+    headers['method'] = method
 
-  if (NODE_ENV != "develop")
-    origin = "#{headers.origin}#{SUBPATH}"
-    referer = headers.referer.replace(/\/\?.*$/, "") || ""
-    if (origin != referer.replace(/\/$/, ""))
-      res.json(-1)
-      return
+    if (NODE_ENV != "develop")
+      origin = "#{headers.origin || ""}#{SUBPATH}"
+      referer = (headers.referer || "").replace(/\/\?.*$/, "")
+      if (!headers.origin? || origin != referer.replace(/\/$/, ""))
+        res.json(-1)
+        return
 
-  #--------------------------
-  # get application info from server
-  #--------------------------
-  if (endpoint == "__getappsinfo__")
-    readFileList = (path) ->
-      return new Promise (resolve, reject) ->
-        fs.readdir path, (err, lists) ->
-          if (err)
-            reject(err)
-          else
-            resolve(lists)
+    #--------------------------
+    # get application info from server
+    #--------------------------
+    if (endpoint == "__getappsinfo__")
+      readFileList = (path) ->
+        return new Promise (resolve, reject) ->
+          fs.readdir path, (err, lists) ->
+            if (err)
+              reject(err)
+            else
+              resolve(lists)
 
-    # make load Javascript file list
-    jsfilelist = {}
-    lists = await readFileList(pathinfo.usrjsview).catch (e) =>
-      console.log(e)
+      # make load Javascript file list
+      jsfilelist = {}
+      lists = await readFileList(pathinfo.usrjsview).catch (e) =>
+        console.log(e)
 
-    jsfilelist['userjsview'] = []
-    for fname in lists
-      if (fname.match(/^.*\.min\.js$/))
-        if (fname.match(/appsmain\.min\.js$/) == null)
-          jsfilelist['userjsview'].push("#{pathinfo.pkgname}/view/#{fname}")
+      jsfilelist['userjsview'] = []
+      for fname in (lists || [])
+        if (fname.match(/^.*\.min\.js$/))
+          if (fname.match(/appsmain\.min\.js$/) == null)
+            jsfilelist['userjsview'].push("#{pathinfo.pkgname}/view/#{fname}")
 
-    res.json
-      jrror: 0
-      pathinfo: pathinfo
-      jsfilelist: jsfilelist
+      # do not expose server side directory paths
+      res.json
+        jrror: 0
+        pathinfo:
+          appsjson: pathinfo.appsjson
+          pkgname: pathinfo.pkgname
+        jsfilelist: jsfilelist
 
-  else
-    if (bind_router[endpoint]? && typeof(bind_router[endpoint]) == 'function')
-      ret = await (bind_router[endpoint])(headers, data, query)
-      res.json(ret)
+    else
+      # only endpoints registered by the application (not Object.prototype members)
+      if (Object.hasOwn(bind_router, endpoint) && typeof(bind_router[endpoint]) == 'function')
+        ret = await (bind_router[endpoint])(headers, data, query)
+        res.json(ret)
+      else
+        res.status(404).json(-1)
+
+  catch e
+    console.error(e)
+    res.status(500).json(-1) if (!res.headersSent)
 
 module.exports = router
 

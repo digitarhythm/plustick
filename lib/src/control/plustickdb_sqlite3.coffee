@@ -17,9 +17,7 @@ class plustickdb_sqlite3
   begin: ->
     return new Promise (resolve, reject) =>
       try
-        stmt = @_dbobject.prepare("BEGIN TRANSACTION")
-        stmt.run param, (err, rows) =>
-          #stmt.finalize()
+        @_dbobject.run "BEGIN TRANSACTION", (err) =>
           resolve
             err: 0
       catch e
@@ -29,9 +27,7 @@ class plustickdb_sqlite3
   commit: ->
     return new Promise (resolve, reject) =>
       try
-        stmt = @_dbobject.prepare("COMMIT")
-        stmt.run param, (err, rows) =>
-          #stmt.finalize()
+        @_dbobject.run "COMMIT", (err) =>
           resolve
             err: 0
       catch e
@@ -43,7 +39,7 @@ class plustickdb_sqlite3
       try
         stmt = @_dbobject.prepare(sql, param)
         stmt.run param, (err, rows) =>
-          #stmt.finalize()
+          stmt.finalize()
           resolve
             err: 0
       catch e
@@ -55,7 +51,7 @@ class plustickdb_sqlite3
       try
         stmt = @_dbobject.prepare(sql)
         stmt.all param, (err, rows) =>
-          #stmt.finalize()
+          stmt.finalize()
           resolve
             err: 0
             rows: rows
@@ -68,7 +64,7 @@ class plustickdb_sqlite3
       try
         stmt = @_dbobject.prepare(sql)
         stmt.all param, (err, rows) =>
-          #stmt.finalize()
+          stmt.finalize()
           resolve
             err: 0
             rows: rows
