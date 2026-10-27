@@ -11,6 +11,7 @@ fs = require("fs-extra")
 echo = require("ndlog").echo
 process = require("process")
 sharp = require("sharp")
+crypto = require("crypto")
 ECT = require("ect")
 
 __systemdir = fs.realpathSync(__dirname+"/../../..")
@@ -124,6 +125,14 @@ securityBinding = ->
 # uri directory binding
 #==========================================================================
 directoryBinding = ->
+  # service worker: allow the page to register it with the page scope
+  app.get ["#{SUBPATH}/#{PKGNAME}/serviceworker.js", "#{SUBPATH}/#{PKGNAME}/serviceworker.develop.js"], (req, res, next) ->
+    swfile = "#{PATHINFO.libdir}/#{path.basename(req.path)}"
+    if (!fs.existsSync(swfile))
+      return next()
+    res.set("Service-Worker-Allowed", "/")
+    res.set("Cache-Control", "no-cache")
+    res.sendFile(swfile)
   app.use("#{SUBPATH}/#{PKGNAME}", express.static(PATHINFO.libdir))
   app.use("#{SUBPATH}/#{PKGNAME}/plugin", express.static(PATHINFO.plugindir))
   app.use("#{SUBPATH}/#{PKGNAME}/stylesheet", express.static(PATHINFO.stylesheetdir))
@@ -244,35 +253,70 @@ generateManifest = ->
 #==============================================================================
 # generate service worker
 #==============================================================================
-generateServiceworker = ->
-  cache_contents_list = ["'/'", "  '#{SUBPATH}/#{PKGNAME}/view/appsmain.min.js'", "  '#{SUBPATH}/#{PKGNAME}/template/system.css'"]
+__isExternalUrl = (uri) ->
+  return /^([a-z][a-z0-9+.\-]*:)?\/\//i.test(uri)
 
+# hash of the files served to the browser (cache name changes when they change)
+__contentsHash = (extra) ->
+  hash = crypto.createHash("sha256")
+  hash.update(extra)
+  dirs = [PATHINFO.usrjsview, PATHINFO.plugindir, PATHINFO.stylesheetdir, PATHINFO.sysjsview, PATHINFO.syslibdir]
+  files = ["#{PATHINFO.templatedir}/system.css", "#{PATHINFO.templatedir}/main.ect", "#{PATHINFO.appsdir}/config/application.json"]
+  for dir in dirs
+    try
+      for fname in fs.readdirSync(dir).sort()
+        files.push("#{dir}/#{fname}")
+  for f in files
+    try
+      if (fs.statSync(f).isFile())
+        hash.update(f)
+        hash.update(fs.readFileSync(f))
+  return hash.digest("hex").substring(0, 12)
+
+generateServiceworker = ->
   JSFILELIST = []
   try
     for fname in fs.readdirSync(PATHINFO.usrjsview)
-      if (fname.match(/^.*\.min\.js$/) && fname.match(/appsmain\.min\.js$/) == null)
+      if (fname.match(/^.*\.min\.js$/) && fname.match(/(^|\/)appsmain\.min\.js$/) == null)
         JSFILELIST.push("#{PKGNAME}/view/#{fname}")
 
-  serviceworker = fs.readFileSync(SERVICEWORKER_TMP, 'utf8')
-  serviceworker = serviceworker.replace(/\[\[\[:name:\]\]\]/, PKGJSON.name)
-  serviceworker = serviceworker.replace(/\[\[\[:version:\]\]\]/, PKGJSON.version)
-
   SYSTEMCSS = "#{SUBPATH}/#{PKGNAME}/template/system.css"
-  CSSFILELIST.forEach (f) =>
-    cache_contents_list.push("  '#{SUBPATH}/#{f}'")
+  scope = "#{SUBPATH}/"
 
-  JSFILELIST.forEach (f) =>
-    cache_contents_list.push("  '#{SUBPATH}/#{f}'")
+  cache_contents_list = [
+    scope
+    "#{SUBPATH}/#{PKGNAME}/syslib/plustick.min.js"
+    "#{SUBPATH}/#{PKGNAME}/syslib/main.min.js"
+    "#{SUBPATH}/#{PKGNAME}/view/appsmain.min.js"
+    SYSTEMCSS
+    "#{SUBPATH}/#{MANIFEST_URI}"
+    "#{SUBPATH}/#{PKGNAME}/lib/img/icons/favicon.png"
+  ]
+  for f in [].concat(CSSFILELIST, JSFILELIST, JSSYSLIST)
+    if (!f?)
+      continue
+    if (__isExternalUrl(f))
+      cache_contents_list.push(f)
+    else if (f.match(/(^|\/)(apps)?main\.min\.js$/) == null)
+      cache_contents_list.push("#{SUBPATH}/#{f}")
+  cache_contents_list = cache_contents_list.filter (v, i, a) -> a.indexOf(v) == i
 
-  JSSYSLIST.forEach (f) =>
-    if (!f.match(/main\.min\.js/))
-      if (f.match(/^.*:\/\//))
-        cache_contents_list.push("  '#{f}'")
-      else
-        cache_contents_list.push("  '#{SUBPATH}/#{f}'")
+  plustickjson = require("#{PATHINFO.systemdir}/package.json")
+  cache_prefix = "#{PKGJSON.name}-caches-"
+  cache_hash = __contentsHash("#{plustickjson.version}\n#{JSON.stringify(cache_contents_list)}")
+  cache_name = "#{cache_prefix}#{PKGJSON.version}-#{cache_hash}"
 
-  cache_contents = cache_contents_list.join(",\n")
-  serviceworker = serviceworker.replace(/\[\[\[:cache_contents:\]\]\]/, cache_contents)
+  params =
+    cache_name: JSON.stringify(cache_name)
+    cache_prefix: JSON.stringify(cache_prefix)
+    cache_contents: JSON.stringify(cache_contents_list, null, 2)
+    page_url: JSON.stringify(scope)
+    api_path: JSON.stringify("#{SUBPATH}/#{PKGNAME}/api/")
+    develop: JSON.stringify(NODE_ENV == "develop")
+
+  serviceworker = fs.readFileSync(SERVICEWORKER_TMP, 'utf8')
+  serviceworker = serviceworker.replace /\[\[\[:([a-z_]+):\]\]\]/g, (m, key) ->
+    return if (params[key]?) then params[key] else m
   fs.writeFileSync(SERVICEWORKER_PATH, serviceworker, 'utf8')
 
 #==============================================================================

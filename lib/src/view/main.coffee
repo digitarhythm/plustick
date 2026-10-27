@@ -254,19 +254,34 @@ window.addEventListener "DOMContentLoaded", ->
     if (PWA == "activate")
       if (navigator.serviceWorker?)
         if (NODE_ENV == "develop")
-          swfile = "#{pkgname}/serviceworker.develop.js"
+          swfile = "#{SITEURL}/serviceworker.develop.js"
         else
-          swfile = "#{pkgname}/serviceworker.js"
-        registration = await navigator.serviceWorker.register(swfile)
-        if (typeof registration.update == 'function')
-          registration.update()
-        else
+          swfile = "#{SITEURL}/serviceworker.js"
+        # a failure of the service worker must not stop the application
+        try
+          registration = await navigator.serviceWorker.register(swfile, { scope: "#{ORIGIN}/" })
+          if (typeof registration.update == 'function')
+            registration.update().catch (e) ->
+              echo "Serviceworker update failed: #{e}"
+          else
+            PWA = "inactivate"
+        catch e
+          echo "Serviceworker registration failed: #{e}"
           PWA = "inactivate"
       else
         PWA = "inactivate"
 
     else if (PWA == "inactivate")
       echo "Serviceworker Inactivation."
+      # remove a service worker registered while PWA was active
+      if (navigator.serviceWorker?)
+        try
+          for reg in await navigator.serviceWorker.getRegistrations()
+            sw = reg.active || reg.waiting || reg.installing
+            if (sw? && sw.scriptURL.indexOf("/#{pkgname}/serviceworker") >= 0)
+              await reg.unregister()
+        catch e
+          echo "Serviceworker unregister failed: #{e}"
 
   #---------------------------------------------------------------------------
   # Gyro
