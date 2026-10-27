@@ -1,8 +1,27 @@
-sqlite3 = require('sqlite3').verbose()
+Database = require('better-sqlite3')
 echo = require("ndlog").echo
 fs = require("fs-extra")
 
 DBDIR = "#{APPSDIR}/apps/database"
+
+#==========================================================================
+# convert sqlite3 style parameters to better-sqlite3 arguments
+#   undefined / null   -> no parameter
+#   [1, 2]             -> positional parameters
+#   {$id: 1, ":n": 2}  -> named parameters (prefix removed)
+#   1                  -> single positional parameter
+#==========================================================================
+__bindParams = (param) ->
+  if (!param?)
+    return []
+  if (Array.isArray(param))
+    return param
+  if (typeof(param) == 'object')
+    named = {}
+    for key, val of param
+      named[key.replace(/^[\$:@]/, "")] = val
+    return [named]
+  return [param]
 
 class plustickdb_sqlite3
   constructor: ->
@@ -10,16 +29,16 @@ class plustickdb_sqlite3
   init:(dbname) ->
     try
       path = "#{DBDIR}/#{dbname}"
-      @_dbobject = new sqlite3.Database(path)
+      @_dbobject = new Database(path)
     catch e
       echo "error: #{e}"
 
   begin: ->
     return new Promise (resolve, reject) =>
       try
-        @_dbobject.run "BEGIN TRANSACTION", (err) =>
-          resolve
-            err: 0
+        @_dbobject.exec("BEGIN TRANSACTION")
+        resolve
+          err: 0
       catch e
         reject
           err: e
@@ -27,9 +46,9 @@ class plustickdb_sqlite3
   commit: ->
     return new Promise (resolve, reject) =>
       try
-        @_dbobject.run "COMMIT", (err) =>
-          resolve
-            err: 0
+        @_dbobject.exec("COMMIT")
+        resolve
+          err: 0
       catch e
         reject
           err: e
@@ -37,11 +56,13 @@ class plustickdb_sqlite3
   run:(sql, param) ->
     return new Promise (resolve, reject) =>
       try
-        stmt = @_dbobject.prepare(sql, param)
-        stmt.run param, (err, rows) =>
-          stmt.finalize()
-          resolve
-            err: 0
+        stmt = @_dbobject.prepare(sql)
+        if (stmt.reader)
+          stmt.all(__bindParams(param)...)
+        else
+          stmt.run(__bindParams(param)...)
+        resolve
+          err: 0
       catch e
         reject
           err: e
@@ -49,12 +70,10 @@ class plustickdb_sqlite3
   get:(sql, param) ->
     return new Promise (resolve, reject) =>
       try
-        stmt = @_dbobject.prepare(sql)
-        stmt.all param, (err, rows) =>
-          stmt.finalize()
-          resolve
-            err: 0
-            rows: rows
+        rows = @_dbobject.prepare(sql).all(__bindParams(param)...)
+        resolve
+          err: 0
+          rows: rows
       catch e
         reject
           err: e
@@ -62,12 +81,10 @@ class plustickdb_sqlite3
   all:(sql, param) ->
     return new Promise (resolve, reject) =>
       try
-        stmt = @_dbobject.prepare(sql)
-        stmt.all param, (err, rows) =>
-          stmt.finalize()
-          resolve
-            err: 0
-            rows: rows
+        rows = @_dbobject.prepare(sql).all(__bindParams(param)...)
+        resolve
+          err: 0
+          rows: rows
       catch e
         reject
           err: e
@@ -75,10 +92,8 @@ class plustickdb_sqlite3
   each:(sql, param, func) ->
     return new Promise (resolve, reject) =>
       try
-        stmt = @_dbobject.prepare(sql, param)
-        stmt.each (err, rows) =>
-          func(rows)
-        stmt.finalize()
+        for row from @_dbobject.prepare(sql).iterate(__bindParams(param)...)
+          func(row)
         resolve
           err: 0
       catch e
@@ -89,4 +104,3 @@ class plustickdb_sqlite3
     @_dbobject.close()
 
 module.exports = plustickdb_sqlite3
-

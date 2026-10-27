@@ -1,4 +1,3 @@
-sqlite3 = require('sqlite3').verbose()
 echo = require("ndlog").echo
 fs = require("fs-extra")
 

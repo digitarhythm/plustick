@@ -6,7 +6,7 @@
   "scripts": {
     "start": "pm2 start --name=`pwd` ./apps/js/control/index.min.js",
     "stop": "pm2 delete --name=`pwd` ./apps/js/control/index.min.js",
-    "debug": "NODE_ENV=develop node-dev ./apps/js/control/index.min.js"
+    "debug": "NODE_ENV=develop node --watch ./apps/js/control/index.min.js"
   },
   "repository": {
     "type": "git",
@@ -27,6 +27,7 @@
   "homepage": "https://github.com/digitarhythm/plustick",
   "dependencies": {
     "argv": "0.0.2",
+    "better-sqlite3": "^12.11.1",
     "bluebird": "^3.7.2",
     "coffeescript": "^2.5.1",
     "config": "^5.0.1",
@@ -35,24 +36,9 @@
     "fs-extra": "^9.0.1",
     "httpolyglot": "^0.1.2",
     "ndlog": "^0.3.2",
-    "node-dev": "^8.0.0",
     "sharp": "^0.35.5",
-    "sqlite3": "^5.1.7",
     "terffee": "^1.7.2",
     "terser": "^5.3.2"
-  },
-  "overrides": {
-    "node-notifier": {
-      "uuid": "^11.1.1"
-    },
-    "sqlite3": {
-      "node-gyp": "^11.0.0",
-      "tar": "^7.5.21",
-      "prebuild-install": {
-        "minimist": "^1.2.6",
-        "simple-get": "^4.0.0"
-      }
-    }
   },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"

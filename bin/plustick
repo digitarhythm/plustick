@@ -245,7 +245,7 @@ function optproc() {
       if [ $FIRSTBOOT -eq 1 ]; then
         compile 0
       fi
-      NODE_ENV=develop node-dev $MODULE/lib/js/control/index.min.js
+      NODE_ENV=develop node --watch $MODULE/lib/js/control/index.min.js
       ;;
     [t] )
       uid=`pwd -P`
